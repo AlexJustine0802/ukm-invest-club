@@ -9,9 +9,9 @@ export const site = {
   linkedin: "https://linkedin.com/",
   nav: [
     { label: "Home", href: "/" },
-    { label: "Events", href: "/events" },
-    { label: "Publications", href: "/publications" },
     { label: "About", href: "/about" },
+    { label: "Research", href: "/publications" },
+    { label: "Events", href: "/events" },
     { label: "Gallery", href: "/gallery" },
     { label: "Contact", href: "/contact" },
   ],
