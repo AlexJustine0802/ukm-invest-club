@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #0a2540;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-gold text-navy hover:bg-gold-light focus:ring-gold;
+  }
+
+  .btn-secondary {
+    @apply btn border border-navy/20 bg-white text-navy hover:bg-navy/5 focus:ring-navy;
+  }
+
+  .btn-navy {
+    @apply btn bg-navy text-white hover:bg-navy-light focus:ring-navy;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-600;
+  }
+
+  .card {
+    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md;
+  }
+
+  .input {
+    @apply block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-navy shadow-sm focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-navy;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
+
+/* Markdown / prose rendering */
+.prose-content {
+  @apply leading-relaxed text-slate-700;
+}
+.prose-content h1 {
+  @apply mb-4 mt-8 text-3xl font-bold text-navy;
+}
+.prose-content h2 {
+  @apply mb-3 mt-6 text-2xl font-bold text-navy;
+}
+.prose-content h3 {
+  @apply mb-2 mt-5 text-xl font-semibold text-navy;
+}
+.prose-content p {
+  @apply mb-4;
+}
+.prose-content ul {
+  @apply mb-4 list-disc space-y-1 pl-6;
+}
+.prose-content ol {
+  @apply mb-4 list-decimal space-y-1 pl-6;
+}
+.prose-content a {
+  @apply text-gold-dark underline hover:text-gold;
+}
+.prose-content blockquote {
+  @apply my-4 border-l-4 border-gold pl-4 italic text-slate-600;
+}
+.prose-content strong {
+  @apply font-semibold text-navy;
+}
+.prose-content code {
+  @apply rounded bg-slate-100 px-1.5 py-0.5 text-sm text-navy;
+}
+.prose-content img {
+  @apply my-4 rounded-lg;
+}
