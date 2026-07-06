@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #0a2540;
+  --background: #f8fafc;
+  --foreground: #1e293b;
 }
 
 html {
@@ -27,11 +27,11 @@ body {
   }
 
   .btn-primary {
-    @apply btn bg-gold text-navy hover:bg-gold-light focus:ring-gold;
+    @apply btn bg-primary text-white hover:bg-primary-dark focus:ring-primary;
   }
 
   .btn-secondary {
-    @apply btn border border-navy/20 bg-white text-navy hover:bg-navy/5 focus:ring-navy;
+    @apply btn border border-primary bg-white text-primary hover:bg-primary-light focus:ring-primary;
   }
 
   .btn-navy {
@@ -47,7 +47,7 @@ body {
   }
 
   .input {
-    @apply block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-navy shadow-sm focus:border-gold focus:outline-none focus:ring-1 focus:ring-gold;
+    @apply block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-navy shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary;
   }
 
   .label {
@@ -82,10 +82,10 @@ body {
   @apply mb-4 list-decimal space-y-1 pl-6;
 }
 .prose-content a {
-  @apply text-gold-dark underline hover:text-gold;
+  @apply text-primary underline hover:text-primary-dark;
 }
 .prose-content blockquote {
-  @apply my-4 border-l-4 border-gold pl-4 italic text-slate-600;
+  @apply my-4 border-l-4 border-primary pl-4 italic text-slate-600;
 }
 .prose-content strong {
   @apply font-semibold text-navy;

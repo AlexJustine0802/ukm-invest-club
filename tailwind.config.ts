@@ -8,19 +8,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        primary: {
+          DEFAULT: "#144DC8",
+          dark: "#103FA5",
+          light: "#DCE9FF",
+        },
         navy: {
-          DEFAULT: "#0A2540",
-          light: "#12395f",
-          dark: "#061829",
+          DEFAULT: "#1E293B",
+          light: "#334155",
+          dark: "#0F172A",
         },
-        gold: {
-          DEFAULT: "#C8A24B",
-          light: "#d8b96f",
-          dark: "#a5842f",
-        },
-        emerald: {
-          DEFAULT: "#10b981",
-        },
+        success: "#16A34A",
+        warning: "#F59E0B",
+        error: "#DC2626",
+        info: "#0EA5E9",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
