@@ -1,14 +1,15 @@
 import Link from "next/link";
+import { TrendingUp } from "lucide-react";
 import { site } from "@/lib/site";
 
 export default function Footer() {
   return (
-    <footer className="mt-20 bg-navy text-slate-300">
+    <footer className="mt-20 bg-navy-dark text-slate-300">
       <div className="container-page grid gap-8 py-12 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2 text-white">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold font-bold text-navy">
-              IC
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
+              <TrendingUp className="h-5 w-5" />
             </span>
             <span className="text-lg font-bold">{site.name}</span>
           </div>
@@ -26,7 +27,7 @@ export default function Footer() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-slate-400 transition-colors hover:text-gold"
+                  className="text-slate-400 transition-colors hover:text-primary-light"
                 >
                   {item.label}
                 </Link>
@@ -43,7 +44,7 @@ export default function Footer() {
             <li>
               <a
                 href={`mailto:${site.email}`}
-                className="text-slate-400 transition-colors hover:text-gold"
+                className="text-slate-400 transition-colors hover:text-primary-light"
               >
                 {site.email}
               </a>
@@ -53,7 +54,7 @@ export default function Footer() {
                 href={site.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 transition-colors hover:text-gold"
+                className="text-slate-400 transition-colors hover:text-primary-light"
               >
                 Instagram
               </a>
@@ -63,7 +64,7 @@ export default function Footer() {
                 href={site.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-slate-400 transition-colors hover:text-gold"
+                className="text-slate-400 transition-colors hover:text-primary-light"
               >
                 LinkedIn
               </a>
@@ -77,7 +78,7 @@ export default function Footer() {
           <p>
             © {new Date().getFullYear()} {site.fullName}. All rights reserved.
           </p>
-          <Link href="/admin" className="hover:text-gold">
+          <Link href="/admin" className="hover:text-primary-light">
             Admin
           </Link>
         </div>

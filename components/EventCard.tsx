@@ -34,7 +34,7 @@ export default function EventCard({ event }: EventCardProps) {
         <span
           className={`badge absolute left-3 top-3 ${
             upcoming
-              ? "bg-emerald text-white"
+              ? "bg-success text-white"
               : "bg-slate-200 text-slate-600"
           }`}
         >
@@ -42,10 +42,10 @@ export default function EventCard({ event }: EventCardProps) {
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-sm font-medium text-gold-dark">
+        <p className="text-sm font-medium text-primary">
           {formatDate(event.eventDate)}
         </p>
-        <h3 className="mt-1 text-lg font-bold text-navy group-hover:text-gold-dark">
+        <h3 className="mt-1 text-lg font-bold text-navy group-hover:text-primary">
           {event.title}
         </h3>
         {event.location && (

@@ -31,7 +31,7 @@ export default function ContactPage() {
                 <dd>
                   <a
                     href={`mailto:${site.email}`}
-                    className="text-slate-600 hover:text-gold-dark"
+                    className="text-slate-600 hover:text-primary"
                   >
                     {site.email}
                   </a>
@@ -47,7 +47,7 @@ export default function ContactPage() {
                     href={site.instagram}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-slate-600 hover:text-gold-dark"
+                    className="text-slate-600 hover:text-primary"
                   >
                     Follow us
                   </a>

@@ -35,10 +35,10 @@ export default function PublicationCard({ publication }: PublicationCardProps) {
         )}
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <p className="text-sm font-medium text-gold-dark">
+        <p className="text-sm font-medium text-primary">
           {formatDate(publication.publishedAt)}
         </p>
-        <h3 className="mt-1 text-lg font-bold text-navy group-hover:text-gold-dark">
+        <h3 className="mt-1 text-lg font-bold text-navy group-hover:text-primary">
           {publication.title}
         </h3>
         <p className="mt-2 line-clamp-3 flex-1 text-sm text-slate-600">

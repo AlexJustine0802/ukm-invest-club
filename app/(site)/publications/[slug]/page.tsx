@@ -32,13 +32,13 @@ export default async function PublicationDetailPage({ params }: Props) {
     <article className="container-page py-12">
       <Link
         href="/publications"
-        className="text-sm font-medium text-gold-dark hover:text-gold"
+        className="text-sm font-medium text-primary hover:text-primary-dark"
       >
         ← Back to publications
       </Link>
 
       <div className="mx-auto mt-6 max-w-3xl">
-        <p className="text-sm font-medium text-gold-dark">
+        <p className="text-sm font-medium text-primary">
           {formatDate(pub.publishedAt)}
           {pub.author && ` · ${pub.author}`}
         </p>

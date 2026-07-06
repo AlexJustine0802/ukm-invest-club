@@ -49,7 +49,7 @@ export default async function EventDetailPage({ params }: Props) {
       <div className="container-page py-12">
         <Link
           href="/events"
-          className="text-sm font-medium text-gold-dark hover:text-gold"
+          className="text-sm font-medium text-primary hover:text-primary-dark"
         >
           ← Back to events
         </Link>
@@ -57,7 +57,7 @@ export default async function EventDetailPage({ params }: Props) {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <span
             className={`badge ${
-              upcoming ? "bg-emerald text-white" : "bg-slate-200 text-slate-600"
+              upcoming ? "bg-success text-white" : "bg-slate-200 text-slate-600"
             }`}
           >
             {upcoming ? "Upcoming" : "Past event"}
