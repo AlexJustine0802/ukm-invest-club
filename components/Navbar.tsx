@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Search, Menu, X, TrendingUp } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { site } from "@/lib/site";
 
 export default function Navbar() {
@@ -16,11 +17,15 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 text-navy">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-            <TrendingUp className="h-5 w-5" />
-          </span>
-          <span className="text-lg font-bold tracking-tight">{site.name}</span>
+        <Link href="/" className="relative -left-12 flex items-center text-navy">
+          <Image
+            src="/images/logo-nobg.png"
+            alt={`${site.name} logo`}
+            width={156}
+            height={100}
+            priority
+            className="h-20 w-auto shrink-0 object-contain"
+          />
         </Link>
 
         {/* Desktop nav */}
@@ -51,14 +56,6 @@ export default function Navbar() {
           >
             Join Us
           </Link>
-          <button
-            type="button"
-            aria-label="Search"
-            className="hidden rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-navy md:inline-flex"
-          >
-            <Search className="h-5 w-5" />
-          </button>
-
           {/* Mobile toggle */}
           <button
             type="button"

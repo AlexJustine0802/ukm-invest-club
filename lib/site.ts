@@ -12,7 +12,6 @@ export const site = {
     { label: "About", href: "/about" },
     { label: "Research", href: "/publications" },
     { label: "Events", href: "/events" },
-    { label: "Gallery", href: "/gallery" },
     { label: "Contact", href: "/contact" },
   ],
 };

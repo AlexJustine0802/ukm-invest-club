@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, Calendar, Users, FileText, CalendarDays, Building2 } from "lucide-react";
+import { ArrowRight, Users, FileText, CalendarDays, Building2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import EventCard from "@/components/EventCard";
+import HeroCarousel from "@/components/HeroCarousel";
 import PublicationCard from "@/components/PublicationCard";
 import PartnerStrip from "@/components/PartnerStrip";
 
@@ -47,38 +48,32 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary-light/40 to-white">
-        <div className="container-page grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
-          <div className="animate-fade-up">
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Learn. Analyze. Grow Together.
-            </span>
-            <h1 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl lg:text-6xl">
-              Empowering Future{" "}
-              <span className="text-primary">Investors</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg text-slate-600">
-              {site.description}
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/publications" className="btn-primary">
-                Explore Research
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-              <Link href="/events" className="btn-secondary">
-                <Calendar className="mr-2 h-4 w-4" />
-                View Events
-              </Link>
-            </div>
-          </div>
+      <HeroCarousel />
 
-          {/* Static Market Overview widget */}
-          <MarketOverview
-            memberCount={memberCount}
-            pubCount={pubCount}
-            eventCount={eventCount}
-          />
+      {/* Impact */}
+      <section className="bg-slate-50 py-16">
+        <div className="container-page">
+          <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+            Our Impact
+          </span>
+          <div className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
+            {impact.map((stat) => (
+              <div
+                key={stat.label}
+                className="card flex items-center gap-4 p-6"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
+                  <stat.icon className="h-6 w-6" />
+                </span>
+                <div>
+                  <p className="text-2xl font-extrabold text-navy sm:text-3xl">
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-slate-500">{stat.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -169,113 +164,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* Impact */}
-      <section className="bg-slate-50 py-16">
-        <div className="container-page">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-            Our Impact
-          </span>
-          <div className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {impact.map((stat) => (
-              <div
-                key={stat.label}
-                className="card flex items-center gap-4 p-6"
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-                  <stat.icon className="h-6 w-6" />
-                </span>
-                <div>
-                  <p className="text-2xl font-extrabold text-navy sm:text-3xl">
-                    {stat.value}
-                  </p>
-                  <p className="text-sm text-slate-500">{stat.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <PartnerStrip />
     </>
-  );
-}
-
-function MarketOverview({
-  memberCount,
-  pubCount,
-  eventCount,
-}: {
-  memberCount: number;
-  pubCount: number;
-  eventCount: number;
-}) {
-  const tickers = [
-    { code: "BBCA", price: "9,525", change: "+1.34%", up: true },
-    { code: "TLKM", price: "2,820", change: "-0.70%", up: false },
-    { code: "BBRI", price: "4,730", change: "+0.85%", up: true },
-    { code: "BMRI", price: "6,125", change: "+1.30%", up: true },
-  ];
-
-  return (
-    <div className="card animate-fade-up p-6 shadow-md">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-slate-500">Market Overview</p>
-          <p className="text-xs text-slate-400">IHSG Index</p>
-        </div>
-        <span className="badge bg-success/10 text-success">1D</span>
-      </div>
-
-      <div className="mt-3 flex items-baseline gap-2">
-        <span className="text-3xl font-extrabold text-navy">7,274.44</span>
-        <span className="text-sm font-medium text-success">+1.24% (88.94)</span>
-      </div>
-
-      {/* decorative sparkline */}
-      <svg
-        viewBox="0 0 300 80"
-        className="mt-4 h-20 w-full"
-        preserveAspectRatio="none"
-      >
-        <polyline
-          fill="none"
-          stroke="#144DC8"
-          strokeWidth="2"
-          points="0,60 30,55 60,58 90,45 120,48 150,35 180,38 210,25 240,28 270,15 300,10"
-        />
-        <polygon
-          fill="#144DC8"
-          fillOpacity="0.08"
-          points="0,60 30,55 60,58 90,45 120,48 150,35 180,38 210,25 240,28 270,15 300,10 300,80 0,80"
-        />
-      </svg>
-
-      <div className="mt-4 grid grid-cols-3 gap-2 border-y border-slate-100 py-3 text-center">
-        <Stat value={`${pubCount}+`} label="Research" />
-        <Stat value={`${memberCount}+`} label="Members" />
-        <Stat value={`${eventCount}+`} label="Events" />
-      </div>
-
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-        {tickers.map((t) => (
-          <span key={t.code} className="font-medium text-slate-600">
-            {t.code}{" "}
-            <span className={t.up ? "text-success" : "text-error"}>
-              {t.price} {t.change}
-            </span>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div>
-      <p className="text-lg font-bold text-navy">{value}</p>
-      <p className="text-xs text-slate-400">{label}</p>
-    </div>
   );
 }

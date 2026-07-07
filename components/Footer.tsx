@@ -1,17 +1,20 @@
 import Link from "next/link";
-import { TrendingUp } from "lucide-react";
 import { site } from "@/lib/site";
+import Image from "next/image";
 
 export default function Footer() {
   return (
     <footer className="mt-20 bg-navy-dark text-slate-300">
       <div className="container-page grid gap-8 py-12 md:grid-cols-3">
         <div>
-          <div className="flex items-center gap-2 text-white">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-              <TrendingUp className="h-5 w-5" />
-            </span>
-            <span className="text-lg font-bold">{site.name}</span>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/logo.png"
+              alt="Investment Club Unpar"
+              width={180}
+              height={60}
+              className="h-20 w-auto"
+            />
           </div>
           <p className="mt-3 max-w-xs text-sm text-slate-400">
             {site.description}

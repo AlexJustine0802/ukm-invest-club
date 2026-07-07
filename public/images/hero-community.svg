@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" role="img" aria-labelledby="title desc">
+  <title id="title">Investment community</title>
+  <desc id="desc">Students collaborating around a laptop with chart panels.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="620" fill="url(#bg)"/>
+  <rect x="98" y="118" width="300" height="188" rx="24" fill="#fff" opacity=".9"/>
+  <rect x="128" y="156" width="210" height="18" rx="9" fill="#144dc8"/>
+  <rect x="128" y="200" width="150" height="16" rx="8" fill="#93c5fd"/>
+  <rect x="128" y="238" width="220" height="16" rx="8" fill="#bfdbfe"/>
+  <rect x="570" y="90" width="260" height="210" rx="24" fill="#fff" opacity=".92"/>
+  <polyline points="604,238 650,198 692,214 742,156 804,132" fill="none" stroke="#144dc8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="480" cy="530" rx="300" ry="44" fill="#93c5fd" opacity=".32"/>
+  <g>
+    <circle cx="350" cy="292" r="48" fill="#f3bf8f"/>
+    <path d="M276 500c16-96 54-144 114-144s98 48 114 144H276Z" fill="#144dc8"/>
+    <circle cx="506" cy="268" r="54" fill="#f0b27a"/>
+    <path d="M420 500c20-112 62-168 126-168s106 56 126 168H420Z" fill="#0f274b"/>
+    <circle cx="640" cy="306" r="46" fill="#e7a86d"/>
+    <path d="M570 500c15-88 51-132 108-132s92 44 108 132H570Z" fill="#1d4ed8"/>
+  </g>
+  <rect x="350" y="406" width="260" height="126" rx="18" fill="#fff"/>
+  <rect x="382" y="430" width="196" height="18" rx="9" fill="#144dc8"/>
+  <rect x="382" y="468" width="138" height="16" rx="8" fill="#93c5fd"/>
+  <rect x="382" y="498" width="172" height="16" rx="8" fill="#bfdbfe"/>
+</svg>

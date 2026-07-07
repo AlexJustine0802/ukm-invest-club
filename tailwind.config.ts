@@ -23,9 +23,6 @@ const config: Config = {
         error: "#DC2626",
         info: "#0EA5E9",
       },
-      fontFamily: {
-        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-      },
       container: {
         center: true,
         padding: "1rem",

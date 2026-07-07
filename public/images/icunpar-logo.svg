@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 360" role="img" aria-labelledby="title desc">
+  <title id="title">Investment Club Unpar logo</title>
+  <desc id="desc">Blue investment club icon with an upward arrow and wordmark.</desc>
+  <rect width="940" height="360" fill="#fff"/>
+  <g fill="#1457d9">
+    <circle cx="95" cy="113" r="28"/>
+    <path d="M92 166 52 137c-13 10-20 24-20 41v126c0 12 14 18 23 10l37-36V166Z"/>
+    <path d="M88 150h123c8 0 15 3 20 9l35 42H123L88 150Z"/>
+    <path d="M64 321h207l37 34c-8 8-19 13-31 13H67c-15 0-27-9-32-21l29-26Z"/>
+    <path d="M304 103h-36l64-91 65 91h-38v242l-28 27-27-27V103Z"/>
+    <rect x="121" y="224" width="38" height="76" rx="2"/>
+    <rect x="176" y="201" width="38" height="99" rx="2"/>
+    <rect x="232" y="163" width="38" height="137" rx="2"/>
+  </g>
+  <g font-family="Inter, Arial, sans-serif" font-weight="800">
+    <text x="440" y="150" font-size="72" fill="#0f274b">Investment</text>
+    <text x="440" y="235" font-size="72" fill="#1457d9">Club</text>
+    <text x="440" y="320" font-size="72" fill="#1457d9">Unpar</text>
+  </g>
+</svg>
