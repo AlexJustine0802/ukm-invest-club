@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
-  Building2,
   CalendarDays,
   ChevronDown,
   Clock,
-  Mail,
   MapPin,
-  MessageCircle,
-  Presentation,
-  Share2,
-  Trophy,
   Users,
-  Wrench,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import EventHeroSlider, {
+  type HeroEventSlide,
+} from "@/components/EventHeroSlider";
+import EventCategoriesInteractive, {
+  type EventCategoryWithPreview,
+} from "@/components/EventCategoriesInteractive";
 
 export const dynamic = "force-dynamic";
 
@@ -47,17 +45,11 @@ type DbEvent = {
   coverImage: string | null;
 };
 
-type EventCategory = {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-};
-
 const eventImages = [
   "/images/research-seminar.png",
   "/images/research-modeling.png",
   "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-  "https://images.unsplash.com/photo-1515169067865-5387ec356754?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
 ];
 
@@ -155,7 +147,7 @@ const fallbackPast: EventDisplay[] = [
     endDate: new Date("2026-03-10T12:00:00+07:00"),
     location: "Auditorium FEB Unpar",
     image:
-      "https://images.unsplash.com/photo-1515169067865-5387ec356754?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
     participants: "150+ Participants",
   },
   {
@@ -175,39 +167,6 @@ const fallbackPast: EventDisplay[] = [
 const fallbackSlugs = new Set(
   [...fallbackUpcoming, ...fallbackPast].map((event) => event.slug),
 );
-
-const eventCategories: EventCategory[] = [
-  {
-    title: "Seminar",
-    description: "Sesi berbagi ilmu dan wawasan mendalam",
-    icon: Building2,
-  },
-  {
-    title: "Workshop",
-    description: "Pelatihan praktis untuk mengasah keterampilan",
-    icon: Wrench,
-  },
-  {
-    title: "Talkshow",
-    description: "Diskusi inspiratif bersama para profesional",
-    icon: MessageCircle,
-  },
-  {
-    title: "Training",
-    description: "Program pelatihan terstruktur",
-    icon: Presentation,
-  },
-  {
-    title: "Competition",
-    description: "Kompetisi investasi dan analisis",
-    icon: Trophy,
-  },
-  {
-    title: "Networking",
-    description: "Bangun koneksi dan perluas relasi",
-    icon: Share2,
-  },
-];
 
 function cleanDescription(description: string) {
   return description
@@ -290,12 +249,10 @@ function eventHref(event: EventDisplay) {
 }
 
 function SectionHeader({
-  number,
   title,
   action,
   href = "/events",
 }: {
-  number: string;
   title: string;
   action?: string;
   href?: string;
@@ -303,7 +260,7 @@ function SectionHeader({
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
       <h2 className="text-sm font-extrabold uppercase tracking-tight text-navy">
-        <span className="text-primary">{number}.</span> {title}
+        {title}
       </h2>
       {action && (
         <Link
@@ -370,7 +327,7 @@ function UpcomingCard({ event }: { event: EventDisplay }) {
               {event.location}
             </p>
           </div>
-          <Link href={eventHref(event)} className="btn-navy mt-6 px-5 py-2 text-xs">
+          <Link href={eventHref(event)} className="btn-primary mt-6 px-5 py-2 text-xs">
             Register Now
           </Link>
         </div>
@@ -406,7 +363,7 @@ function CalendarRow({ event }: { event: EventDisplay }) {
           {event.location}
         </p>
       </div>
-      <Link href={eventHref(event)} className="btn-navy justify-self-start px-6 py-2 text-xs lg:justify-self-end">
+      <Link href={eventHref(event)} className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end">
         Register
       </Link>
     </div>
@@ -447,9 +404,10 @@ export default async function EventsPage() {
   const now = new Date();
   let upcomingEvents: DbEvent[] = [];
   let pastEvents: DbEvent[] = [];
+  let categoriesWithPreview: EventCategoryWithPreview[] = [];
 
   try {
-    [upcomingEvents, pastEvents] = await Promise.all([
+    const [upcomingRows, pastRows, categoryRows] = await Promise.all([
       prisma.event.findMany({
         where: { published: true, eventDate: { gte: now } },
         orderBy: { eventDate: "asc" },
@@ -460,7 +418,32 @@ export default async function EventsPage() {
         orderBy: { eventDate: "desc" },
         take: 4,
       }),
+      prisma.eventCategory.findMany({
+        orderBy: { order: "asc" },
+        include: {
+          events: {
+            where: { published: true, eventDate: { gte: now } },
+            orderBy: { eventDate: "asc" },
+            take: 3,
+          },
+        },
+      }),
     ]);
+    upcomingEvents = upcomingRows;
+    pastEvents = pastRows;
+    categoriesWithPreview = categoryRows.map((c) => ({
+      id: c.id,
+      title: c.title,
+      slug: c.slug,
+      description: c.description,
+      icon: c.icon,
+      events: c.events.map((e) => ({
+        slug: e.slug,
+        title: e.title,
+        dateLabel: formatFullDate(e.eventDate),
+        href: `/events/${e.slug}`,
+      })),
+    }));
   } catch (error) {
     console.warn("Unable to load events from database, using fallback content.", error);
   }
@@ -480,7 +463,15 @@ export default async function EventsPage() {
         }))
       : fallbackPast;
 
-  const featuredEvent = upcoming[0];
+  const heroSlides: HeroEventSlide[] = upcoming.slice(0, 5).map((event) => ({
+    slug: event.slug,
+    title: event.title,
+    image: event.image,
+    dateLabel: formatFullDate(event.date),
+    timeLabel: formatTimeRange(event.date, event.endDate),
+    location: event.location,
+    href: eventHref(event),
+  }));
 
   return (
     <div className="bg-white text-navy">
@@ -505,7 +496,7 @@ export default async function EventsPage() {
               di dunia investasi.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="#upcoming-events" className="btn-navy">
+              <Link href="#upcoming-events" className="btn-primary">
                 Upcoming Events
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
@@ -515,58 +506,12 @@ export default async function EventsPage() {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
-              <div className="relative h-[315px] sm:h-[390px]">
-                <Image
-                  src={featuredEvent.image}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 650px"
-                  className="object-cover"
-                />
-                <div className="absolute inset-x-7 bottom-7 max-w-sm rounded-lg bg-white p-6 shadow-xl">
-                  <TypeBadge type="Next Event" />
-                  <h2 className="mt-3 text-lg font-extrabold leading-6 text-navy">
-                    {featuredEvent.title}
-                  </h2>
-                  <div className="mt-4 space-y-2 text-sm font-semibold text-slate-600">
-                    <p className="flex items-center gap-2">
-                      <CalendarDays className="h-4 w-4 text-navy" />
-                      {formatFullDate(featuredEvent.date)}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-navy" />
-                      {formatTimeRange(featuredEvent.date, featuredEvent.endDate)}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-navy" />
-                      {featuredEvent.location}
-                    </p>
-                  </div>
-                  <Link
-                    href={eventHref(featuredEvent)}
-                    aria-label="Open next event"
-                    className="absolute bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full bg-navy text-white shadow-lg transition-transform hover:scale-105"
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-            <div className="mt-5 flex justify-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              <span className="h-2 w-2 rounded-full bg-slate-300" />
-              <span className="h-2 w-2 rounded-full bg-slate-300" />
-              <span className="h-2 w-2 rounded-full bg-slate-300" />
-            </div>
-          </div>
+          <EventHeroSlider slides={heroSlides} />
         </div>
       </section>
 
       <section id="upcoming-events" className="container-page py-9">
-        <SectionHeader number="1" title="Upcoming Events" action="View All Events" href="#calendar" />
+        <SectionHeader title="Upcoming Events" action="View All Events" href="/events/all" />
         <div className="grid gap-6 lg:grid-cols-3">
           {upcoming.slice(0, 3).map((event) => (
             <UpcomingCard key={event.slug} event={event} />
@@ -575,84 +520,34 @@ export default async function EventsPage() {
       </section>
 
       <section className="container-page border-t border-slate-100 py-9">
-        <SectionHeader number="2" title="Event Categories" />
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
-          {eventCategories.map((category) => (
-            <article
-              key={category.title}
-              className="rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
-            >
-              <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-primary">
-                <category.icon className="h-8 w-8" />
-              </span>
-              <h3 className="mt-5 text-base font-extrabold text-navy">
-                {category.title}
-              </h3>
-              <p className="mt-3 text-sm font-medium leading-6 text-slate-600">
-                {category.description}
-              </p>
-            </article>
-          ))}
-        </div>
+        <SectionHeader title="Event Categories" />
+        <EventCategoriesInteractive categories={categoriesWithPreview} />
       </section>
 
       <section id="calendar" className="container-page border-t border-slate-100 py-9">
-        <SectionHeader number="3" title="Upcoming Events Calendar" action="View Calendar" href="#calendar" />
+        <SectionHeader title="Upcoming Events Calendar" action="View All Events" href="/events/all" />
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           {upcoming.slice(0, 5).map((event) => (
             <CalendarRow key={event.slug} event={event} />
           ))}
         </div>
         <div className="mt-5 flex justify-center">
-          <button
-            type="button"
+          <Link
+            href="/events/all"
             className="inline-flex min-w-72 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-navy shadow-sm transition-colors hover:bg-slate-50"
           >
             Load More Events
             <ChevronDown className="h-4 w-4" />
-          </button>
+          </Link>
         </div>
       </section>
 
       <section id="past-events" className="container-page border-t border-slate-100 py-9">
-        <SectionHeader number="4" title="Past Events Highlights" action="View All Past Events" href="#past-events" />
+        <SectionHeader title="Past Events Highlights" action="View All Past Events" href="/events/all?tab=latest" />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {past.slice(0, 4).map((event) => (
             <PastEventCard key={event.slug} event={event} />
           ))}
-        </div>
-      </section>
-
-      <section className="container-page pb-8 pt-2">
-        <div className="relative overflow-hidden rounded-lg bg-navy-dark p-7 text-white shadow-lg">
-          <div className="absolute right-0 top-0 h-full w-44 bg-[radial-gradient(circle_at_center,#93b4ff_1.4px,transparent_1.4px)] opacity-75 [background-size:20px_20px]" />
-          <div className="relative grid items-center gap-6 lg:grid-cols-[auto_1fr_auto]">
-            <span className="flex h-14 w-14 items-center justify-center rounded-lg border border-white/40 text-white">
-              <Mail className="h-8 w-8" />
-            </span>
-            <div>
-              <h2 className="text-2xl font-extrabold">
-                Jangan Lewatkan Event Menarik!
-              </h2>
-              <p className="mt-2 text-sm text-blue-100">
-                Dapatkan informasi terbaru tentang event dan kegiatan kami.
-              </p>
-            </div>
-            <form className="flex w-full flex-col gap-3 sm:flex-row lg:w-[420px]">
-              <label htmlFor="event-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="event-email"
-                type="email"
-                placeholder="Enter your email"
-                className="min-h-11 flex-1 rounded-md border border-white/20 bg-white/10 px-4 text-sm text-white outline-none placeholder:text-blue-100 focus:border-white/50"
-              />
-              <button type="submit" className="btn-primary min-h-11 px-6">
-                Subscribe
-              </button>
-            </form>
-          </div>
         </div>
       </section>
     </div>

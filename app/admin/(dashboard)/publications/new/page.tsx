@@ -1,9 +1,17 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import PublicationForm from "@/components/admin/PublicationForm";
 import { createPublication } from "../actions";
 
-export default function NewPublicationPage() {
+export const dynamic = "force-dynamic";
+
+export default async function NewPublicationPage() {
+  const categories = await prisma.researchCategory.findMany({
+    orderBy: { order: "asc" },
+    select: { id: true, title: true },
+  });
+
   return (
     <div>
       <Link
@@ -17,6 +25,7 @@ export default function NewPublicationPage() {
         <PublicationForm
           action={createPublication}
           uploadEnabled={isBlobConfigured()}
+          categories={categories}
         />
       </div>
     </div>

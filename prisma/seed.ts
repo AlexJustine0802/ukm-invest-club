@@ -11,6 +11,61 @@ function daysFromNow(days: number): Date {
 async function main() {
   console.log("Seeding database...");
 
+  // --- Event categories ---
+  await prisma.event.updateMany({ data: { categoryId: null } });
+  await prisma.eventCategory.deleteMany();
+
+  const eventCategoryDefs = [
+    {
+      title: "Seminar",
+      slug: "seminar",
+      description: "Sesi berbagi ilmu dan wawasan mendalam",
+      icon: "Building2",
+      order: 1,
+    },
+    {
+      title: "Workshop",
+      slug: "workshop",
+      description: "Pelatihan praktis untuk mengasah keterampilan",
+      icon: "Wrench",
+      order: 2,
+    },
+    {
+      title: "Talkshow",
+      slug: "talkshow",
+      description: "Diskusi inspiratif bersama para profesional",
+      icon: "MessageCircle",
+      order: 3,
+    },
+    {
+      title: "Training",
+      slug: "training",
+      description: "Program pelatihan terstruktur",
+      icon: "Presentation",
+      order: 4,
+    },
+    {
+      title: "Competition",
+      slug: "competition",
+      description: "Kompetisi investasi dan analisis",
+      icon: "Trophy",
+      order: 5,
+    },
+    {
+      title: "Networking",
+      slug: "networking",
+      description: "Bangun koneksi dan perluas relasi",
+      icon: "Share2",
+      order: 6,
+    },
+  ];
+
+  const eventCategories: Record<string, string> = {};
+  for (const c of eventCategoryDefs) {
+    const created = await prisma.eventCategory.create({ data: c });
+    eventCategories[c.slug] = created.id;
+  }
+
   // --- Events ---
   await prisma.event.deleteMany();
   await prisma.event.createMany({
@@ -25,6 +80,7 @@ async function main() {
         coverImage:
           "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80",
         published: true,
+        categoryId: eventCategories["training"],
       },
       {
         title: "Weekly Market Recap & Discussion",
@@ -36,6 +92,7 @@ async function main() {
         coverImage:
           "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80",
         published: true,
+        categoryId: eventCategories["talkshow"],
       },
       {
         title: "Guest Talk: Investing in Indonesian Blue Chips",
@@ -47,9 +104,126 @@ async function main() {
         coverImage:
           "https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=1200&q=80",
         published: true,
+        categoryId: eventCategories["talkshow"],
+      },
+      {
+        title: "Investment Outlook 2026: Navigating the Uncertainty",
+        slug: "investment-outlook-2026",
+        description:
+          "Analisis kondisi pasar global dan strategi investasi di tengah ketidakpastian ekonomi bersama para praktisi pasar modal.",
+        eventDate: daysFromNow(14),
+        location: "Auditorium FEB Unpar",
+        coverImage: "/images/research-seminar.png",
+        published: true,
+        categoryId: eventCategories["seminar"],
+      },
+      {
+        title: "Financial Modeling for Investment Analysis",
+        slug: "financial-modeling-for-investment-analysis",
+        description:
+          "Belajar membangun model keuangan untuk analisis dan valuasi perusahaan secara hands-on.",
+        eventDate: daysFromNow(28),
+        location: "Lab. Capital Market",
+        coverImage: "/images/research-modeling.png",
+        published: true,
+        categoryId: eventCategories["workshop"],
+      },
+      {
+        title: "ICU Investment Challenge 2026",
+        slug: "icu-investment-challenge-2026",
+        description:
+          "Kompetisi analisis investasi untuk mengasah kemampuan riset dan presentasi mahasiswa.",
+        eventDate: daysFromNow(45),
+        location: "Auditorium FEB Unpar",
+        coverImage:
+          "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        categoryId: eventCategories["competition"],
+      },
+      {
+        title: "Economic Outlook 2026",
+        slug: "economic-outlook-2026",
+        description: "Market outlook seminar with guest speakers.",
+        eventDate: daysFromNow(-30),
+        location: "Auditorium FEB Unpar",
+        coverImage:
+          "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        categoryId: eventCategories["seminar"],
+      },
+      {
+        title: "Technical Analysis Workshop",
+        slug: "technical-analysis-workshop",
+        description: "Hands-on session for reading charts and indicators.",
+        eventDate: daysFromNow(-45),
+        location: "Lab. Capital Market",
+        coverImage:
+          "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        categoryId: eventCategories["workshop"],
+      },
+      {
+        title: "ICU Bonding & Networking Night",
+        slug: "icu-bonding-networking-night",
+        description:
+          "Malam santai untuk mempererat hubungan antar anggota sekaligus membangun relasi baru.",
+        eventDate: daysFromNow(-60),
+        location: "Ballroom Hotel",
+        coverImage:
+          "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        categoryId: eventCategories["networking"],
       },
     ],
   });
+
+  // --- Research categories ---
+  await prisma.publication.updateMany({ data: { categoryId: null } });
+  await prisma.researchCategory.deleteMany();
+
+  const categoryDefs = [
+    {
+      title: "Equity Research",
+      slug: "equity-research",
+      description: "Analisis saham & sektor",
+      icon: "PieChart",
+      order: 1,
+    },
+    {
+      title: "Macroeconomics",
+      slug: "macroeconomics",
+      description: "Analisis ekonomi makro",
+      icon: "BarChart3",
+      order: 2,
+    },
+    {
+      title: "Fixed Income",
+      slug: "fixed-income",
+      description: "Analisis obligasi & suku bunga",
+      icon: "CircleDollarSign",
+      order: 3,
+    },
+    {
+      title: "Industry Analysis",
+      slug: "industry-analysis",
+      description: "Analisis industri & bisnis",
+      icon: "TrendingUp",
+      order: 4,
+    },
+    {
+      title: "Global Market",
+      slug: "global-market",
+      description: "Analisis pasar global",
+      icon: "Globe2",
+      order: 5,
+    },
+  ];
+
+  const categories: Record<string, string> = {};
+  for (const c of categoryDefs) {
+    const created = await prisma.researchCategory.create({ data: c });
+    categories[c.slug] = created.id;
+  }
 
   // --- Publications ---
   await prisma.publication.deleteMany();
@@ -67,6 +241,8 @@ async function main() {
           "https://images.unsplash.com/photo-1434626881859-194d67b2b86f?auto=format&fit=crop&w=1200&q=80",
         published: true,
         publishedAt: daysFromNow(-3),
+        categoryId: categories["equity-research"],
+        featured: false,
       },
       {
         title: "How to Read a Company's Balance Sheet",
@@ -80,6 +256,8 @@ async function main() {
           "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80",
         published: true,
         publishedAt: daysFromNow(-10),
+        categoryId: categories["equity-research"],
+        featured: false,
       },
       {
         title: "Diversification: Don't Put All Your Eggs in One Basket",
@@ -93,6 +271,134 @@ async function main() {
           "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&w=1200&q=80",
         published: true,
         publishedAt: daysFromNow(-20),
+        categoryId: categories["industry-analysis"],
+        featured: false,
+      },
+      {
+        title: "Indonesia Economic Outlook 2024",
+        slug: "indonesia-economic-outlook-2024",
+        excerpt:
+          "Peluang dan tantangan sektor perbankan di tengah kondisi ekonomi global.",
+        content:
+          "## Ringkasan\n\nEkonomi Indonesia diperkirakan tumbuh moderat pada 2024, ditopang konsumsi domestik yang tetap kuat meski suku bunga masih tinggi.\n\n### Sorotan Sektor Perbankan\n\n- Pertumbuhan kredit stabil di kisaran 9-11%.\n- NIM (Net Interest Margin) sedikit tertekan akibat biaya dana yang naik.\n- Kualitas aset tetap terjaga dengan rasio NPL yang rendah.\n\n### Kesimpulan\n\nSektor perbankan tetap menjadi salah satu sektor paling defensif untuk dicermati investor sepanjang 2024.",
+        author: "ICUnpar Research Team",
+        coverImage: "/images/research-building.png",
+        published: true,
+        publishedAt: daysFromNow(-1),
+        categoryId: categories["macroeconomics"],
+        featured: true,
+        featuredOrder: 1,
+        pageCount: 24,
+        badge: "Latest Research",
+      },
+      {
+        title: "Policy Rate Monitor: BI Rate Decision Recap",
+        slug: "policy-rate-monitor",
+        excerpt:
+          "Ringkasan keputusan BI dan implikasi ke pasar modal untuk kuartal ini.",
+        content:
+          "## Keputusan BI Rate\n\nBank Indonesia mempertahankan suku bunga acuan pada level saat ini, sejalan dengan ekspektasi pasar.\n\n### Implikasi ke Pasar\n\nPasar obligasi dan saham merespons secara terbatas, dengan fokus investor bergeser ke data inflasi berikutnya.",
+        author: "ICUnpar Research Team",
+        coverImage:
+          "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        publishedAt: daysFromNow(-6),
+        categoryId: categories["macroeconomics"],
+        featured: true,
+        featuredOrder: 2,
+        pageCount: 12,
+      },
+      {
+        title: "Indonesia Bond Market Update",
+        slug: "indonesia-bond-market-update",
+        excerpt:
+          "Yield curve, SUN benchmark, dan sentimen obligasi terkini.",
+        content:
+          "## Yield Curve\n\nYield SUN benchmark tenor 10 tahun bergerak relatif stabil, mencerminkan ekspektasi pasar terhadap arah suku bunga global.\n\n### Sentimen\n\nAliran dana asing ke pasar obligasi domestik tetap positif secara year-to-date.",
+        author: "ICUnpar Research Team",
+        coverImage:
+          "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        publishedAt: daysFromNow(-8),
+        categoryId: categories["fixed-income"],
+        featured: true,
+        featuredOrder: 3,
+        pageCount: 18,
+      },
+      {
+        title: "Duration & Convexity: A Practical Guide",
+        slug: "duration-and-convexity-guide",
+        excerpt:
+          "Panduan praktis membaca risiko harga obligasi bagi investor pemula.",
+        content:
+          "## Apa itu Duration?\n\nDuration mengukur sensitivitas harga obligasi terhadap perubahan suku bunga. Semakin tinggi duration, semakin besar risiko perubahan harga.\n\n### Convexity\n\nConvexity melengkapi duration dengan menangkap sifat non-linear dari hubungan harga dan yield.",
+        author: "ICUnpar Research Team",
+        coverImage:
+          "https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        publishedAt: daysFromNow(-15),
+        categoryId: categories["fixed-income"],
+        featured: false,
+      },
+      {
+        title: "Consumer Sector Update: Margins Under Pressure",
+        slug: "consumer-sector-update",
+        excerpt:
+          "Tren margin, daya beli, dan strategi emiten konsumer menghadapi 2024.",
+        content:
+          "## Tekanan Margin\n\nKenaikan biaya bahan baku dan distribusi menekan margin emiten konsumer, meski volume penjualan tetap bertumbuh.\n\n### Strategi Emiten\n\nBeberapa emiten mulai melakukan reformulasi produk dan efisiensi rantai pasok untuk menjaga profitabilitas.",
+        author: "ICUnpar Research Team",
+        coverImage: "/images/research-modeling.png",
+        published: true,
+        publishedAt: daysFromNow(-4),
+        categoryId: categories["industry-analysis"],
+        featured: true,
+        featuredOrder: 4,
+        pageCount: 16,
+      },
+      {
+        title: "Digital Economy Radar",
+        slug: "digital-economy-radar",
+        excerpt:
+          "Peta peluang bisnis teknologi dan platform digital di Indonesia.",
+        content:
+          "## Peta Peluang\n\nSektor e-commerce dan fintech tetap menjadi motor pertumbuhan ekonomi digital Indonesia, dengan adopsi pembayaran digital yang terus meningkat.",
+        author: "ICUnpar Research Team",
+        coverImage:
+          "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        publishedAt: daysFromNow(-18),
+        categoryId: categories["industry-analysis"],
+        featured: false,
+      },
+      {
+        title: "Global Market Weekly",
+        slug: "global-market-weekly",
+        excerpt:
+          "Update indeks global, komoditas, dan aliran dana asing minggu ini.",
+        content:
+          "## Ringkasan Global\n\nIndeks saham global bergerak variatif, dengan sentimen pasar dipengaruhi oleh data inflasi Amerika Serikat dan pergerakan harga komoditas.",
+        author: "ICUnpar Research Team",
+        coverImage: "/images/research-seminar.png",
+        published: true,
+        publishedAt: daysFromNow(-2),
+        categoryId: categories["global-market"],
+        featured: false,
+      },
+      {
+        title: "FX & Commodities Brief",
+        slug: "fx-and-commodities-brief",
+        excerpt:
+          "Ringkasan pergerakan USD, minyak, emas, dan dampaknya ke Indonesia.",
+        content:
+          "## Nilai Tukar\n\nRupiah bergerak dalam rentang terbatas terhadap dolar AS, dipengaruhi oleh ekspektasi kebijakan The Fed.\n\n### Komoditas\n\nHarga minyak dan emas tetap menjadi faktor kunci bagi neraca perdagangan Indonesia.",
+        author: "ICUnpar Research Team",
+        coverImage:
+          "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80",
+        published: true,
+        publishedAt: daysFromNow(-12),
+        categoryId: categories["global-market"],
+        featured: false,
       },
     ],
   });
@@ -184,6 +490,143 @@ async function main() {
       },
     ],
   });
+
+  // --- Community moments ---
+  await prisma.momentPhoto.deleteMany();
+  await prisma.moment.deleteMany();
+
+  const moments: {
+    title: string;
+    category: string;
+    date: Date;
+    coverImage: string;
+    order: number;
+    photos: string[];
+  }[] = [
+    {
+      title: "Financial Modeling & Valuation Workshop",
+      category: "Workshop",
+      date: new Date("2025-04-12"),
+      coverImage: "/images/research-modeling.png",
+      order: 1,
+      photos: [
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "Company Visit to IDX Building",
+      category: "Company Visit",
+      date: new Date("2025-02-21"),
+      coverImage: "/images/research-building.png",
+      order: 2,
+      photos: [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "Market Outlook 2025",
+      category: "Seminar",
+      date: new Date("2025-03-15"),
+      coverImage: "/images/research-seminar.png",
+      order: 3,
+      photos: [
+        "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "Weekly Research Meeting",
+      category: "Research",
+      date: daysFromNow(-2),
+      coverImage: "/images/hero-community.svg",
+      order: 4,
+      photos: [
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "ICU Recruitment 2025",
+      category: "Internal Gathering",
+      date: new Date("2025-01-18"),
+      coverImage:
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1000&q=80",
+      order: 5,
+      photos: [
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "Investment Challenge 2025",
+      category: "Competition",
+      date: new Date("2025-05-24"),
+      coverImage:
+        "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1000&q=80",
+      order: 6,
+      photos: [
+        "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "ICU Bonding Night",
+      category: "Bonding",
+      date: new Date("2025-04-05"),
+      coverImage:
+        "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80",
+      order: 7,
+      photos: [
+        "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "Valuation Bootcamp",
+      category: "Workshop",
+      date: new Date("2025-03-02"),
+      coverImage: "/images/research-modeling.png",
+      order: 8,
+      photos: [
+        "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+    {
+      title: "Guest Speaker: Portfolio Management",
+      category: "Seminar",
+      date: new Date("2025-02-08"),
+      coverImage: "/images/research-seminar.png",
+      order: 9,
+      photos: [
+        "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=800&q=80",
+      ],
+    },
+  ];
+
+  for (const m of moments) {
+    await prisma.moment.create({
+      data: {
+        title: m.title,
+        category: m.category,
+        date: m.date,
+        coverImage: m.coverImage,
+        order: m.order,
+        photos: {
+          create: m.photos.map((imageUrl, i) => ({ imageUrl, order: i })),
+        },
+      },
+    });
+  }
 
   console.log("Seeding complete.");
 }

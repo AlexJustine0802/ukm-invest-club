@@ -8,6 +8,7 @@ import { toDateTimeLocalValue } from "@/lib/utils";
 interface EventFormProps {
   action: (formData: FormData) => void;
   uploadEnabled: boolean;
+  categories: { id: string; title: string }[];
   event?: {
     id: string;
     title: string;
@@ -16,12 +17,14 @@ interface EventFormProps {
     location: string | null;
     coverImage: string | null;
     published: boolean;
+    categoryId: string | null;
   };
 }
 
 export default function EventForm({
   action,
   uploadEnabled,
+  categories,
   event,
 }: EventFormProps) {
   return (
@@ -69,6 +72,25 @@ export default function EventForm({
             className="input"
           />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="categoryId" className="label">
+          Category
+        </label>
+        <select
+          id="categoryId"
+          name="categoryId"
+          defaultValue={event?.categoryId ?? ""}
+          className="input"
+        >
+          <option value="">None</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.title}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>

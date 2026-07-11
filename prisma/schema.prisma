@@ -19,7 +19,24 @@ model Event {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  categoryId String?
+  category   EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
   @@index([eventDate])
+  @@index([categoryId])
+}
+
+model EventCategory {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String?
+  icon        String   @default("Building2")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  events      Event[]
+
+  @@index([order])
 }
 
 model Publication {
@@ -35,7 +52,29 @@ model Publication {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  categoryId    String?
+  category      ResearchCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  featured      Boolean           @default(false)
+  featuredOrder Int               @default(0)
+  pageCount     Int?
+  badge         String?
+
   @@index([publishedAt])
+  @@index([categoryId])
+  @@index([featured, featuredOrder])
+}
+
+model ResearchCategory {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  description  String?
+  icon         String        @default("PieChart")
+  order        Int           @default(0)
+  createdAt    DateTime      @default(now())
+  publications Publication[]
+
+  @@index([order])
 }
 
 model TeamMember {
@@ -61,4 +100,30 @@ model GalleryImage {
   createdAt DateTime @default(now())
 
   @@index([order])
+}
+
+model Moment {
+  id         String        @id @default(cuid())
+  title      String
+  category   String
+  date       DateTime
+  coverImage String
+  order      Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  photos     MomentPhoto[]
+
+  @@index([order])
+  @@index([category])
+}
+
+model MomentPhoto {
+  id        String   @id @default(cuid())
+  momentId  String
+  moment    Moment   @relation(fields: [momentId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([momentId, order])
 }

@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPublicationsPage() {
   const publications = await prisma.publication.findMany({
+    include: { category: true },
     orderBy: { publishedAt: "desc" },
   });
 
@@ -37,6 +38,7 @@ export default async function AdminPublicationsPage() {
             <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-medium">Title</th>
+                <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Published</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -50,6 +52,14 @@ export default async function AdminPublicationsPage() {
                     {pub.author && (
                       <p className="text-xs text-slate-400">{pub.author}</p>
                     )}
+                    {pub.featured && (
+                      <span className="badge mt-1 bg-primary-light text-primary">
+                        Featured
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {pub.category?.title ?? "—"}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {formatDate(pub.publishedAt)}

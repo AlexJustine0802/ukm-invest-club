@@ -13,7 +13,13 @@ export default async function EditEventPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const event = await prisma.event.findUnique({ where: { id } });
+  const [event, categories] = await Promise.all([
+    prisma.event.findUnique({ where: { id } }),
+    prisma.eventCategory.findMany({
+      orderBy: { order: "asc" },
+      select: { id: true, title: true },
+    }),
+  ]);
   if (!event) notFound();
 
   return (
@@ -29,6 +35,7 @@ export default async function EditEventPage({
         <EventForm
           action={updateEvent}
           uploadEnabled={isBlobConfigured()}
+          categories={categories}
           event={event}
         />
       </div>

@@ -17,14 +17,17 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="relative -left-12 flex items-center text-navy">
+        <Link
+          href="/"
+          className="relative left-0 flex shrink-0 items-center text-navy md:-left-12"
+        >
           <Image
             src="/images/logo-nobg.png"
             alt={`${site.name} logo`}
             width={156}
             height={100}
             priority
-            className="h-20 w-auto shrink-0 object-contain"
+            className="h-12 w-auto shrink-0 object-contain sm:h-16 md:h-20"
           />
         </Link>
 
@@ -50,12 +53,14 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/contact"
-            className="hidden btn-primary md:inline-flex"
-          >
-            Join Us
-          </Link>
+          <div className="hidden items-center gap-2 md:flex">
+            <button type="button" className="btn-secondary">
+              Login
+            </button>
+            <button type="button" className="btn-primary">
+              Sign Up
+            </button>
+          </div>
           {/* Mobile toggle */}
           <button
             type="button"
@@ -87,14 +92,13 @@ export default function Navbar() {
                 </Link>
               </li>
             ))}
-            <li>
-              <Link
-                href="/contact"
-                onClick={() => setOpen(false)}
-                className="btn-primary mt-2 w-full"
-              >
-                Join Us
-              </Link>
+            <li className="mt-2 flex gap-2">
+              <button type="button" className="btn-secondary flex-1">
+                Login
+              </button>
+              <button type="button" className="btn-primary flex-1">
+                Sign Up
+              </button>
             </li>
           </ul>
         </div>

@@ -21,12 +21,15 @@ async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
 
 function revalidatePublications() {
   revalidatePath("/publications");
+  revalidatePath("/publications/all");
   revalidatePath("/");
   revalidatePath("/admin/publications");
 }
 
 function parseFields(formData: FormData) {
   const publishedAtRaw = (formData.get("publishedAt") as string)?.trim();
+  const categoryId = (formData.get("categoryId") as string)?.trim();
+  const pageCountRaw = (formData.get("pageCount") as string)?.trim();
   return {
     title: (formData.get("title") as string).trim(),
     excerpt: (formData.get("excerpt") as string).trim(),
@@ -34,6 +37,11 @@ function parseFields(formData: FormData) {
     author: (formData.get("author") as string)?.trim() || null,
     published: formData.get("published") === "on",
     publishedAt: publishedAtRaw ? new Date(publishedAtRaw) : new Date(),
+    categoryId: categoryId || null,
+    featured: formData.get("featured") === "on",
+    featuredOrder: Number(formData.get("featuredOrder")) || 0,
+    pageCount: pageCountRaw ? Number(pageCountRaw) : null,
+    badge: (formData.get("badge") as string)?.trim() || null,
   };
 }
 

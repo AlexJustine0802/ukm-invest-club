@@ -13,7 +13,13 @@ export default async function EditPublicationPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const publication = await prisma.publication.findUnique({ where: { id } });
+  const [publication, categories] = await Promise.all([
+    prisma.publication.findUnique({ where: { id } }),
+    prisma.researchCategory.findMany({
+      orderBy: { order: "asc" },
+      select: { id: true, title: true },
+    }),
+  ]);
   if (!publication) notFound();
 
   return (
@@ -29,6 +35,7 @@ export default async function EditPublicationPage({
         <PublicationForm
           action={updatePublication}
           uploadEnabled={isBlobConfigured()}
+          categories={categories}
           publication={publication}
         />
       </div>

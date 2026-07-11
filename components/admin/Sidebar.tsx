@@ -7,9 +7,20 @@ import { logout } from "@/app/admin/actions";
 const links = [
   { label: "Dashboard", href: "/admin", icon: "🏠" },
   { label: "Events", href: "/admin/events", icon: "📅" },
+  {
+    label: "Event Categories",
+    href: "/admin/event-categories",
+    icon: "🏷️",
+  },
   { label: "Publications", href: "/admin/publications", icon: "📄" },
+  {
+    label: "Research Categories",
+    href: "/admin/research-categories",
+    icon: "🗂️",
+  },
   { label: "Team", href: "/admin/team", icon: "👥" },
   { label: "Gallery", href: "/admin/gallery", icon: "🖼️" },
+  { label: "Community", href: "/admin/community", icon: "📸" },
 ];
 
 export default function Sidebar() {

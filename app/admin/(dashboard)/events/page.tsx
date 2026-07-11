@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({
+    include: { category: true },
     orderBy: { eventDate: "desc" },
   });
 
@@ -34,6 +35,7 @@ export default async function AdminEventsPage() {
             <thead className="border-b border-slate-200 bg-slate-50 text-slate-500">
               <tr>
                 <th className="px-4 py-3 font-medium">Title</th>
+                <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Date</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -47,6 +49,9 @@ export default async function AdminEventsPage() {
                     {event.location && (
                       <p className="text-xs text-slate-400">{event.location}</p>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {event.category?.title ?? "—"}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {formatDate(event.eventDate)}

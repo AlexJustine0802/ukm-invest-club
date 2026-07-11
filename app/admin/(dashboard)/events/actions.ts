@@ -21,6 +21,7 @@ async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
 
 function revalidateEvents() {
   revalidatePath("/events");
+  revalidatePath("/events/all");
   revalidatePath("/");
   revalidatePath("/admin/events");
 }
@@ -33,6 +34,7 @@ export async function createEvent(formData: FormData) {
   const eventDate = new Date(formData.get("eventDate") as string);
   const location = (formData.get("location") as string)?.trim() || null;
   const published = formData.get("published") === "on";
+  const categoryId = (formData.get("categoryId") as string)?.trim() || null;
   const coverImage = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
@@ -47,6 +49,7 @@ export async function createEvent(formData: FormData) {
       location,
       coverImage,
       published,
+      categoryId,
     },
   });
 
@@ -63,6 +66,7 @@ export async function updateEvent(formData: FormData) {
   const eventDate = new Date(formData.get("eventDate") as string);
   const location = (formData.get("location") as string)?.trim() || null;
   const published = formData.get("published") === "on";
+  const categoryId = (formData.get("categoryId") as string)?.trim() || null;
   const coverImage = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
@@ -78,6 +82,7 @@ export async function updateEvent(formData: FormData) {
       location,
       coverImage,
       published,
+      categoryId,
     },
   });
 

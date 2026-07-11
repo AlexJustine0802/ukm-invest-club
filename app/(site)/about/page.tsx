@@ -16,6 +16,9 @@ import {
   Trophy,
   Link2,
   AtSign,
+  Landmark,
+  ArrowRight,
+  type LucideIcon,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
@@ -48,6 +51,70 @@ const journey = [
   { year: "2023", icon: Handshake, title: "Stronger Collaboration", text: "Partnered with institutions, companies, and other investment communities." },
   { year: "2024+", icon: Trophy, title: "Impact the Future", text: "Continuing to grow and deliver greater impact for members and society." },
 ];
+
+const moments = [
+  {
+    image: "/images/research-modeling.png",
+    icon: CalendarDays,
+    title: "Workshop",
+    subtitle: "Financial Modeling & Valuation",
+    date: "April 2025",
+  },
+  {
+    image: "/images/research-seminar.png",
+    icon: Users,
+    title: "Guest Speaker Session",
+    subtitle: "Market Outlook 2025",
+    date: "March 2025",
+  },
+  {
+    image: "/images/research-building.png",
+    icon: Landmark,
+    title: "Company Visit",
+    subtitle: "IDX Building",
+    date: "February 2025",
+  },
+  {
+    image: "/images/hero-community.svg",
+    icon: Users,
+    title: "Research & Discussion",
+    subtitle: "Weekly Research Meeting",
+    date: "Every Week",
+  },
+];
+
+function MomentCard({
+  moment,
+  className = "",
+  imageHeight = "h-56",
+}: {
+  moment: { image: string; icon: LucideIcon; title: string; subtitle: string; date: string };
+  className?: string;
+  imageHeight?: string;
+}) {
+  return (
+    <div className={`relative overflow-hidden rounded-2xl ${imageHeight} ${className}`}>
+      <Image
+        src={moment.image}
+        alt={moment.title}
+        fill
+        className="object-cover"
+        sizes="(min-width: 1024px) 50vw, 100vw"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+      <div className="absolute bottom-4 left-4 right-4 flex items-end gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+          <moment.icon className="h-5 w-5" />
+        </span>
+        <div className="text-white">
+          <p className="font-bold">{moment.title}</p>
+          <p className="text-sm text-white/85">{moment.subtitle}</p>
+          <p className="text-xs text-white/70">{moment.date}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const divisions = [
   { icon: ChartColumn, title: "Investment Analyst", text: "Analyze markets, sectors, and companies and publish quality research." },
@@ -149,23 +216,111 @@ export default async function AboutPage() {
       {/* Our Journey */}
       <section className="bg-slate-50 py-16">
         <div className="container-page">
+          <div className="text-center">
+            <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+              Our Journey
+            </span>
+            <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold text-navy">
+              Every Step, Building a Stronger Future
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+              From a small initiative on campus to a growing investment
+              community that creates impact for members and society.
+            </p>
+          </div>
+
+          <div className="relative mt-14">
+            <div className="absolute left-1/2 top-0 hidden h-full w-0.5 -translate-x-1/2 bg-primary-light sm:block" />
+
+            <div className="space-y-10 sm:space-y-6">
+              {journey.map((j, i) => {
+                const onRight = i % 2 === 1;
+                const card = (
+                  <div className="card p-6">
+                    <span className="text-sm font-bold text-primary">
+                      {j.year}
+                    </span>
+                    <h3 className="mt-1 text-lg font-bold text-navy">
+                      {j.title}
+                    </h3>
+                    <span className="mt-2 block h-0.5 w-8 bg-primary-light" />
+                    <p className="mt-3 text-sm text-slate-600">{j.text}</p>
+                  </div>
+                );
+                const badge = (
+                  <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-primary-light bg-white text-primary">
+                    <j.icon className="h-6 w-6" />
+                  </span>
+                );
+
+                return (
+                  <div
+                    key={j.year}
+                    className="grid grid-cols-[auto_1fr] items-center gap-4 sm:grid-cols-[1fr_auto_1fr] sm:gap-6"
+                  >
+                    <div className="sm:hidden">{badge}</div>
+                    <div className="sm:hidden">{card}</div>
+
+                    <div className="hidden sm:block">
+                      {!onRight && (
+                        <div className="flex items-center justify-end gap-4">
+                          <div className="flex-1">{card}</div>
+                          <span className="h-0.5 w-6 bg-primary-light" />
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="hidden sm:block">{badge}</div>
+                    <div className="hidden sm:block">
+                      {onRight && (
+                        <div className="flex items-center gap-4">
+                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                          <span className="h-0.5 w-6 bg-primary-light" />
+                          <div className="flex-1">{card}</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Community */}
+      <section id="community" className="container-page py-16">
+        <div className="text-center">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-            Our Journey
+            Our Community
           </span>
-          <ol className="mt-8 space-y-6 border-l-2 border-primary-light pl-8">
-            {journey.map((j) => (
-              <li key={j.year} className="relative">
-                <span className="absolute -left-[41px] flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary-light bg-white text-primary">
-                  <j.icon className="h-4 w-4" />
-                </span>
-                <div className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="text-sm font-bold text-primary">{j.year}</span>
-                  <h3 className="text-base font-bold text-navy">{j.title}</h3>
-                </div>
-                <p className="mt-1 text-sm text-slate-600">{j.text}</p>
-              </li>
-            ))}
-          </ol>
+          <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold text-navy">
+            More Than Investing
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+            We build friendships, share knowledge, and create opportunities to
+            grow together as a community.
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-4 lg:grid-cols-2">
+          <MomentCard
+            moment={moments[0]}
+            imageHeight="h-72 lg:h-full"
+            className="lg:row-span-2"
+          />
+          <MomentCard moment={moments[1]} imageHeight="h-56" />
+          <div className="grid grid-cols-2 gap-4">
+            <MomentCard moment={moments[2]} imageHeight="h-56" />
+            <MomentCard moment={moments[3]} imageHeight="h-56" />
+          </div>
+        </div>
+
+        <div className="mt-10 text-center">
+          <Link href="/community" className="btn-primary">
+            View All Moments
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
         </div>
       </section>
 
