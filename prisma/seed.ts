@@ -442,52 +442,139 @@ async function main() {
     ],
   });
 
-  // --- Gallery ---
-  await prisma.galleryImage.deleteMany();
-  await prisma.galleryImage.createMany({
+  // --- Site settings (singleton) ---
+  await prisma.siteSettings.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      homeAboutImage: "/images/research-building.png",
+      aboutHeroImage: "/images/hero-community.svg",
+    },
+  });
+
+  // --- Hero slides (home carousel) ---
+  await prisma.heroSlide.deleteMany();
+  await prisma.heroSlide.createMany({
     data: [
       {
-        title: "Bootcamp Session",
-        imageUrl:
-          "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1000&q=80",
-        caption: "Members collaborating during our annual bootcamp.",
+        location: "home",
+        imageUrl: "/images/hero-growth.svg",
+        eyebrow: "Learn. Analyze. Grow Together.",
+        titleStart: "Empowering Future ",
+        highlight: "Investors",
+        titleEnd: "",
+        description:
+          "We are a campus community that shares knowledge, analyzes markets, and grows together in the world of investment.",
         order: 1,
       },
       {
-        title: "Guest Speaker",
-        imageUrl:
-          "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1000&q=80",
-        caption: "An industry expert sharing market insights.",
+        location: "home",
+        imageUrl: "/images/hero-research.svg",
+        eyebrow: "Research. Discuss. Decide.",
+        titleStart: "Insight Today, Better ",
+        highlight: "Decisions",
+        titleEnd: " Tomorrow",
+        description:
+          "Providing in-depth research and market insight to help students understand finance with sharper perspective.",
         order: 2,
       },
       {
-        title: "Team Discussion",
-        imageUrl:
-          "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1000&q=80",
-        caption: "Weekly research and discussion session.",
+        location: "home",
+        imageUrl: "/images/hero-community.svg",
+        eyebrow: "Community. Collaboration. Growth.",
+        titleStart: "Learn. Share. ",
+        highlight: "Grow",
+        titleEnd: " Together.",
+        description:
+          "Join a community of passionate students who believe in continuous learning and long-term growth.",
+        order: 3,
+      },
+      // Home "About Us" section slideshow (images only)
+      {
+        location: "home-about",
+        imageUrl: "/images/research-building.png",
+        order: 1,
+      },
+      {
+        location: "home-about",
+        imageUrl: "/images/research-seminar.png",
+        order: 2,
+      },
+      {
+        location: "home-about",
+        imageUrl: "/images/research-modeling.png",
+        order: 3,
+      },
+      // About-page slideshow ("Our Community" cards)
+      {
+        location: "about",
+        imageUrl: "/images/research-modeling.png",
+        title: "Workshop",
+        subtitle: "Financial Modeling & Valuation",
+        caption: "April 2025",
+        icon: "CalendarDays",
+        order: 1,
+      },
+      {
+        location: "about",
+        imageUrl: "/images/research-seminar.png",
+        title: "Guest Speaker Session",
+        subtitle: "Market Outlook 2025",
+        caption: "March 2025",
+        icon: "Users",
+        order: 2,
+      },
+      {
+        location: "about",
+        imageUrl: "/images/research-building.png",
+        title: "Company Visit",
+        subtitle: "IDX Building",
+        caption: "February 2025",
+        icon: "Landmark",
         order: 3,
       },
       {
-        title: "Networking Event",
-        imageUrl:
-          "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1000&q=80",
-        caption: "Connecting with fellow student investors.",
+        location: "about",
+        imageUrl: "/images/hero-community.svg",
+        title: "Research & Discussion",
+        subtitle: "Weekly Research Meeting",
+        caption: "Every Week",
+        icon: "Users",
         order: 4,
       },
-      {
-        title: "Award Ceremony",
-        imageUrl:
-          "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1000&q=80",
-        caption: "Celebrating our members' achievements.",
-        order: 5,
-      },
-      {
-        title: "Study Group",
-        imageUrl:
-          "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1000&q=80",
-        caption: "Preparing for the trading simulation contest.",
-        order: 6,
-      },
+    ],
+  });
+
+  // --- Impact stats (shared home + about) ---
+  await prisma.impactStat.deleteMany();
+  await prisma.impactStat.createMany({
+    data: [
+      // Home + About ("Our Impact")
+      { section: "home", label: "Active Members", value: "350+", icon: "Users", order: 1 },
+      { section: "home", label: "Research Published", value: "120+", icon: "FileText", order: 2 },
+      { section: "home", label: "Events Held", value: "40+", icon: "CalendarDays", order: 3 },
+      { section: "home", label: "Partners", value: "15+", icon: "Building2", order: 4 },
+      // Research page ("Research By The Numbers")
+      { section: "research", label: "Research Published", value: "50+", icon: "Users", order: 1 },
+      { section: "research", label: "Active Analysts", value: "15+", icon: "Users", order: 2 },
+      { section: "research", label: "Data Points Analyzed", value: "10K+", icon: "Waypoints", order: 3 },
+      { section: "research", label: "Companies Covered", value: "120+", icon: "Landmark", order: 4 },
+      { section: "research", label: "Years of Research", value: "5+", icon: "PieChart", order: 5 },
+    ],
+  });
+
+  // --- Partners (shared home + about) ---
+  await prisma.partner.deleteMany();
+  await prisma.partner.createMany({
+    data: [
+      { name: "Mandiri Sekuritas", order: 1 },
+      { name: "BNI Sekuritas", order: 2 },
+      { name: "CGS CIMB", order: 3 },
+      { name: "Trimegah", order: 4 },
+      { name: "Mirae Asset", order: 5 },
+      { name: "ajaib", order: 6 },
+      { name: "IDX", order: 7 },
     ],
   });
 

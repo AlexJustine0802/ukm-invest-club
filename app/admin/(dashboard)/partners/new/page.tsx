@@ -1,0 +1,21 @@
+import Link from "next/link";
+import { isBlobConfigured } from "@/lib/upload";
+import PartnerForm from "@/components/admin/PartnerForm";
+import { createPartner } from "../actions";
+
+export default function NewPartnerPage() {
+  return (
+    <div>
+      <Link
+        href="/admin/partners"
+        className="text-sm text-gold-dark hover:text-gold"
+      >
+        ← Back to partners
+      </Link>
+      <h1 className="mt-2 text-2xl font-bold text-navy">Add partner</h1>
+      <div className="mt-6 max-w-2xl">
+        <PartnerForm action={createPartner} uploadEnabled={isBlobConfigured()} />
+      </div>
+    </div>
+  );
+}

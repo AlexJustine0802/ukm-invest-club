@@ -25,11 +25,11 @@ const publicationSummarySelect = {
 export default async function PublicationsPage() {
   const now = new Date();
 
-  const [featured, categories, latestPublications, upcomingEvents] =
+  const [featured, categories, latestPublications, upcomingEvents, researchStats] =
     await Promise.all([
       prisma.publication.findMany({
         where: { published: true, featured: true },
-        orderBy: { featuredOrder: "asc" },
+        orderBy: [{ featuredOrder: "asc" }, { publishedAt: "desc" }],
         take: 6,
         select: publicationSummarySelect,
       }),
@@ -63,8 +63,13 @@ export default async function PublicationsPage() {
           coverImage: true,
         },
       }),
+      prisma.impactStat.findMany({
+        where: { section: "research" },
+        orderBy: { order: "asc" },
+      }),
     ]);
 
+  // Hero shows the ticked ("featured") publications; falls back to the latest.
   const heroSlides =
     featured.length > 0 ? featured : latestPublications.slice(0, 3);
 
@@ -74,6 +79,7 @@ export default async function PublicationsPage() {
       categories={categories}
       latestPublications={latestPublications}
       upcomingEvents={upcomingEvents}
+      researchStats={researchStats}
     />
   );
 }

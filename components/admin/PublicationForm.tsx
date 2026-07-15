@@ -156,15 +156,21 @@ export default function PublicationForm({
           </div>
           <div>
             <label htmlFor="badge" className="label">
-              Hero badge text
+              Hero badge
             </label>
-            <input
+            <select
               id="badge"
               name="badge"
               defaultValue={publication?.badge ?? ""}
-              placeholder="Defaults to category name"
               className="input"
-            />
+            >
+              <option value="">Defaults to category name</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.title}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

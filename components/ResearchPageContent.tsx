@@ -9,14 +9,11 @@ import {
   CalendarDays,
   Clock,
   FileText,
-  Landmark,
   MapPin,
-  PieChart,
-  Users,
-  Waypoints,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { getResearchIcon } from "@/lib/researchIcons";
+import { getUiIcon } from "@/lib/uiIcons";
 
 export type PublicationSummary = {
   id: string;
@@ -48,11 +45,19 @@ export type UpcomingEventSummary = {
   coverImage: string | null;
 };
 
+export type ResearchStatView = {
+  id: string;
+  label: string;
+  value: string;
+  icon: string;
+};
+
 interface ResearchPageContentProps {
   heroSlides: PublicationSummary[];
   categories: ResearchCategoryWithPreview[];
   latestPublications: PublicationSummary[];
   upcomingEvents: UpcomingEventSummary[];
+  researchStats: ResearchStatView[];
 }
 
 const marketCards = [
@@ -90,14 +95,6 @@ const marketCards = [
   },
 ];
 
-const researchStats = [
-  { value: "50+", label: "Research Published", icon: Users },
-  { value: "15+", label: "Active Analysts", icon: Users },
-  { value: "10K+", label: "Data Points Analyzed", icon: Waypoints },
-  { value: "120+", label: "Companies Covered", icon: Landmark },
-  { value: "5+", label: "Years of Research", icon: PieChart },
-];
-
 function SectionHeader({
   title,
   action,
@@ -109,7 +106,9 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
-      <h2 className="text-sm font-bold uppercase text-navy">{title}</h2>
+      <h2 className="text-sm font-bold uppercase tracking-widest text-primary">
+        {title}
+      </h2>
       {action && (
         <Link
           href={href ?? "/publications/all"}
@@ -230,20 +229,32 @@ export default function ResearchPageContent({
   categories,
   latestPublications,
   upcomingEvents,
+  researchStats,
 }: ResearchPageContentProps) {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [activeSlide, setActiveSlide] = useState(0);
   const [paused, setPaused] = useState(false);
 
+  const heroCards = heroSlides.map((s) => ({
+    key: s.id,
+    image: s.coverImage || "/images/research-building.png",
+    badge: s.badge || s.category?.title || "Research",
+    title: s.title,
+    excerpt: s.excerpt,
+    dateLabel: formatDate(s.publishedAt),
+    pageCount: s.pageCount,
+    href: `/publications/${s.slug}`,
+  }));
+
   useEffect(() => {
-    if (paused || heroSlides.length <= 1) return;
+    if (paused || heroCards.length <= 1) return;
     const id = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % heroSlides.length);
+      setActiveSlide((current) => (current + 1) % heroCards.length);
     }, 4500);
     return () => window.clearInterval(id);
-  }, [paused, heroSlides.length]);
+  }, [paused, heroCards.length]);
 
-  const slide = heroSlides[activeSlide];
+  const slide = heroCards[activeSlide];
   const spotlight = latestPublications[0];
   const featuredList = latestPublications.slice(1, 4);
   const publicationCards = latestPublications.slice(0, 3);
@@ -289,7 +300,7 @@ export default function ResearchPageContent({
               <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
                 <div className="relative h-[300px] sm:h-[350px]">
                   <Image
-                    src={slide.coverImage || "/images/research-building.png"}
+                    src={slide.image}
                     alt={slide.title}
                     fill
                     priority
@@ -300,7 +311,7 @@ export default function ResearchPageContent({
                   <div className="absolute inset-0 flex flex-col justify-between p-7 sm:p-8">
                     <div>
                       <span className="inline-flex rounded-lg bg-primary px-3 py-1.5 text-xs font-bold uppercase text-white">
-                        {slide.badge || slide.category?.title || "Research"}
+                        {slide.badge}
                       </span>
                       <h2 className="mt-14 max-w-sm text-2xl font-bold text-white">
                         {slide.title}
@@ -309,33 +320,39 @@ export default function ResearchPageContent({
                         {slide.excerpt}
                       </p>
                     </div>
-                    <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-blue-50">
-                      <span className="inline-flex items-center gap-2">
-                        <CalendarDays className="h-4 w-4" />
-                        {formatDate(slide.publishedAt)}
-                      </span>
-                      {slide.pageCount && (
-                        <span className="inline-flex items-center gap-2">
-                          <FileText className="h-4 w-4" />
-                          {slide.pageCount} Halaman
-                        </span>
-                      )}
-                    </div>
+                    {(slide.dateLabel || slide.pageCount) && (
+                      <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-blue-50">
+                        {slide.dateLabel && (
+                          <span className="inline-flex items-center gap-2">
+                            <CalendarDays className="h-4 w-4" />
+                            {slide.dateLabel}
+                          </span>
+                        )}
+                        {slide.pageCount && (
+                          <span className="inline-flex items-center gap-2">
+                            <FileText className="h-4 w-4" />
+                            {slide.pageCount} Halaman
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <Link
-                    href={`/publications/${slide.slug}`}
-                    aria-label={`Open ${slide.title}`}
-                    className="absolute bottom-8 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-transform hover:scale-105"
-                  >
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
+                  {slide.href && (
+                    <Link
+                      href={slide.href}
+                      aria-label={`Open ${slide.title}`}
+                      className="absolute bottom-8 right-8 flex h-12 w-12 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-transform hover:scale-105"
+                    >
+                      <ArrowRight className="h-5 w-5" />
+                    </Link>
+                  )}
                 </div>
               </div>
-              {heroSlides.length > 1 && (
+              {heroCards.length > 1 && (
                 <div className="mt-5 flex justify-center gap-2">
-                  {heroSlides.map((s, index) => (
+                  {heroCards.map((s, index) => (
                     <button
-                      key={s.id}
+                      key={s.key}
                       type="button"
                       aria-label={`Go to slide ${index + 1}`}
                       onClick={() => setActiveSlide(index)}
@@ -571,24 +588,27 @@ export default function ResearchPageContent({
           <div className="absolute right-0 top-0 h-44 w-36 bg-[radial-gradient(circle_at_center,#93b4ff_1.5px,transparent_1.5px)] opacity-90 [background-size:18px_18px]" />
           <SectionHeader title="Research By The Numbers" />
           <div className="relative mt-14 grid grid-cols-2 gap-6 sm:grid-cols-5">
-            {researchStats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-primary shadow-sm">
-                  <stat.icon className="h-7 w-7" />
-                </span>
-                <p className="mt-4 text-2xl font-bold text-navy">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
+            {researchStats.map((stat) => {
+              const Icon = getUiIcon(stat.icon);
+              return (
+                <div key={stat.id} className="text-center">
+                  <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-primary shadow-sm">
+                    <Icon className="h-7 w-7" />
+                  </span>
+                  <p className="mt-4 text-2xl font-bold text-navy">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
+                    {stat.label}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
 
         <div>
-          <SectionHeader title="Upcoming Research Events" action="View All Events" href="/events" />
+          <SectionHeader title="Upcoming Events" action="View All Events" href="/events" />
           {upcomingEvents.length > 0 ? (
             <div className="space-y-5">
               {upcomingEvents.map((event) => {

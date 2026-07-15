@@ -9,6 +9,9 @@ interface ImageFieldProps {
   /** Whether file uploads are configured (Vercel Blob). */
   uploadEnabled?: boolean;
   required?: boolean;
+  /** Form field names — override when a form has more than one image. */
+  fileName?: string;
+  urlName?: string;
 }
 
 export default function ImageField({
@@ -16,6 +19,8 @@ export default function ImageField({
   defaultUrl,
   uploadEnabled = false,
   required = false,
+  fileName = "imageFile",
+  urlName = "imageUrl",
 }: ImageFieldProps) {
   const [preview, setPreview] = useState<string | null>(defaultUrl ?? null);
 
@@ -26,7 +31,7 @@ export default function ImageField({
       {uploadEnabled && (
         <input
           type="file"
-          name="imageFile"
+          name={fileName}
           accept="image/*"
           className="input mb-2 file:mr-3 file:rounded file:border-0 file:bg-navy file:px-3 file:py-1 file:text-white"
           onChange={(e) => {
@@ -38,7 +43,7 @@ export default function ImageField({
 
       <input
         type="url"
-        name="imageUrl"
+        name={urlName}
         placeholder="…or paste an image URL (https://…)"
         defaultValue={defaultUrl ?? ""}
         required={required && !uploadEnabled}

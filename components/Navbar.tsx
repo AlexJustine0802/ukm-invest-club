@@ -54,12 +54,12 @@ export default function Navbar() {
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 md:flex">
-            <button type="button" className="btn-secondary">
+            <Link href="/login" className="btn-secondary">
               Login
-            </button>
-            <button type="button" className="btn-primary">
+            </Link>
+            <Link href="/signup" className="btn-primary">
               Sign Up
-            </button>
+            </Link>
           </div>
           {/* Mobile toggle */}
           <button
@@ -93,12 +93,20 @@ export default function Navbar() {
               </li>
             ))}
             <li className="mt-2 flex gap-2">
-              <button type="button" className="btn-secondary flex-1">
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="btn-secondary flex-1 text-center"
+              >
                 Login
-              </button>
-              <button type="button" className="btn-primary flex-1">
+              </Link>
+              <Link
+                href="/signup"
+                onClick={() => setOpen(false)}
+                className="btn-primary flex-1 text-center"
+              >
                 Sign Up
-              </button>
+              </Link>
             </li>
           </ul>
         </div>

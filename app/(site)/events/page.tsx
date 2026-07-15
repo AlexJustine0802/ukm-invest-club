@@ -259,13 +259,13 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
-      <h2 className="text-sm font-extrabold uppercase tracking-tight text-navy">
+      <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">
         {title}
       </h2>
       {action && (
         <Link
           href={href}
-          className="hidden items-center gap-2 text-sm font-bold text-primary transition-colors hover:text-primary-dark sm:inline-flex"
+          className="hidden items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary-dark sm:inline-flex"
         >
           {action}
           <ArrowRight className="h-4 w-4" />
@@ -463,14 +463,28 @@ export default async function EventsPage() {
         }))
       : fallbackPast;
 
-  const heroSlides: HeroEventSlide[] = upcoming.slice(0, 5).map((event) => ({
-    slug: event.slug,
+  // Hero shows the ticked ("featured") events; falls back to upcoming events.
+  const featuredRows = await prisma.event
+    .findMany({
+      where: { published: true, featured: true },
+      orderBy: { eventDate: "asc" },
+      take: 5,
+    })
+    .catch(() => [] as DbEvent[]);
+
+  const heroSource =
+    featuredRows.length > 0
+      ? featuredRows.map((event, index) => normalizeEvent(event, index))
+      : upcoming.slice(0, 5);
+
+  const heroSlides: HeroEventSlide[] = heroSource.map((event) => ({
     title: event.title,
     image: event.image,
     dateLabel: formatFullDate(event.date),
     timeLabel: formatTimeRange(event.date, event.endDate),
     location: event.location,
     href: eventHref(event),
+    badge: featuredRows.length > 0 ? "Featured" : "Next Event",
   }));
 
   return (

@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 import { ArrowRight, CalendarDays, Clock, MapPin } from "lucide-react";
 
 export type HeroEventSlide = {
-  slug: string;
   title: string;
   image: string;
-  dateLabel: string;
-  timeLabel: string;
-  location: string;
   href: string;
+  badge?: string;
+  dateLabel?: string;
+  timeLabel?: string;
+  location?: string;
 };
 
 export default function EventHeroSlider({
@@ -51,26 +51,34 @@ export default function EventHeroSlider({
             className="object-cover"
           />
           <div className="absolute inset-x-7 bottom-7 max-w-sm rounded-lg bg-white p-6 shadow-xl">
-            <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-extrabold uppercase text-primary">
-              Next Event
+            <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
+              {slide.badge ?? "Next Event"}
             </span>
-            <h2 className="mt-3 text-lg font-extrabold leading-6 text-navy">
+            <h2 className="mt-3 text-lg font-bold leading-6 text-navy">
               {slide.title}
             </h2>
-            <div className="mt-4 space-y-2 text-sm font-semibold text-slate-600">
-              <p className="flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-primary" />
-                {slide.dateLabel}
-              </p>
-              <p className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-primary" />
-                {slide.timeLabel}
-              </p>
-              <p className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-primary" />
-                {slide.location}
-              </p>
-            </div>
+            {(slide.dateLabel || slide.timeLabel || slide.location) && (
+              <div className="mt-4 space-y-2 text-sm font-semibold text-slate-600">
+                {slide.dateLabel && (
+                  <p className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-primary" />
+                    {slide.dateLabel}
+                  </p>
+                )}
+                {slide.timeLabel && (
+                  <p className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    {slide.timeLabel}
+                  </p>
+                )}
+                {slide.location && (
+                  <p className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    {slide.location}
+                  </p>
+                )}
+              </div>
+            )}
             <Link
               href={slide.href}
               aria-label={`Open ${slide.title}`}
@@ -83,9 +91,9 @@ export default function EventHeroSlider({
       </div>
       {slides.length > 1 && (
         <div className="mt-5 flex justify-center gap-2">
-          {slides.map((s, index) => (
+          {slides.map((_, index) => (
             <button
-              key={s.slug}
+              key={index}
               type="button"
               aria-label={`Go to slide ${index + 1}`}
               onClick={() => setActive(index)}

@@ -1,0 +1,59 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import { requireSession } from "@/lib/auth";
+import { resolveImage } from "@/lib/upload";
+
+function revalidatePartners() {
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/admin/partners");
+}
+
+export async function createPartner(formData: FormData) {
+  await requireSession();
+  const logoUrl = await resolveImage(
+    formData.get("imageFile") as File | null,
+    formData.get("imageUrl") as string | null,
+  );
+  await prisma.partner.create({
+    data: {
+      name: (formData.get("name") as string).trim(),
+      logoUrl,
+      order: Number(formData.get("order")) || 0,
+    },
+  });
+  revalidatePartners();
+  redirect("/admin/partners");
+}
+
+export async function updatePartner(formData: FormData) {
+  await requireSession();
+  const id = formData.get("id") as string;
+  const existing = await prisma.partner.findUnique({ where: { id } });
+  if (!existing) throw new Error("Partner not found");
+
+  const resolved = await resolveImage(
+    formData.get("imageFile") as File | null,
+    formData.get("imageUrl") as string | null,
+  );
+  await prisma.partner.update({
+    where: { id },
+    data: {
+      name: (formData.get("name") as string).trim(),
+      logoUrl: resolved ?? existing.logoUrl,
+      order: Number(formData.get("order")) || 0,
+    },
+  });
+  revalidatePartners();
+  redirect("/admin/partners");
+}
+
+export async function deletePartner(formData: FormData) {
+  await requireSession();
+  const id = formData.get("id") as string;
+  await prisma.partner.delete({ where: { id } });
+  revalidatePartners();
+}

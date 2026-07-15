@@ -1,33 +1,79 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logout } from "@/app/admin/actions";
 
-const links = [
-  { label: "Dashboard", href: "/admin", icon: "🏠" },
-  { label: "Events", href: "/admin/events", icon: "📅" },
+type Child = { label: string; href: string };
+type Group = { label: string; icon: string; href: string; children?: Child[] };
+
+// 5 groups mirroring the public navbar (Home, About, Research, Events, Contact).
+const groups: Group[] = [
   {
-    label: "Event Categories",
-    href: "/admin/event-categories",
-    icon: "🏷️",
+    label: "Home",
+    icon: "🏠",
+    href: "/admin",
+    children: [
+      { label: "Image", href: "/admin/hero-slides?loc=home" },
+      { label: "Impact Stats", href: "/admin/impact-stats" },
+    ],
   },
-  { label: "Publications", href: "/admin/publications", icon: "📄" },
   {
-    label: "Research Categories",
-    href: "/admin/research-categories",
-    icon: "🗂️",
+    label: "About",
+    icon: "ℹ️",
+    href: "/admin/team",
+    children: [
+      { label: "Team", href: "/admin/team" },
+      { label: "Community", href: "/admin/community" },
+      { label: "Partners", href: "/admin/partners" },
+    ],
   },
-  { label: "Team", href: "/admin/team", icon: "👥" },
-  { label: "Gallery", href: "/admin/gallery", icon: "🖼️" },
-  { label: "Community", href: "/admin/community", icon: "📸" },
+  {
+    label: "Research",
+    icon: "📄",
+    href: "/admin/publications",
+    children: [
+      { label: "Publications", href: "/admin/publications" },
+      { label: "Research Categories", href: "/admin/research-categories" },
+      { label: "Hero Slides", href: "/admin/publications/featured" },
+      { label: "Research Stats", href: "/admin/impact-stats?section=research" },
+    ],
+  },
+  {
+    label: "Events",
+    icon: "📅",
+    href: "/admin/events",
+    children: [
+      { label: "Events", href: "/admin/events" },
+      { label: "Event Categories", href: "/admin/event-categories" },
+      { label: "Hero Slides", href: "/admin/events/featured" },
+    ],
+  },
+  {
+    label: "Contact",
+    icon: "✉️",
+    href: "/contact",
+    children: [{ label: "View Contact Page", href: "/contact" }],
+  },
 ];
+
+// A child is active if the current path starts with its route (ignoring query).
+function childActive(pathname: string, href: string) {
+  const path = href.split("?")[0];
+  return path === "/admin" ? pathname === "/admin" : pathname.startsWith(path);
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
+  const isGroupActive = (g: Group) =>
+    (g.children ?? []).some((c) => childActive(pathname, c.href));
+
+  // Open the group that contains the active route by default.
+  const [open, setOpen] = useState<string | null>(
+    groups.find((g) => isGroupActive(g))?.label ?? "Home",
+  );
 
   return (
     <aside className="flex w-full flex-col bg-navy text-slate-200 md:h-screen md:w-64 md:shrink-0">
@@ -42,20 +88,61 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 space-y-1 p-3">
-        {links.map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              isActive(link.href)
-                ? "bg-gold text-navy"
-                : "text-slate-300 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <span>{link.icon}</span>
-            {link.label}
-          </Link>
-        ))}
+        <Link
+          href="/admin"
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+            pathname === "/admin"
+              ? "bg-gold text-navy"
+              : "text-slate-300 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          <span>📊</span>
+          Dashboard
+        </Link>
+
+        {groups.map((group) => {
+          const expanded = open === group.label;
+          const active = isGroupActive(group);
+          return (
+            <div key={group.label}>
+              <button
+                type="button"
+                onClick={() => setOpen(expanded ? null : group.label)}
+                className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                  active
+                    ? "bg-white/10 text-white"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                <span>{group.icon}</span>
+                <span className="flex-1 text-left">{group.label}</span>
+                <span
+                  className={`text-xs transition-transform ${expanded ? "rotate-90" : ""}`}
+                >
+                  ›
+                </span>
+              </button>
+
+              {expanded && group.children && (
+                <div className="mt-1 space-y-1 pl-6">
+                  {group.children.map((child) => (
+                    <Link
+                      key={child.href}
+                      href={child.href}
+                      className={`flex items-center rounded-lg px-3 py-1.5 text-sm transition-colors ${
+                        childActive(pathname, child.href)
+                          ? "bg-gold text-navy"
+                          : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {child.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
 
       <div className="space-y-2 border-t border-white/10 p-3">

@@ -21,6 +21,7 @@ model Event {
 
   categoryId String?
   category   EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  featured   Boolean        @default(false) // ticked to show in the events hero
 
   @@index([eventDate])
   @@index([categoryId])
@@ -91,13 +92,61 @@ model TeamMember {
   @@index([order])
 }
 
-model GalleryImage {
-  id        String   @id @default(cuid())
-  title     String
-  imageUrl  String
-  caption   String?
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model SiteSettings {
+  id             Int      @id @default(1) // singleton row
+  homeAboutImage String? // home "About Us" strip picture
+  aboutHeroImage String? // about page hero image
+  updatedAt      DateTime @updatedAt
+}
+
+model HeroSlide {
+  id       String @id @default(cuid())
+  location String // "home" | "about"
+  imageUrl String
+
+  // home hero fields
+  eyebrow     String?
+  titleStart  String?
+  highlight   String?
+  titleEnd    String?
+  description String? @db.Text
+
+  // about slideshow fields
+  title    String?
+  subtitle String?
+  caption  String? // e.g. date label
+  icon     String? // lucide name for the about card
+
   order     Int      @default(0)
   createdAt DateTime @default(now())
+
+  @@index([location, order])
+}
+
+model ImpactStat {
+  id      String @id @default(cuid())
+  label   String
+  value   String
+  icon    String @default("TrendingUp")
+  section String @default("home") // "home" (shared home+about) | "research"
+  order   Int    @default(0)
+
+  @@index([section, order])
+}
+
+model Partner {
+  id      String  @id @default(cuid())
+  name    String
+  logoUrl String?
+  order   Int     @default(0)
 
   @@index([order])
 }

@@ -5,7 +5,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, Calendar } from "lucide-react";
 
-const slides = [
+export type HeroSlideView = {
+  eyebrow: string | null;
+  titleStart: string | null;
+  highlight: string | null;
+  titleEnd: string | null;
+  description: string | null;
+  image: string;
+};
+
+// Used when the admin hasn't added any home hero slides yet.
+const defaultSlides: HeroSlideView[] = [
   {
     eyebrow: "Learn. Analyze. Grow Together.",
     titleStart: "Empowering Future ",
@@ -35,7 +45,14 @@ const slides = [
   },
 ];
 
-export default function HeroCarousel() {
+export default function HeroCarousel({
+  slides: slidesProp,
+}: {
+  slides?: HeroSlideView[];
+}) {
+  const slides =
+    slidesProp && slidesProp.length > 0 ? slidesProp : defaultSlides;
+
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -63,7 +80,7 @@ export default function HeroCarousel() {
       >
         {slides.map((slide, index) => (
           <div
-            key={slide.highlight}
+            key={index}
             className="relative min-w-full overflow-hidden"
           >
             <div className="absolute inset-0">
@@ -122,9 +139,9 @@ export default function HeroCarousel() {
         <div
           className="pointer-events-auto absolute bottom-12 left-1/2 flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-slate-200 bg-white/85 px-2.5 py-1.5 shadow-sm"
         >
-          {slides.map((item, index) => (
+          {slides.map((_, index) => (
             <button
-              key={item.highlight}
+              key={index}
               type="button"
               aria-label={`Go to slide ${index + 1}`}
               onClick={() => goTo(index)}

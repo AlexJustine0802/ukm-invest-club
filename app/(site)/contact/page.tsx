@@ -177,36 +177,6 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="container-page pb-10">
-        <div className="relative overflow-hidden rounded-lg bg-navy-dark p-7 text-white shadow-lg">
-          <div className="absolute right-0 top-0 h-full w-44 bg-[radial-gradient(circle_at_center,#93b4ff_1.4px,transparent_1.4px)] opacity-75 [background-size:20px_20px]" />
-          <div className="relative grid items-center gap-6 lg:grid-cols-[auto_1fr_auto]">
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-light/20 text-white">
-              <Mail className="h-9 w-9" />
-            </span>
-            <div>
-              <h2 className="text-2xl font-bold">Stay Connected with ICU</h2>
-              <p className="mt-2 text-sm text-blue-100">
-                Subscribe to our newsletter and never miss an update!
-              </p>
-            </div>
-            <form className="flex w-full flex-col gap-3 sm:flex-row lg:w-[480px]">
-              <label htmlFor="newsletter-email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="newsletter-email"
-                type="email"
-                placeholder="Enter your email"
-                className="min-h-12 flex-1 rounded-md border border-white/30 bg-white/10 px-4 text-sm text-white outline-none placeholder:text-blue-100 focus:border-white/60"
-              />
-              <button type="submit" className="btn-primary min-h-12 px-8">
-                Subscribe
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

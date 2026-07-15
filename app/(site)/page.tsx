@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, Users, FileText, CalendarDays, Building2 } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
+import { getUiIcon } from "@/lib/uiIcons";
 import EventCard from "@/components/EventCard";
 import HeroCarousel from "@/components/HeroCarousel";
+import AboutSlideshow from "@/components/AboutSlideshow";
 import PublicationCard from "@/components/PublicationCard";
 import PartnerStrip from "@/components/PartnerStrip";
 
@@ -12,8 +14,15 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const now = new Date();
 
-  const [upcomingEvents, latestPublications, eventCount, pubCount, memberCount] =
-    await Promise.all([
+  const [
+    upcomingEvents,
+    latestPublications,
+    heroSlides,
+    impact,
+    partners,
+    settings,
+    aboutSlides,
+  ] = await Promise.all([
       prisma.event.findMany({
         where: { published: true, eventDate: { gte: now } },
         orderBy: { eventDate: "asc" },
@@ -24,9 +33,20 @@ export default async function HomePage() {
         orderBy: { publishedAt: "desc" },
         take: 3,
       }),
-      prisma.event.count({ where: { published: true } }),
-      prisma.publication.count({ where: { published: true } }),
-      prisma.teamMember.count(),
+      prisma.heroSlide.findMany({
+        where: { location: "home" },
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      }),
+      prisma.impactStat.findMany({
+        where: { section: "home" },
+        orderBy: { order: "asc" },
+      }),
+      prisma.partner.findMany({ orderBy: { order: "asc" } }),
+      prisma.siteSettings.findUnique({ where: { id: 1 } }),
+      prisma.heroSlide.findMany({
+        where: { location: "home-about" },
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+      }),
     ]);
 
   // Fall back to most recent past events if nothing upcoming.
@@ -39,16 +59,24 @@ export default async function HomePage() {
           take: 3,
         });
 
-  const impact = [
-    { icon: Users, value: `${memberCount}+`, label: "Active Members" },
-    { icon: FileText, value: `${pubCount}+`, label: "Research Published" },
-    { icon: CalendarDays, value: `${eventCount}+`, label: "Events Held" },
-    { icon: Building2, value: "15+", label: "Partners" },
-  ];
+  const slides = heroSlides.map((s) => ({
+    eyebrow: s.eyebrow,
+    titleStart: s.titleStart,
+    highlight: s.highlight,
+    titleEnd: s.titleEnd,
+    description: s.description,
+    image: s.imageUrl,
+  }));
+
+  // About-Us slideshow images; fall back to the legacy single settings image.
+  const aboutImages = aboutSlides.map((s) => s.imageUrl);
+  if (aboutImages.length === 0 && settings?.homeAboutImage) {
+    aboutImages.push(settings.homeAboutImage);
+  }
 
   return (
     <>
-      <HeroCarousel />
+      <HeroCarousel slides={slides} />
 
       {/* Impact */}
       <section className="bg-slate-50 py-16">
@@ -57,22 +85,22 @@ export default async function HomePage() {
             Our Impact
           </span>
           <div className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {impact.map((stat) => (
-              <div
-                key={stat.label}
-                className="card flex items-center gap-4 p-6"
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
-                  <stat.icon className="h-6 w-6" />
-                </span>
-                <div>
-                  <p className="text-2xl font-extrabold text-navy sm:text-3xl">
-                    {stat.value}
-                  </p>
-                  <p className="text-sm text-slate-500">{stat.label}</p>
+            {impact.map((stat) => {
+              const Icon = getUiIcon(stat.icon);
+              return (
+                <div key={stat.id} className="card flex items-center gap-4 p-6">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-light text-primary">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <div>
+                    <p className="text-2xl font-extrabold text-navy sm:text-3xl">
+                      {stat.value}
+                    </p>
+                    <p className="text-sm text-slate-500">{stat.label}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -100,9 +128,7 @@ export default async function HomePage() {
               <ArrowRight className="ml-1.5 h-4 w-4" />
             </Link>
           </div>
-          <div className="flex aspect-[16/10] items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-slate-400">
-            <Users className="h-16 w-16" />
-          </div>
+          <AboutSlideshow images={aboutImages} />
         </div>
       </section>
 
@@ -164,7 +190,34 @@ export default async function HomePage() {
         )}
       </section>
 
-      <PartnerStrip />
+      {/* Contact CTA */}
+      <section className="container-page py-16">
+        <div className="relative overflow-hidden rounded-2xl bg-navy p-8 text-white shadow-lg sm:p-12">
+          <div className="absolute right-0 top-0 h-full w-44 bg-[radial-gradient(circle_at_center,#93b4ff_1.4px,transparent_1.4px)] opacity-60 [background-size:20px_20px]" />
+          <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary-light/20 text-white">
+                <Mail className="h-7 w-7" />
+              </span>
+              <div>
+                <h2 className="text-2xl font-bold sm:text-3xl">
+                  Have a question? Get in touch.
+                </h2>
+                <p className="mt-2 max-w-xl text-blue-100">
+                  Reach out to {site.name} for collaborations, membership, or
+                  anything about our activities.
+                </p>
+              </div>
+            </div>
+            <Link href="/contact" className="btn-primary shrink-0">
+              Contact Us
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <PartnerStrip partners={partners} />
     </>
   );
 }

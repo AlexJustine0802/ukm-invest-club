@@ -22,6 +22,8 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
+import { getUiIcon } from "@/lib/uiIcons";
+import { formatDate } from "@/lib/utils";
 import PartnerStrip from "@/components/PartnerStrip";
 
 export const dynamic = "force-dynamic";
@@ -30,12 +32,6 @@ export const metadata: Metadata = {
   title: "About",
   description: `Learn about ${site.fullName} — our mission, values, and committee.`,
 };
-
-const stats = [
-  { icon: Users, value: "350+", label: "Active Members" },
-  { icon: FileText, value: "120+", label: "Research Published" },
-  { icon: CalendarDays, value: "40+", label: "Events Held" },
-];
 
 const missions = [
   "Improve investment literacy and understanding among students.",
@@ -52,43 +48,20 @@ const journey = [
   { year: "2024+", icon: Trophy, title: "Impact the Future", text: "Continuing to grow and deliver greater impact for members and society." },
 ];
 
-const moments = [
-  {
-    image: "/images/research-modeling.png",
-    icon: CalendarDays,
-    title: "Workshop",
-    subtitle: "Financial Modeling & Valuation",
-    date: "April 2025",
-  },
-  {
-    image: "/images/research-seminar.png",
-    icon: Users,
-    title: "Guest Speaker Session",
-    subtitle: "Market Outlook 2025",
-    date: "March 2025",
-  },
-  {
-    image: "/images/research-building.png",
-    icon: Landmark,
-    title: "Company Visit",
-    subtitle: "IDX Building",
-    date: "February 2025",
-  },
-  {
-    image: "/images/hero-community.svg",
-    icon: Users,
-    title: "Research & Discussion",
-    subtitle: "Weekly Research Meeting",
-    date: "Every Week",
-  },
-];
+type MomentView = {
+  image: string;
+  icon: LucideIcon;
+  title: string;
+  subtitle: string;
+  date: string;
+};
 
 function MomentCard({
   moment,
   className = "",
   imageHeight = "h-56",
 }: {
-  moment: { image: string; icon: LucideIcon; title: string; subtitle: string; date: string };
+  moment: MomentView;
   className?: string;
   imageHeight?: string;
 }) {
@@ -125,15 +98,48 @@ const divisions = [
 ];
 
 export default async function AboutPage() {
-  const team = await prisma.teamMember.findMany({
-    orderBy: [{ order: "asc" }, { name: "asc" }],
-  });
+  const [team, stats, partners, communityMoments, settings] = await Promise.all([
+    prisma.teamMember.findMany({
+      orderBy: [{ order: "asc" }, { name: "asc" }],
+    }),
+    prisma.impactStat.findMany({
+      where: { section: "home" },
+      orderBy: { order: "asc" },
+    }),
+    prisma.partner.findMany({ orderBy: { order: "asc" } }),
+    prisma.moment.findMany({
+      orderBy: [{ order: "asc" }, { date: "desc" }],
+      take: 4,
+    }),
+    prisma.siteSettings.findUnique({ where: { id: 1 } }),
+  ]);
+
+  const moments: MomentView[] = communityMoments.map((m) => ({
+    image: m.coverImage,
+    icon: getUiIcon("Users"),
+    title: m.title,
+    subtitle: m.category,
+    date: formatDate(m.date),
+  }));
 
   return (
     <div>
       {/* Hero */}
-      <section className="border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white">
-        <div className="container-page py-16 text-center lg:py-20">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white">
+        {settings?.aboutHeroImage && (
+          <>
+            <Image
+              src={settings.aboutHeroImage}
+              alt=""
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+            <div className="absolute inset-0 bg-white/80" />
+          </>
+        )}
+        <div className="container-page relative py-16 text-center lg:py-20">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">
             About Us
           </span>
@@ -145,21 +151,26 @@ export default async function AboutPage() {
             and grows together in the world of investment.
           </p>
 
-          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
-            {stats.map((s) => (
-              <div
-                key={s.label}
-                className="card flex items-center justify-center gap-3 p-5"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
-                  <s.icon className="h-5 w-5" />
-                </span>
-                <div className="text-left">
-                  <p className="text-2xl font-extrabold text-navy">{s.value}</p>
-                  <p className="text-xs text-slate-500">{s.label}</p>
+          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {stats.map((s) => {
+              const Icon = getUiIcon(s.icon);
+              return (
+                <div
+                  key={s.id}
+                  className="card flex items-center justify-center gap-3 p-5"
+                >
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div className="text-left">
+                    <p className="text-2xl font-extrabold text-navy">
+                      {s.value}
+                    </p>
+                    <p className="text-xs text-slate-500">{s.label}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -303,18 +314,30 @@ export default async function AboutPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-4 lg:grid-cols-2">
-          <MomentCard
-            moment={moments[0]}
-            imageHeight="h-72 lg:h-full"
-            className="lg:row-span-2"
-          />
-          <MomentCard moment={moments[1]} imageHeight="h-56" />
-          <div className="grid grid-cols-2 gap-4">
-            <MomentCard moment={moments[2]} imageHeight="h-56" />
-            <MomentCard moment={moments[3]} imageHeight="h-56" />
+        {moments.length > 0 && (
+          <div className="mt-12 grid gap-4 lg:grid-cols-2">
+            {moments[0] && (
+              <MomentCard
+                moment={moments[0]}
+                imageHeight="h-72 lg:h-full"
+                className="lg:row-span-2"
+              />
+            )}
+            {moments[1] && (
+              <MomentCard moment={moments[1]} imageHeight="h-56" />
+            )}
+            {(moments[2] || moments[3]) && (
+              <div className="grid grid-cols-2 gap-4">
+                {moments[2] && (
+                  <MomentCard moment={moments[2]} imageHeight="h-56" />
+                )}
+                {moments[3] && (
+                  <MomentCard moment={moments[3]} imageHeight="h-56" />
+                )}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         <div className="mt-10 text-center">
           <Link href="/community" className="btn-primary">
@@ -426,7 +449,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <PartnerStrip />
+      <PartnerStrip partners={partners} />
     </div>
   );
 }
