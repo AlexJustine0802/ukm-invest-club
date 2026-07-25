@@ -2,9 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { hashPassword } from "@/lib/userAuth";
-import { issueAuthToken, siteUrl } from "@/lib/authTokens";
-import { sendAuthEmail } from "@/lib/email";
+import {
+  createUserSessionToken,
+  hashPassword,
+  setUserSessionCookie,
+} from "@/lib/userAuth";
 
 export interface AuthState {
   error?: string;
@@ -31,13 +33,18 @@ export async function signupUser(
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: "An account with this email already exists." };
 
+  // No email confirmation step: the address is taken as given and the account
+  // is usable straight away.
   const user = await prisma.user.create({
-    data: { name, email, passwordHash: await hashPassword(password) },
+    data: {
+      name,
+      email,
+      passwordHash: await hashPassword(password),
+      emailVerified: new Date(),
+    },
   });
 
-  const token = await issueAuthToken(user.id, "VERIFY");
-  await sendAuthEmail(email, "verify", `${siteUrl()}/verify-email?token=${token}`);
-
-  // Do not auto-login; the account is inactive until the email is verified.
-  redirect("/login?registered=1");
+  const token = await createUserSessionToken(user.id, user.email);
+  await setUserSessionCookie(token);
+  redirect("/account");
 }

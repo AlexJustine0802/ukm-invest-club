@@ -21,16 +21,10 @@ function SubmitButton() {
 export default function LoginForm() {
   const [state, formAction] = useActionState<AuthState, FormData>(loginUser, {});
   const params = useSearchParams();
-  const registered = params.get("registered") === "1";
   const reset = params.get("reset") === "1";
 
   return (
     <form action={formAction} className="space-y-5">
-      {registered && !state.error && (
-        <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
-          Account created — check your email for a verification link.
-        </p>
-      )}
       {reset && !state.error && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
           Password updated — please log in.

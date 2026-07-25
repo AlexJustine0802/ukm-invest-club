@@ -47,24 +47,21 @@ export async function sendContactEmail(msg: ContactMessage): Promise<void> {
 }
 
 /**
- * Send a transactional auth email (verify address / reset password).
+ * Send a transactional auth email. Signup no longer confirms addresses, so the
+ * password reset link is the only one left.
  * Falls back to logging the link to the server console when Resend is not
  * configured, so the flow stays testable in local dev.
  */
 export async function sendAuthEmail(
   to: string,
-  kind: "verify" | "reset",
+  kind: "reset",
   link: string,
 ): Promise<void> {
-  const subject =
-    kind === "verify" ? "Verify your ICUnpar email" : "Reset your ICUnpar password";
-  const heading =
-    kind === "verify" ? "Confirm your email address" : "Reset your password";
+  const subject = "Reset your ICUnpar password";
+  const heading = "Reset your password";
   const body =
-    kind === "verify"
-      ? "Welcome to ICUnpar! Confirm your email address to activate your account. This link expires in 24 hours."
-      : "We received a request to reset your ICUnpar password. This link expires in 1 hour. If you did not request it, you can safely ignore this email.";
-  const cta = kind === "verify" ? "Verify Email" : "Reset Password";
+    "We received a request to reset your ICUnpar password. This link expires in 1 hour. If you did not request it, you can safely ignore this email.";
+  const cta = "Reset Password";
 
   const apiKey = process.env.RESEND_API_KEY;
   const from =
