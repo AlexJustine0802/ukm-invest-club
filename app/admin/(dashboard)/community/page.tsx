@@ -31,7 +31,7 @@ export default async function AdminCommunityPage() {
           No moments yet.{" "}
           <Link
             href="/admin/community/new"
-            className="text-gold-dark underline"
+            className="text-accent-dark underline"
           >
             Add one
           </Link>
@@ -50,7 +50,7 @@ export default async function AdminCommunityPage() {
                 />
               </div>
               <div className="p-4">
-                <span className="text-xs font-semibold uppercase tracking-wide text-gold-dark">
+                <span className="text-xs font-semibold uppercase tracking-wide text-primary-dark">
                   {m.category}
                 </span>
                 <p className="font-semibold text-navy">{m.title}</p>

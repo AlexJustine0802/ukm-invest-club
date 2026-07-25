@@ -24,7 +24,7 @@ export default async function AdminEventsPage() {
       {events.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No events yet.{" "}
-          <Link href="/admin/events/new" className="text-gold-dark underline">
+          <Link href="/admin/events/new" className="text-accent-dark underline">
             Create your first event
           </Link>
           .

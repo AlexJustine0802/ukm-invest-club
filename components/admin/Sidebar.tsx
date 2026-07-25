@@ -1,15 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { logout } from "@/app/admin/actions";
 
 type Child = { label: string; href: string };
 type Group = { label: string; icon: string; href: string; children?: Child[] };
+type WorkspaceId = "public" | "dashboard";
 
-// 5 groups mirroring the public navbar (Home, About, Research, Events, Contact).
-const groups: Group[] = [
+// Public website — mirrors the public navbar (Home, About, Research, Events, Contact).
+const publicGroups: Group[] = [
   {
     label: "Home",
     icon: "🏠",
@@ -24,6 +25,7 @@ const groups: Group[] = [
     icon: "ℹ️",
     href: "/admin/team",
     children: [
+      { label: "Divisions", href: "/admin/divisions" },
       { label: "Team", href: "/admin/team" },
       { label: "Community", href: "/admin/community" },
       { label: "Partners", href: "/admin/partners" },
@@ -58,46 +60,246 @@ const groups: Group[] = [
   },
 ];
 
-// A child is active if the current path starts with its route (ignoring query).
-function childActive(pathname: string, href: string) {
-  const path = href.split("?")[0];
-  return path === "/admin" ? pathname === "/admin" : pathname.startsWith(path);
+// Member dashboard — everything behind the member login at /account.
+const dashboardGroups: Group[] = [
+  {
+    label: "Banner",
+    icon: "📢",
+    href: "/admin/highlights",
+    children: [{ label: "Highlight", href: "/admin/highlights" }],
+  },
+  {
+    label: "Assignments",
+    icon: "📝",
+    href: "/admin/assignments",
+    children: [{ label: "Assignments", href: "/admin/assignments" }],
+  },
+  {
+    label: "Members",
+    icon: "🧑‍🎓",
+    href: "/admin/members",
+    children: [{ label: "Members & Roles", href: "/admin/members" }],
+  },
+  {
+    label: "Registrations",
+    icon: "🧾",
+    href: "/admin/registrations",
+    children: [
+      { label: "Forms", href: "/admin/registrations" },
+      { label: "Recruitment", href: "/admin/recruitment" },
+    ],
+  },
+  {
+    label: "Discussions",
+    icon: "💬",
+    href: "/admin/discussions",
+    children: [{ label: "Channels", href: "/admin/discussions" }],
+  },
+  {
+    label: "Career Alerts",
+    icon: "💼",
+    href: "/admin/career",
+    children: [{ label: "Job Postings", href: "/admin/career" }],
+  },
+  {
+    label: "Dashboard Content",
+    icon: "🧩",
+    href: "/admin/dashboard-content",
+    children: [
+      { label: "Overview Stats", href: "/admin/dashboard-content?section=overview" },
+      { label: "Announcements", href: "/admin/dashboard-content?section=announcement" },
+      { label: "Recent Resources", href: "/admin/dashboard-content?section=resource" },
+    ],
+  },
+  {
+    label: "Resources Page",
+    icon: "📁",
+    href: "/admin/dashboard-content?section=folder",
+    children: [
+      { label: "Folders", href: "/admin/dashboard-content?section=folder" },
+    ],
+  },
+];
+
+const workspaces: {
+  id: WorkspaceId;
+  label: string;
+  desc: string;
+  icon: string;
+  home: string;
+  groups: Group[];
+}[] = [
+  {
+    id: "public",
+    label: "Public Website",
+    desc: "Pages any visitor can see",
+    icon: "🌐",
+    home: "/admin",
+    groups: publicGroups,
+  },
+  {
+    id: "dashboard",
+    label: "Member Dashboard",
+    desc: "Login-only member area",
+    icon: "🎓",
+    home: "/admin/member-dashboard",
+    groups: dashboardGroups,
+  },
+];
+
+// Routes that belong to the member-dashboard workspace.
+const dashboardPrefixes = [
+  "/admin/member-dashboard",
+  "/admin/highlights",
+  "/admin/dashboard-content",
+  "/admin/assignments",
+  "/admin/discussions",
+  "/admin/career",
+  "/admin/registrations",
+  "/admin/recruitment",
+  "/admin/members",
+];
+
+/**
+ * A child is active when the path matches. Children that differ only by query
+ * string (?section=…) must also match on that key, otherwise every sibling
+ * lights up at once.
+ */
+function childActive(pathname: string, search: string, href: string) {
+  const [path, query] = href.split("?");
+  const pathMatches =
+    path === "/admin" ? pathname === "/admin" : pathname.startsWith(path);
+  if (!pathMatches) return false;
+  if (!query) return true;
+
+  const want = new URLSearchParams(query);
+  const have = new URLSearchParams(search);
+  for (const [key, value] of want) {
+    if ((have.get(key) ?? "") !== value) return false;
+  }
+  return true;
 }
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const search = searchParams.toString();
+
+  const currentWorkspace: WorkspaceId = dashboardPrefixes.some((p) =>
+    pathname.startsWith(p),
+  )
+    ? "dashboard"
+    : "public";
+
+  const workspace =
+    workspaces.find((w) => w.id === currentWorkspace) ?? workspaces[0];
+  const groups = workspace.groups;
 
   const isGroupActive = (g: Group) =>
-    (g.children ?? []).some((c) => childActive(pathname, c.href));
+    (g.children ?? []).some((c) => childActive(pathname, search, c.href));
 
-  // Open the group that contains the active route by default.
-  const [open, setOpen] = useState<string | null>(
-    groups.find((g) => isGroupActive(g))?.label ?? "Home",
-  );
+  // Default: the group containing the current route, else the first one.
+  const defaultOpen =
+    groups.find((g) => isGroupActive(g))?.label ?? groups[0]?.label ?? null;
+
+  // Manual toggles are scoped to a workspace, so switching workspaces falls
+  // back to that workspace's default instead of keeping a stale group name
+  // (which left every group collapsed and looked like the menu vanished).
+  const [override, setOverride] = useState<{
+    workspace: WorkspaceId;
+    label: string | null;
+  } | null>(null);
+
+  const open =
+    override && override.workspace === workspace.id
+      ? override.label
+      : defaultOpen;
+
+  const setOpen = (label: string | null) =>
+    setOverride({ workspace: workspace.id, label });
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const switcherRef = useRef<HTMLDivElement>(null);
+
+  // Close the workspace switcher on outside click or Escape.
+  useEffect(() => {
+    if (!switcherOpen) return;
+    function onPointerDown(e: MouseEvent) {
+      if (!switcherRef.current?.contains(e.target as Node)) setSwitcherOpen(false);
+    }
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setSwitcherOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [switcherOpen]);
 
   return (
     <aside className="flex w-full flex-col bg-navy text-slate-200 md:h-screen md:w-64 md:shrink-0">
-      <div className="flex items-center gap-2 border-b border-white/10 px-6 py-4 text-white">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold font-bold text-navy">
-          IC
-        </span>
-        <div>
-          <p className="text-sm font-bold leading-none">ICUnpar</p>
-          <p className="text-xs text-slate-400">Admin</p>
-        </div>
+      {/* Workspace switcher */}
+      <div ref={switcherRef} className="relative border-b border-white/10">
+        <button
+          type="button"
+          onClick={() => setSwitcherOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={switcherOpen}
+          className="flex w-full items-center gap-2 px-6 py-4 text-left text-white hover:bg-white/5"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-base">
+            {workspace.icon}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold leading-tight">
+              {workspace.label}
+            </p>
+            <p className="truncate text-xs text-slate-400">Admin</p>
+          </div>
+          <span
+            className={`text-xs transition-transform ${switcherOpen ? "rotate-180" : ""}`}
+          >
+            ▾
+          </span>
+        </button>
+
+        {switcherOpen && (
+          <div className="absolute left-3 right-3 z-50 mt-1 overflow-hidden rounded-xl border border-white/10 bg-navy shadow-xl">
+            {workspaces.map((w) => (
+              <Link
+                key={w.id}
+                href={w.home}
+                onClick={() => setSwitcherOpen(false)}
+                className={`flex items-start gap-3 px-4 py-3 hover:bg-white/10 ${
+                  w.id === currentWorkspace ? "bg-white/5" : ""
+                }`}
+              >
+                <span className="mt-0.5 text-base">{w.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-white">{w.label}</p>
+                  <p className="text-xs text-slate-400">{w.desc}</p>
+                </div>
+                {w.id === currentWorkspace && (
+                  <span className="text-sm text-primary-light">✓</span>
+                )}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3">
         <Link
-          href="/admin"
+          href={workspace.id === "public" ? "/admin" : "/admin/member-dashboard"}
           className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
-            pathname === "/admin"
-              ? "bg-gold text-navy"
+            pathname === "/admin" || pathname === "/admin/member-dashboard"
+              ? "bg-accent text-white"
               : "text-slate-300 hover:bg-white/10 hover:text-white"
           }`}
         >
           <span>📊</span>
-          Dashboard
+          Overview
         </Link>
 
         {groups.map((group) => {
@@ -130,8 +332,8 @@ export default function Sidebar() {
                       key={child.href}
                       href={child.href}
                       className={`flex items-center rounded-lg px-3 py-1.5 text-sm transition-colors ${
-                        childActive(pathname, child.href)
-                          ? "bg-gold text-navy"
+                        childActive(pathname, search, child.href)
+                          ? "bg-accent text-white"
                           : "text-slate-300 hover:bg-white/10 hover:text-white"
                       }`}
                     >
@@ -147,11 +349,12 @@ export default function Sidebar() {
 
       <div className="space-y-2 border-t border-white/10 p-3">
         <Link
-          href="/"
+          href={workspace.id === "dashboard" ? "/account" : "/"}
           target="_blank"
           className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white"
         >
-          <span>🌐</span> View site
+          <span>🌐</span>
+          {workspace.id === "dashboard" ? "View dashboard" : "View site"}
         </Link>
         <form action={logout}>
           <button

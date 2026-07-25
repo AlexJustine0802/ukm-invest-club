@@ -26,7 +26,7 @@ export default async function EditPublicationPage({
     <div>
       <Link
         href="/admin/publications"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to publications
       </Link>

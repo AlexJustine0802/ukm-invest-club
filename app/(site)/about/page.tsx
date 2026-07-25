@@ -25,6 +25,8 @@ import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
 import { formatDate } from "@/lib/utils";
 import PartnerStrip from "@/components/PartnerStrip";
+import DivisionsSection from "@/components/DivisionsSection";
+import { sortDivisionPeople, isHead } from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -89,18 +91,25 @@ function MomentCard({
   );
 }
 
-const divisions = [
-  { icon: ChartColumn, title: "Investment Analyst", text: "Analyze markets, sectors, and companies and publish quality research." },
-  { icon: Camera, title: "Media & Creative", text: "Manage content, design, and communication to spread educational information." },
-  { icon: Users, title: "Human Resource", text: "Manage member development, recruitment, and internal community activities." },
-  { icon: Handshake, title: "Partnership", text: "Build and maintain good relationships with partners, sponsors, and institutions." },
-  { icon: CalendarDays, title: "Event & Program", text: "Design and run activities that benefit members." },
-];
-
 export default async function AboutPage() {
-  const [team, stats, partners, communityMoments, settings] = await Promise.all([
-    prisma.teamMember.findMany({
+  const [divisionRows, divisionPeople, stats, partners, communityMoments, settings] = await Promise.all([
+    prisma.division.findMany({
       orderBy: [{ order: "asc" }, { name: "asc" }],
+    }),
+    // The people are member accounts — edited once in /admin/members and shown
+    // here and in the member area both.
+    prisma.user.findMany({
+      where: { division: { not: null } },
+      select: {
+        id: true,
+        name: true,
+        role: true,
+        division: true,
+        photo: true,
+        bio: true,
+        instagram: true,
+        linkedin: true,
+      },
     }),
     prisma.impactStat.findMany({
       where: { section: "home" },
@@ -113,6 +122,24 @@ export default async function AboutPage() {
     }),
     prisma.siteSettings.findUnique({ where: { id: 1 } }),
   ]);
+
+  // Attach each division's people, ordered head first then by the org chart.
+  const divisions = divisionRows.map((d) => ({
+    ...d,
+    members: sortDivisionPeople(
+      divisionPeople.filter((p) => p.division === d.slug),
+      d.slug,
+    ).map((p) => ({
+      id: p.id,
+      name: p.name,
+      role: p.role,
+      isHead: isHead(p.role),
+      photo: p.photo,
+      bio: p.bio,
+      instagram: p.instagram,
+      linkedin: p.linkedin,
+    })),
+  }));
 
   const moments: MomentView[] = communityMoments.map((m) => ({
     image: m.coverImage,
@@ -224,81 +251,6 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Our Journey */}
-      <section className="bg-slate-50 py-16">
-        <div className="container-page">
-          <div className="text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-              Our Journey
-            </span>
-            <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold text-navy">
-              Every Step, Building a Stronger Future
-            </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-              From a small initiative on campus to a growing investment
-              community that creates impact for members and society.
-            </p>
-          </div>
-
-          <div className="relative mt-14">
-            <div className="absolute left-1/2 top-0 hidden h-full w-0.5 -translate-x-1/2 bg-primary-light sm:block" />
-
-            <div className="space-y-10 sm:space-y-6">
-              {journey.map((j, i) => {
-                const onRight = i % 2 === 1;
-                const card = (
-                  <div className="card p-6">
-                    <span className="text-sm font-bold text-primary">
-                      {j.year}
-                    </span>
-                    <h3 className="mt-1 text-lg font-bold text-navy">
-                      {j.title}
-                    </h3>
-                    <span className="mt-2 block h-0.5 w-8 bg-primary-light" />
-                    <p className="mt-3 text-sm text-slate-600">{j.text}</p>
-                  </div>
-                );
-                const badge = (
-                  <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-primary-light bg-white text-primary">
-                    <j.icon className="h-6 w-6" />
-                  </span>
-                );
-
-                return (
-                  <div
-                    key={j.year}
-                    className="grid grid-cols-[auto_1fr] items-center gap-4 sm:grid-cols-[1fr_auto_1fr] sm:gap-6"
-                  >
-                    <div className="sm:hidden">{badge}</div>
-                    <div className="sm:hidden">{card}</div>
-
-                    <div className="hidden sm:block">
-                      {!onRight && (
-                        <div className="flex items-center justify-end gap-4">
-                          <div className="flex-1">{card}</div>
-                          <span className="h-0.5 w-6 bg-primary-light" />
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="hidden sm:block">{badge}</div>
-                    <div className="hidden sm:block">
-                      {onRight && (
-                        <div className="flex items-center gap-4">
-                          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                          <span className="h-0.5 w-6 bg-primary-light" />
-                          <div className="flex-1">{card}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Our Community */}
       <section id="community" className="container-page py-16">
         <div className="text-center">
@@ -327,7 +279,7 @@ export default async function AboutPage() {
               <MomentCard moment={moments[1]} imageHeight="h-56" />
             )}
             {(moments[2] || moments[3]) && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4 sm:grid-cols-2">
                 {moments[2] && (
                   <MomentCard moment={moments[2]} imageHeight="h-56" />
                 )}
@@ -347,107 +299,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Our Divisions */}
-      <section className="container-page py-16">
-        <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-          Our Divisions
-        </span>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {divisions.map((d) => (
-            <div key={d.title} className="card p-6 text-center">
-              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-light text-primary">
-                <d.icon className="h-6 w-6" />
-              </span>
-              <h3 className="mt-4 text-lg font-bold text-navy">{d.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{d.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="bg-slate-50 py-16">
-        <div className="container-page">
-          <div className="flex items-end justify-between">
-            <div>
-              <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-                Meet Our Team
-              </span>
-              <h2 className="mt-2 text-3xl font-bold text-navy">
-                The people who keep {site.name} running
-              </h2>
-            </div>
-          </div>
-
-          {team.length > 0 ? (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {team.map((member) => (
-                <div key={member.id} className="card p-6 text-center">
-                  <div className="relative mx-auto h-28 w-28 overflow-hidden rounded-full bg-slate-200">
-                    {member.photo ? (
-                      <Image
-                        src={member.photo}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                        sizes="112px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-slate-400">
-                        <Users className="h-10 w-10" />
-                      </div>
-                    )}
-                  </div>
-                  <h3 className="mt-4 text-lg font-bold text-navy">
-                    {member.name}
-                  </h3>
-                  <p className="text-sm font-medium text-primary">
-                    {member.role}
-                  </p>
-                  {member.bio && (
-                    <p className="mt-2 text-sm text-slate-600">{member.bio}</p>
-                  )}
-                  <div className="mt-3 flex justify-center gap-3">
-                    {member.linkedin && (
-                      <a
-                        href={member.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${member.name} on LinkedIn`}
-                        className="text-slate-400 hover:text-primary"
-                      >
-                        <Link2 className="h-4 w-4" />
-                      </a>
-                    )}
-                    {member.instagram && (
-                      <a
-                        href={member.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`${member.name} on Instagram`}
-                        className="text-slate-400 hover:text-primary"
-                      >
-                        <AtSign className="h-4 w-4" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-8 text-center text-slate-500">
-              Committee members coming soon.
-            </p>
-          )}
-
-          <div className="mt-10 text-center">
-            <Link href="/contact" className="btn-primary">
-              <TrendingUp className="mr-2 h-4 w-4" />
-              Join Our Team
-            </Link>
-          </div>
-        </div>
-      </section>
+      {divisions.length > 0 && <DivisionsSection divisions={divisions} />}
 
       <PartnerStrip partners={partners} />
     </div>

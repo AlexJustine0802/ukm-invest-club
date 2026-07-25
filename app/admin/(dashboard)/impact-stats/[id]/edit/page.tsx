@@ -23,7 +23,7 @@ export default async function EditImpactStatPage({
 
   return (
     <div>
-      <Link href={backHref} className="text-sm text-gold-dark hover:text-gold">
+      <Link href={backHref} className="text-sm text-accent-dark hover:text-accent">
         ← Back to stats
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-navy">Edit stat</h1>

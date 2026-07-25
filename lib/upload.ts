@@ -6,13 +6,21 @@ import { put } from "@vercel/blob";
  * fall back to a pasted image URL instead.
  */
 export async function uploadImage(file: File): Promise<string> {
+  return uploadFile(file, "uploads");
+}
+
+/**
+ * Upload any file (form attachments, not just images) and return its URL.
+ * `folder` keeps form uploads out of the CMS image listing.
+ */
+export async function uploadFile(file: File, folder = "uploads"): Promise<string> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     throw new Error(
-      "Image upload is not configured (BLOB_READ_WRITE_TOKEN missing). Paste an image URL instead.",
+      "File upload is not configured (BLOB_READ_WRITE_TOKEN missing).",
     );
   }
-  const ext = file.name.split(".").pop() || "jpg";
-  const key = `uploads/${Date.now()}-${Math.random()
+  const ext = file.name.split(".").pop() || "bin";
+  const key = `${folder}/${Date.now()}-${Math.random()
     .toString(36)
     .slice(2)}.${ext}`;
   const blob = await put(key, file, { access: "public" });

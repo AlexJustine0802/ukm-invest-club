@@ -18,7 +18,7 @@ export default async function EditTeamMemberPage({
 
   return (
     <div>
-      <Link href="/admin/team" className="text-sm text-gold-dark hover:text-gold">
+      <Link href="/admin/team" className="text-sm text-accent-dark hover:text-accent">
         ← Back to team
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-navy">Edit team member</h1>

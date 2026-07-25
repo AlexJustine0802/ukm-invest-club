@@ -19,7 +19,7 @@ export default async function EditEventCategoryPage({
     <div>
       <Link
         href="/admin/event-categories"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to event categories
       </Link>

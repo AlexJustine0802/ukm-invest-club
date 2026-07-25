@@ -27,7 +27,7 @@ export default async function AdminPartnersPage() {
       {partners.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No partners yet.{" "}
-          <Link href="/admin/partners/new" className="text-gold-dark underline">
+          <Link href="/admin/partners/new" className="text-accent-dark underline">
             Add one
           </Link>
           .

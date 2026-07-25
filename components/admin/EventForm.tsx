@@ -9,6 +9,8 @@ interface EventFormProps {
   action: (formData: FormData) => void;
   uploadEnabled: boolean;
   categories: { id: string; title: string }[];
+  /** Public sign-up forms an event's Register button can point at. */
+  registrationForms: { id: string; title: string }[];
   event?: {
     id: string;
     title: string;
@@ -18,6 +20,10 @@ interface EventFormProps {
     coverImage: string | null;
     published: boolean;
     categoryId: string | null;
+    endDate: Date | null;
+    capacity: number | null;
+    seatUnit: string;
+    registrationFormId: string | null;
   };
 }
 
@@ -25,6 +31,7 @@ export default function EventForm({
   action,
   uploadEnabled,
   categories,
+  registrationForms,
   event,
 }: EventFormProps) {
   return (
@@ -74,6 +81,51 @@ export default function EventForm({
         </div>
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div>
+          <label htmlFor="endDate" className="label">
+            End time <span className="text-slate-400">(optional)</span>
+          </label>
+          <input
+            id="endDate"
+            name="endDate"
+            type="datetime-local"
+            defaultValue={
+              event?.endDate ? toDateTimeLocalValue(event.endDate) : undefined
+            }
+            className="input"
+          />
+        </div>
+        <div>
+          <label htmlFor="capacity" className="label">
+            Capacity <span className="text-slate-400">(blank = unlimited)</span>
+          </label>
+          <input
+            id="capacity"
+            name="capacity"
+            type="number"
+            min={0}
+            defaultValue={event?.capacity ?? ""}
+            placeholder="e.g. 60"
+            className="input"
+          />
+        </div>
+        <div>
+          <label htmlFor="seatUnit" className="label">
+            Counted in
+          </label>
+          <select
+            id="seatUnit"
+            name="seatUnit"
+            defaultValue={event?.seatUnit ?? "seats"}
+            className="input"
+          >
+            <option value="seats">seats</option>
+            <option value="teams">teams</option>
+          </select>
+        </div>
+      </div>
+
       <div>
         <label htmlFor="categoryId" className="label">
           Category
@@ -91,6 +143,29 @@ export default function EventForm({
             </option>
           ))}
         </select>
+      </div>
+
+      <div>
+        <label htmlFor="registrationFormId" className="label">
+          Registration form <span className="text-slate-400">(optional)</span>
+        </label>
+        <select
+          id="registrationFormId"
+          name="registrationFormId"
+          defaultValue={event?.registrationFormId ?? ""}
+          className="input"
+        >
+          <option value="">None — “Register Now” opens the event page</option>
+          {registrationForms.map((f) => (
+            <option key={f.id} value={f.id}>
+              {f.title}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1 text-xs text-slate-500">
+          Pick a form and the “Register Now” button on the public events page
+          opens it directly. Create forms under Registrations.
+        </p>
       </div>
 
       <div>

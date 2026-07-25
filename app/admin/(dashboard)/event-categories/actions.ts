@@ -31,6 +31,7 @@ function parseFields(formData: FormData) {
     title: (formData.get("title") as string).trim(),
     description: (formData.get("description") as string)?.trim() || null,
     icon: (formData.get("icon") as string) || "Building2",
+    color: (formData.get("color") as string)?.trim() || null,
     order: Number(formData.get("order")) || 0,
   };
 }

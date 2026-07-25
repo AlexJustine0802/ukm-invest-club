@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import { EVENT_ICON_KEYS, getEventIcon } from "@/lib/eventIcons";
+import { EVENT_COLOR_KEYS } from "@/lib/eventStyles";
 
 interface EventCategoryFormProps {
   action: (formData: FormData) => void;
@@ -12,6 +13,7 @@ interface EventCategoryFormProps {
     title: string;
     description: string | null;
     icon: string;
+    color: string | null;
     order: number;
   };
 }
@@ -74,6 +76,24 @@ export default function EventCategoryForm({
           <div className="mt-2 flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
             <Icon className="h-5 w-5" />
           </div>
+        </div>
+        <div>
+          <label htmlFor="color" className="label">
+            Colour <span className="text-slate-400">(member events page)</span>
+          </label>
+          <select
+            id="color"
+            name="color"
+            defaultValue={category?.color ?? ""}
+            className="input"
+          >
+            <option value="">Auto</option>
+            {EVENT_COLOR_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {key.charAt(0).toUpperCase() + key.slice(1)}
+              </option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="order" className="label">

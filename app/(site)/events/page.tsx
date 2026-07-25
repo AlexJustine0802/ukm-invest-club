@@ -34,6 +34,10 @@ type EventDisplay = {
   location: string;
   image: string;
   participants?: string;
+  /** Slug of the linked public registration form, when the admin set one. */
+  registrationSlug?: string | null;
+  /** True for real rows; the demo placeholders below have no detail page. */
+  fromDb?: boolean;
 };
 
 type DbEvent = {
@@ -43,6 +47,7 @@ type DbEvent = {
   eventDate: Date;
   location: string | null;
   coverImage: string | null;
+  registrationForm?: { slug: string; published: boolean } | null;
 };
 
 const eventImages = [
@@ -164,10 +169,6 @@ const fallbackPast: EventDisplay[] = [
   },
 ];
 
-const fallbackSlugs = new Set(
-  [...fallbackUpcoming, ...fallbackPast].map((event) => event.slug),
-);
-
 function cleanDescription(description: string) {
   return description
     .replace(/[#*_>`]/g, "")
@@ -203,6 +204,10 @@ function normalizeEvent(
     endDate: addHours(event.eventDate, 3),
     location: event.location ?? "Universitas Katolik Parahyangan",
     image: event.coverImage ?? eventImages[index % eventImages.length],
+    registrationSlug: event.registrationForm?.published
+      ? event.registrationForm.slug
+      : null,
+    fromDb: true,
   };
 }
 
@@ -244,8 +249,20 @@ function formatTimeRange(start: Date, end: Date) {
     .replace(":", ".")} WIB`;
 }
 
+// Demo placeholders (used only when the database has no events) have no detail
+// page of their own. A real row always does, even if its slug matches a demo.
 function eventHref(event: EventDisplay) {
-  return fallbackSlugs.has(event.slug) ? "/events" : `/events/${event.slug}`;
+  return event.fromDb ? `/events/${event.slug}` : "/events";
+}
+
+/**
+ * "Register Now" goes straight to the event's sign-up form when one is linked
+ * in the admin; otherwise it falls back to the event detail page.
+ */
+function registerHref(event: EventDisplay) {
+  return event.registrationSlug
+    ? `/register/${event.registrationSlug}`
+    : eventHref(event);
 }
 
 function SectionHeader({
@@ -327,7 +344,7 @@ function UpcomingCard({ event }: { event: EventDisplay }) {
               {event.location}
             </p>
           </div>
-          <Link href={eventHref(event)} className="btn-primary mt-6 px-5 py-2 text-xs">
+          <Link href={registerHref(event)} className="btn-primary mt-6 px-5 py-2 text-xs">
             Register Now
           </Link>
         </div>
@@ -363,7 +380,7 @@ function CalendarRow({ event }: { event: EventDisplay }) {
           {event.location}
         </p>
       </div>
-      <Link href={eventHref(event)} className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end">
+      <Link href={registerHref(event)} className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end">
         Register
       </Link>
     </div>
@@ -412,6 +429,9 @@ export default async function EventsPage() {
         where: { published: true, eventDate: { gte: now } },
         orderBy: { eventDate: "asc" },
         take: 5,
+        include: {
+          registrationForm: { select: { slug: true, published: true } },
+        },
       }),
       prisma.event.findMany({
         where: { published: true, eventDate: { lt: now } },
@@ -469,6 +489,9 @@ export default async function EventsPage() {
       where: { published: true, featured: true },
       orderBy: { eventDate: "asc" },
       take: 5,
+      include: {
+        registrationForm: { select: { slug: true, published: true } },
+      },
     })
     .catch(() => [] as DbEvent[]);
 

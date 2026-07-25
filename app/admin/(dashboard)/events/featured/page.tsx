@@ -24,7 +24,7 @@ export default async function EventsHeroPage() {
     <div>
       <Link
         href="/admin/events"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to events
       </Link>

@@ -20,7 +20,7 @@ export default async function EditPartnerPage({
     <div>
       <Link
         href="/admin/partners"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to partners
       </Link>

@@ -26,7 +26,7 @@ export default async function AdminResearchCategoriesPage() {
           No categories yet.{" "}
           <Link
             href="/admin/research-categories/new"
-            className="text-gold-dark underline"
+            className="text-accent-dark underline"
           >
             Add one
           </Link>

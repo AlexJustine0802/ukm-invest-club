@@ -21,7 +21,7 @@ export default async function EditResearchCategoryPage({
     <div>
       <Link
         href="/admin/research-categories"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to research categories
       </Link>

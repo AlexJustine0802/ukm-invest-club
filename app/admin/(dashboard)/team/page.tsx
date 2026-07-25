@@ -22,7 +22,7 @@ export default async function AdminTeamPage() {
       {members.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No team members yet.{" "}
-          <Link href="/admin/team/new" className="text-gold-dark underline">
+          <Link href="/admin/team/new" className="text-accent-dark underline">
             Add one
           </Link>
           .
@@ -48,7 +48,7 @@ export default async function AdminTeamPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-navy">{member.name}</p>
-                  <p className="text-sm text-gold-dark">{member.role}</p>
+                  <p className="text-sm text-primary-dark">{member.role}</p>
                   <p className="text-xs text-slate-400">Order: {member.order}</p>
                 </div>
               </div>

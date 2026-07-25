@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { resolveImage } from "@/lib/upload";
 import { slugify } from "@/lib/utils";
+import { ensureEventForm } from "@/lib/eventForms";
 
 async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
   const root = slugify(base) || "event";
@@ -24,6 +25,7 @@ function revalidateEvents() {
   revalidatePath("/events/all");
   revalidatePath("/");
   revalidatePath("/admin/events");
+  revalidatePath("/admin/registrations");
 }
 
 export async function createEvent(formData: FormData) {
@@ -35,12 +37,19 @@ export async function createEvent(formData: FormData) {
   const location = (formData.get("location") as string)?.trim() || null;
   const published = formData.get("published") === "on";
   const categoryId = (formData.get("categoryId") as string)?.trim() || null;
+  const endRaw = (formData.get("endDate") as string)?.trim();
+  const endDate = endRaw ? new Date(endRaw) : null;
+  const capacityRaw = (formData.get("capacity") as string)?.trim();
+  const capacity = capacityRaw ? Number(capacityRaw) : null;
+  const seatUnit = (formData.get("seatUnit") as string)?.trim() || "seats";
+  const registrationFormId =
+    (formData.get("registrationFormId") as string)?.trim() || null;
   const coverImage = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
   );
 
-  await prisma.event.create({
+  const created = await prisma.event.create({
     data: {
       title,
       slug: await uniqueSlug(title),
@@ -50,8 +59,15 @@ export async function createEvent(formData: FormData) {
       coverImage,
       published,
       categoryId,
+      endDate,
+      capacity,
+      seatUnit,
+      registrationFormId,
     },
   });
+
+  // No form picked? Give the event its own, so Register always opens a form.
+  await ensureEventForm(prisma, created);
 
   revalidateEvents();
   redirect("/admin/events");
@@ -67,12 +83,19 @@ export async function updateEvent(formData: FormData) {
   const location = (formData.get("location") as string)?.trim() || null;
   const published = formData.get("published") === "on";
   const categoryId = (formData.get("categoryId") as string)?.trim() || null;
+  const endRaw = (formData.get("endDate") as string)?.trim();
+  const endDate = endRaw ? new Date(endRaw) : null;
+  const capacityRaw = (formData.get("capacity") as string)?.trim();
+  const capacity = capacityRaw ? Number(capacityRaw) : null;
+  const seatUnit = (formData.get("seatUnit") as string)?.trim() || "seats";
+  const registrationFormId =
+    (formData.get("registrationFormId") as string)?.trim() || null;
   const coverImage = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
   );
 
-  await prisma.event.update({
+  const updated = await prisma.event.update({
     where: { id },
     data: {
       title,
@@ -83,8 +106,14 @@ export async function updateEvent(formData: FormData) {
       coverImage,
       published,
       categoryId,
+      endDate,
+      capacity,
+      seatUnit,
+      registrationFormId,
     },
   });
+
+  await ensureEventForm(prisma, updated);
 
   revalidateEvents();
   redirect("/admin/events");

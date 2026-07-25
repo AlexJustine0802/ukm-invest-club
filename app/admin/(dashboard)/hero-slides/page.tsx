@@ -103,7 +103,7 @@ export default async function AdminImagesPage({
           No slides yet.{" "}
           <Link
             href={`/admin/hero-slides/new?loc=${location}`}
-            className="text-gold-dark underline"
+            className="text-accent-dark underline"
           >
             Add one
           </Link>

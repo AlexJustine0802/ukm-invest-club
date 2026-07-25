@@ -13,10 +13,15 @@ export default async function EditEventPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [event, categories] = await Promise.all([
+  const [event, categories, registrationForms] = await Promise.all([
     prisma.event.findUnique({ where: { id } }),
     prisma.eventCategory.findMany({
       orderBy: { order: "asc" },
+      select: { id: true, title: true },
+    }),
+    prisma.registrationForm.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
       select: { id: true, title: true },
     }),
   ]);
@@ -26,7 +31,7 @@ export default async function EditEventPage({
     <div>
       <Link
         href="/admin/events"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to events
       </Link>
@@ -36,6 +41,7 @@ export default async function EditEventPage({
           action={updateEvent}
           uploadEnabled={isBlobConfigured()}
           categories={categories}
+          registrationForms={registrationForms}
           event={event}
         />
       </div>

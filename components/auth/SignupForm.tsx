@@ -5,7 +5,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { User, Mail, Lock } from "lucide-react";
 import { signupUser, type AuthState } from "@/app/signup/actions";
-import { IconInput, PasswordInput, OAuthButtons } from "./authParts";
+import { IconInput, PasswordInput } from "./authParts";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -85,7 +85,6 @@ export default function SignupForm() {
       </div>
 
       <SubmitButton />
-      <OAuthButtons />
 
       <p className="text-center text-sm text-slate-500">
         Already have an account?{" "}

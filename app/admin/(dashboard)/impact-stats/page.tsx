@@ -62,7 +62,7 @@ export default async function AdminImpactStatsPage({
       {stats.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No stats yet.{" "}
-          <Link href={newHref} className="text-gold-dark underline">
+          <Link href={newHref} className="text-accent-dark underline">
             Add one
           </Link>
           .

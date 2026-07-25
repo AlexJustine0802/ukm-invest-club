@@ -4,6 +4,9 @@ const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    // Colour palettes live here (eventStyles, dashboardSections) and are also
+    // what the admin stores in the DB — without this they are never generated.
+    "./lib/**/*.{js,ts}",
   ],
   theme: {
     extend: {
@@ -17,6 +20,13 @@ const config: Config = {
           DEFAULT: "#1E293B",
           light: "#334155",
           dark: "#0F172A",
+        },
+        // Decorative accent. Deliberately not green/amber/rose — those already
+        // mean done / due soon / overdue in the UI.
+        accent: {
+          DEFAULT: "#7C3AED",
+          light: "#C4B5FD",
+          dark: "#5B21B6",
         },
         success: "#16A34A",
         warning: "#F59E0B",

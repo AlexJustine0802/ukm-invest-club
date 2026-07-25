@@ -7,7 +7,7 @@ import { useFormStatus } from "react-dom";
 import { Mail, Lock } from "lucide-react";
 import { loginUser } from "@/app/login/actions";
 import type { AuthState } from "@/app/signup/actions";
-import { IconInput, PasswordInput, OAuthButtons } from "./authParts";
+import { IconInput, PasswordInput } from "./authParts";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -20,13 +20,20 @@ function SubmitButton() {
 
 export default function LoginForm() {
   const [state, formAction] = useActionState<AuthState, FormData>(loginUser, {});
-  const registered = useSearchParams().get("registered") === "1";
+  const params = useSearchParams();
+  const registered = params.get("registered") === "1";
+  const reset = params.get("reset") === "1";
 
   return (
     <form action={formAction} className="space-y-5">
       {registered && !state.error && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
-          Account created — please log in.
+          Account created — check your email for a verification link.
+        </p>
+      )}
+      {reset && !state.error && (
+        <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+          Password updated — please log in.
         </p>
       )}
       {state.error && (
@@ -61,14 +68,16 @@ export default function LoginForm() {
           icon={Lock}
         />
         <div className="mt-2 text-right">
-          <span className="cursor-default text-sm font-medium text-primary">
+          <Link
+            href="/forgot-password"
+            className="text-sm font-medium text-primary"
+          >
             Forgot password?
-          </span>
+          </Link>
         </div>
       </div>
 
       <SubmitButton />
-      <OAuthButtons />
 
       <p className="text-center text-sm text-slate-500">
         Don&apos;t have an account?{" "}

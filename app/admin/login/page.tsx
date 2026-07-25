@@ -16,7 +16,7 @@ export default async function LoginPage({
       <div className="w-full max-w-md">
         <div className="mb-6 text-center text-white">
           <Link href="/" className="inline-flex items-center gap-2">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-gold font-bold text-navy">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary font-bold text-navy">
               IC
             </span>
             <span className="text-xl font-bold">{site.name}</span>
@@ -35,7 +35,7 @@ export default async function LoginPage({
         </div>
 
         <p className="mt-4 text-center text-sm text-slate-400">
-          <Link href="/" className="hover:text-gold">
+          <Link href="/" className="hover:text-primary">
             ← Back to website
           </Link>
         </p>

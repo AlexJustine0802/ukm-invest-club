@@ -8,7 +8,7 @@ export default function NewMomentPage() {
     <div>
       <Link
         href="/admin/community"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to community
       </Link>

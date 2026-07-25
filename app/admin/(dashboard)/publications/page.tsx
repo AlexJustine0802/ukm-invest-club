@@ -26,7 +26,7 @@ export default async function AdminPublicationsPage() {
           No publications yet.{" "}
           <Link
             href="/admin/publications/new"
-            className="text-gold-dark underline"
+            className="text-accent-dark underline"
           >
             Write your first one
           </Link>

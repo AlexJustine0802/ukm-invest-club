@@ -1,0 +1,271 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import {
+  ClipboardList,
+  Clock,
+  Send,
+  CheckCircle2,
+  CalendarDays,
+  ChevronRight,
+  SearchX,
+} from "lucide-react";
+import { getUserSession } from "@/lib/userAuth";
+import { prisma } from "@/lib/prisma";
+import AccountTopBar from "@/components/account/AccountTopBar";
+import InlineSearch from "@/components/account/InlineSearch";
+import { getUiIcon } from "@/lib/uiIcons";
+import {
+  ASSIGNMENT_TABS,
+  dueLabel,
+  isDueSoon,
+  isValidTab,
+  type AssignmentTab,
+} from "@/lib/assignments";
+
+export const metadata: Metadata = { title: "Assignments" };
+export const dynamic = "force-dynamic";
+
+export default async function AssignmentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ tab?: string; q?: string }>;
+}) {
+  const session = await getUserSession();
+  if (!session) redirect("/login");
+
+  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  if (!user) redirect("/login");
+
+  const { tab: tabParam, q = "" } = await searchParams;
+  const tab: AssignmentTab = isValidTab(tabParam) ? tabParam : "all";
+  const query = q.trim().toLowerCase();
+
+  const [all, submissions] = await Promise.all([
+    prisma.assignment.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { dueDate: "asc" }],
+    }),
+    prisma.assignmentSubmission.findMany({
+      where: { userId: user.id },
+      select: { assignmentId: true, gradedAt: true, score: true },
+    }),
+  ]);
+
+  const mySubmissions = new Map(submissions.map((s) => [s.assignmentId, s]));
+
+  const now = new Date();
+
+  const counts = {
+    active: all.filter((a) => a.status === "ACTIVE").length,
+    dueSoon: all.filter((a) => isDueSoon(a.dueDate, a.status, now)).length,
+    submitted: all.filter((a) => a.status === "SUBMITTED").length,
+    completed: all.filter((a) => a.status === "COMPLETED").length,
+  };
+
+  const byTab = (a: (typeof all)[number]) => {
+    switch (tab) {
+      case "active":
+        return a.status === "ACTIVE";
+      case "due-soon":
+        return isDueSoon(a.dueDate, a.status, now);
+      case "submitted":
+        return a.status === "SUBMITTED";
+      case "completed":
+        return a.status === "COMPLETED";
+      default:
+        return true;
+    }
+  };
+
+  const visible = all.filter(
+    (a) =>
+      byTab(a) &&
+      (!query ||
+        a.title.toLowerCase().includes(query) ||
+        a.category.toLowerCase().includes(query) ||
+        (a.description ?? "").toLowerCase().includes(query)),
+  );
+
+  const tabCount: Record<AssignmentTab, number | null> = {
+    all: null,
+    active: counts.active,
+    "due-soon": counts.dueSoon,
+    submitted: null,
+    completed: null,
+  };
+
+  const tabHref = (id: AssignmentTab) => {
+    const params = new URLSearchParams();
+    if (id !== "all") params.set("tab", id);
+    if (query) params.set("q", q.trim());
+    const qs = params.toString();
+    return qs ? `/account/assignments?${qs}` : "/account/assignments";
+  };
+
+  const stats = [
+    { value: counts.active, label: "Active Assignments", note: "Currently ongoing", icon: ClipboardList, color: "bg-blue-50 text-primary" },
+    { value: counts.dueSoon, label: "Due Soon", note: "Next 3 days", icon: Clock, color: "bg-amber-50 text-amber-600" },
+    { value: counts.submitted, label: "Submitted", note: "Awaiting review", icon: Send, color: "bg-violet-50 text-violet-600" },
+    { value: counts.completed, label: "Completed", note: "Great job!", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600" },
+  ];
+
+  const listHeading =
+    ASSIGNMENT_TABS.find((t) => t.id === tab)?.label ?? "All Assignments";
+
+  return (
+    <>
+      <AccountTopBar
+        title="Assignments"
+        subtitle="Track your tasks, submit your work, and stay on top of your deadlines."
+        showSearch={false}
+        name={user.name}
+        initial={user.name.charAt(0).toUpperCase()}
+        role={user.role}
+      />
+
+      {/* Tabs */}
+      <div className="mt-8 flex flex-wrap items-center gap-6 border-b border-slate-200">
+        {ASSIGNMENT_TABS.map((t) => {
+          const isActive = t.id === tab;
+          const count = tabCount[t.id];
+          return (
+            <Link
+              key={t.id}
+              href={tabHref(t.id)}
+              className={`-mb-px flex items-center gap-2 border-b-2 pb-3 text-sm font-semibold ${
+                isActive
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 hover:text-navy"
+              }`}
+            >
+              {t.label}
+              {count !== null && count > 0 && (
+                <span
+                  className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold ${
+                    t.id === "due-soon"
+                      ? "bg-amber-500 text-white"
+                      : "bg-primary text-white"
+                  }`}
+                >
+                  {count}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Stat cards */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.label} className="rounded-2xl border border-slate-200 bg-white p-5">
+            <div className="flex items-center gap-4">
+              <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${s.color}`}>
+                <s.icon className="h-6 w-6" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-2xl font-extrabold leading-tight text-navy">
+                  {s.value}
+                </p>
+                <p className="text-sm font-medium text-navy">{s.label}</p>
+              </div>
+            </div>
+            <p className="mt-3 text-sm text-slate-400">{s.note}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* List */}
+      <div className="mt-8 flex items-center justify-between gap-4">
+        <h2 className="text-xl font-bold text-navy">{listHeading}</h2>
+        <InlineSearch placeholder="Search assignments..." />
+      </div>
+
+      {visible.length === 0 ? (
+        <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white py-16">
+          <SearchX className="h-10 w-10 text-slate-300" />
+          <p className="font-semibold text-navy">No assignments here</p>
+          <p className="text-sm text-slate-500">
+            {all.length === 0
+              ? "No assignments have been posted yet."
+              : "Nothing matches this tab or search."}
+          </p>
+        </div>
+      ) : (
+        <div className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          {visible.map((a) => {
+            const Icon = getUiIcon(a.icon);
+            const soon = isDueSoon(a.dueDate, a.status, now);
+            const mine = mySubmissions.get(a.id);
+            // What this member did with it beats the assignment's own status.
+            const badge = mine?.gradedAt
+              ? {
+                  text: mine.score !== null ? `Marked · ${mine.score}` : "Marked",
+                  cls: "bg-blue-50 text-primary",
+                }
+              : mine
+                ? { text: "Submitted", cls: "bg-violet-50 text-violet-600" }
+                : a.status === "COMPLETED"
+                  ? { text: "Completed", cls: "bg-emerald-50 text-emerald-600" }
+                  : soon
+                    ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
+                    : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
+
+            return (
+              <Link
+                key={a.id}
+                href={`/account/assignments/${a.id}`}
+                className="flex flex-col gap-4 p-5 hover:bg-slate-50 lg:flex-row lg:items-center"
+              >
+                <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${a.color ?? "bg-blue-50 text-primary"}`}>
+                  <Icon className="h-6 w-6" />
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-navy">{a.title}</p>
+                  <p className="text-sm text-slate-500">
+                    {a.category} • {a.workType}
+                  </p>
+                  {a.description && (
+                    <p className="mt-1 text-sm text-slate-500">{a.description}</p>
+                  )}
+                </div>
+
+                <div className="shrink-0 lg:w-48">
+                  <p
+                    className={`text-sm font-semibold ${
+                      soon ? "text-red-600" : "text-navy"
+                    }`}
+                  >
+                    {dueLabel(a.dueDate, now)}
+                  </p>
+                  <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {a.dueDate.toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                    ,{" "}
+                    {a.dueDate.toLocaleTimeString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-4">
+                  <span className={`rounded-lg px-3 py-1.5 text-xs font-semibold ${badge.cls}`}>
+                    {badge.text}
+                  </span>
+                  <ChevronRight className="h-5 w-5 text-slate-300" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+}

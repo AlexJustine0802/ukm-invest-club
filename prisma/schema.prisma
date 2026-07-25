@@ -23,8 +23,34 @@ model Event {
   category   EventCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   featured   Boolean        @default(false) // ticked to show in the events hero
 
+  // Member-area registration
+  endDate  DateTime? // end of the session; drives the "13.00 – 16.00" range
+  capacity Int? // null = unlimited, no seat counter shown
+  seatUnit String    @default("seats") // "seats" or "teams"
+
+  registrations EventRegistration[]
+
+  // Optional public sign-up form. When set, "Register Now" on the public events
+  // page opens that form instead of the event detail page.
+  registrationFormId String?
+  registrationForm   RegistrationForm? @relation(fields: [registrationFormId], references: [id], onDelete: SetNull)
+
   @@index([eventDate])
   @@index([categoryId])
+}
+
+// One row per member per event. The unique pair makes double-registering
+// impossible even if the button is clicked twice.
+model EventRegistration {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+  @@index([userId])
 }
 
 model EventCategory {
@@ -33,6 +59,7 @@ model EventCategory {
   slug        String   @unique
   description String?
   icon        String   @default("Building2")
+  color       String? // badge / button colour on the member events page
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   events      Event[]
@@ -93,11 +120,284 @@ model TeamMember {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  createdAt    DateTime @default(now())
+  id            String      @id @default(cuid())
+  name          String
+  email         String      @unique
+  passwordHash  String
+  role          String      @default("Member") // a role from lib/roles.ts
+  division      String? // division slug from lib/roles.ts; null = no division yet
+
+  // Public profile. A member with a division and role is shown in "Our
+  // Divisions" on the public About page, so these are edited once in
+  // /admin/members and appear in both places.
+  photo     String?
+  bio       String? @db.Text
+  instagram String?
+  linkedin  String?
+  emailVerified DateTime?
+  createdAt     DateTime    @default(now())
+  authTokens    AuthToken[]
+
+  eventRegistrations EventRegistration[]
+  channelMembers     ChannelMember[]
+  discussionPosts    DiscussionPost[]
+  formResponses      FormResponse[]
+  submissions        AssignmentSubmission[]
+}
+
+// A discussion channel members opt into. Only admins create channels; members
+// join, and joining is what unlocks reading and posting.
+model DiscussionChannel {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String? // key from lib/uiIcons
+  color       String? // palette key from lib/eventStyles
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members ChannelMember[]
+  posts   DiscussionPost[]
+
+  @@index([published, order])
+}
+
+// Same shape as EventRegistration: the unique pair makes a double click a no-op.
+model ChannelMember {
+  id        String            @id @default(cuid())
+  channelId String
+  channel   DiscussionChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime          @default(now())
+
+  @@unique([channelId, userId])
+  @@index([userId])
+}
+
+// A Google-Forms-style registration: staff recruitment, event sign-up, anything
+// with a custom question list. The questions live in one JSON column (see
+// lib/forms.ts for the shape) because they are only ever read and written as a
+// whole form — a table per question would buy nothing.
+model RegistrationForm {
+  id          String  @id @default(cuid())
+  title       String
+  slug        String  @unique
+  description String? @db.Text
+  coverImage  String?
+
+  audience          String  @default("MEMBERS") // MEMBERS | PUBLIC | BOTH
+  multipleResponses Boolean @default(false) // false = one response per member
+  questions         Json    @default("[]") // FormQuestion[] from lib/forms.ts
+
+  // Ticked on the club's open-recruitment form. The newest one drives
+  // /account/recruitment; when none is open that page shows a closed notice.
+  isRecruitment Boolean @default(false)
+
+  opensAt   DateTime?
+  closesAt  DateTime?
+  capacity  Int? // null = unlimited
+  published Boolean   @default(true)
+  order     Int       @default(0)
+  icon      String? // key from lib/uiIcons
+  color     String? // palette key from lib/eventStyles
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  responses FormResponse[]
+  events    Event[] // events whose "Register Now" points here
+
+  @@index([published, order])
+}
+
+// One submission. `answers` is keyed by question id; file answers hold the
+// uploaded blob URL. Guests (public forms) have no userId, so their name and
+// email are captured on the row itself.
+model FormResponse {
+  id     String           @id @default(cuid())
+  formId String
+  form   RegistrationForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  guestName  String?
+  guestEmail String?
+
+  answers   Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([formId, createdAt])
+  @@index([userId])
+}
+
+// Job / internship openings on /account/career. Publishing one makes it show up
+// in the member notification bell automatically — there is no separate
+// announcement row to keep in sync.
+model CareerAlert {
+  id          String    @id @default(cuid())
+  company     String
+  role        String
+  location    String?
+  workType    String    @default("Internship") // e.g. Internship, Full-time, Part-time
+  description String?   @db.Text
+  applyUrl    String?
+  deadline    DateTime?
+  icon        String? // key from lib/uiIcons
+  color       String? // palette key from lib/eventStyles
+  published   Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([published, createdAt])
+}
+
+model DiscussionPost {
+  id        String            @id @default(cuid())
+  channelId String
+  channel   DiscussionChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  body      String            @db.Text
+  createdAt DateTime          @default(now())
+
+  @@index([channelId, createdAt])
+}
+
+// Single-use tokens for email verification and password reset.
+// Only the SHA-256 hash is stored, so a DB leak cannot be replayed.
+model AuthToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  type      String // "VERIFY" | "RESET"
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId, type])
+}
+
+// Promo banner at the top of the member dashboard (e.g. staff recruitment).
+// Only the newest active row is shown.
+model Highlight {
+  id          String   @id @default(cuid())
+  eyebrow     String // small label above the title, e.g. "Open Recruitment"
+  title       String
+  description String?  @db.Text
+  buttonLabel String?
+  buttonHref  String?
+  noteTitle   String? // optional small side card
+  noteBody    String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, createdAt])
+}
+
+// Editable content blocks on the member dashboard. One model with a `section`
+// discriminator (same pattern as ImpactStat) instead of one table per widget.
+//   overview     title=label     subtitle=value    note=change
+//   announcement title           subtitle=body     meta=detail   badge=category note=age
+//   resource     title           subtitle=lesson   badge=tag     note=age
+//   discussion   title           meta=category & replies         note=age
+//   deadline     title           subtitle=due in   meta=date
+//   career       title=company   subtitle=role     meta=location badge=New
+//   folder       title=name      meta=count        badge=category
+model DashboardItem {
+  id       String  @id @default(cuid())
+  section  String
+  title    String
+  subtitle String?
+  meta     String?
+  note     String?
+  badge    String?
+  icon     String? // key from lib/uiIcons
+  color    String? // tailwind classes, e.g. "bg-blue-50 text-primary"
+  href     String?
+  order    Int     @default(0)
+  active   Boolean @default(true)
+
+  // Overview cards only: a key from lib/metrics. When set, the card's value is
+  // counted live instead of being typed in by hand.
+  metric String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([section, active, order])
+}
+
+// "Our Divisions" on the About page: the division's own description and icon.
+// Its people are User rows with a matching `division` slug — one record per
+// person, edited in /admin/members, shown in both the member and public sites.
+model Division {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  name        String
+  tagline     String? // sub-roles, e.g. "President, Vice President, Controller"
+  description String? @db.Text
+  icon        String? // key from lib/uiIcons
+  order       Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([order])
+}
+
+// Member-area assignments. dueDate is a real date so "Due in N days" and the
+// "Due Soon" bucket stay correct without anyone re-typing them.
+model Assignment {
+  id          String   @id @default(cuid())
+  title       String
+  category    String // e.g. "Financial Analysis"
+  workType    String   @default("Individual") // e.g. "Group (3–4 members)"
+  description String?  @db.Text
+  dueDate     DateTime
+  status      String   @default("ACTIVE") // ACTIVE | SUBMITTED | COMPLETED
+  icon        String?
+  color       String?
+  href        String?
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  submissions AssignmentSubmission[]
+
+  @@index([published, status, dueDate])
+}
+
+// One submission per member per assignment: the member uploads a file, the
+// admin marks it with a score and feedback.
+model AssignmentSubmission {
+  id           String     @id @default(cuid())
+  assignmentId String
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  fileUrl  String?
+  fileName String?
+  note     String? @db.Text
+
+  // Marking. gradedAt set = the member sees their score.
+  score    Int?
+  feedback String?   @db.Text
+  gradedAt DateTime?
+
+  submittedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([assignmentId, userId])
+  @@index([assignmentId, submittedAt])
+  @@index([userId])
 }
 
 model SiteSettings {

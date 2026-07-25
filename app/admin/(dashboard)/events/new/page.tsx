@@ -7,16 +7,23 @@ import { createEvent } from "../actions";
 export const dynamic = "force-dynamic";
 
 export default async function NewEventPage() {
-  const categories = await prisma.eventCategory.findMany({
-    orderBy: { order: "asc" },
-    select: { id: true, title: true },
-  });
+  const [categories, registrationForms] = await Promise.all([
+    prisma.eventCategory.findMany({
+      orderBy: { order: "asc" },
+      select: { id: true, title: true },
+    }),
+    prisma.registrationForm.findMany({
+      where: { published: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      select: { id: true, title: true },
+    }),
+  ]);
 
   return (
     <div>
       <Link
         href="/admin/events"
-        className="text-sm text-gold-dark hover:text-gold"
+        className="text-sm text-accent-dark hover:text-accent"
       >
         ← Back to events
       </Link>
@@ -26,6 +33,7 @@ export default async function NewEventPage() {
           action={createEvent}
           uploadEnabled={isBlobConfigured()}
           categories={categories}
+          registrationForms={registrationForms}
         />
       </div>
     </div>
