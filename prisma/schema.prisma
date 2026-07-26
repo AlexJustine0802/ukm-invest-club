@@ -4,7 +4,11 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Pooled, transaction mode (port 6543) — every runtime query.
+  url       = env("DATABASE_URL")
+  // Session mode (port 5432) — migrations only. Prisma needs advisory locks
+  // and DDL that the transaction pooler cannot carry.
+  directUrl = env("DIRECT_URL")
 }
 
 model Event {

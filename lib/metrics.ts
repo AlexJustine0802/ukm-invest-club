@@ -52,54 +52,44 @@ export function resolveMetric(
 }
 
 /**
- * Count every metric in one round of queries. Cheap enough to run on each
- * dashboard render — these are all indexed counts.
+ * Count every metric in a single round trip.
+ *
+ * This was seven parallel `count()` calls. Each one holds its own connection,
+ * so a single dashboard render opened seven at once — and with the six other
+ * queries on that page, fourteen simultaneously, against a Supavisor ceiling
+ * of fifteen. One visitor could exhaust the pool on their own and the next
+ * request got `EMAXCONNSESSION`.
+ *
+ * The subqueries are the same indexed counts as before; the win is entirely in
+ * connection use. Table and column names are literal here, so
+ * scripts/check-metrics.ts asserts this agrees with Prisma's own counts —
+ * run it after renaming any model or field.
  */
 export async function getMetricValues(
   now: Date = new Date(),
 ): Promise<Record<MetricId, number>> {
-  const [
-    upcomingEvents,
-    pendingAssignments,
-    careerAlerts,
-    openRegistrations,
-    resources,
-    discussionChannels,
-    members,
-  ] = await Promise.all([
-    prisma.event.count({
-      where: { published: true, eventDate: { gte: now } },
-    }),
-    prisma.assignment.count({
-      where: { published: true, status: "ACTIVE" },
-    }),
-    prisma.careerAlert.count({
-      where: {
-        published: true,
-        OR: [{ deadline: null }, { deadline: { gte: now } }],
-      },
-    }),
-    prisma.registrationForm.count({
-      where: {
-        published: true,
-        OR: [{ opensAt: null }, { opensAt: { lte: now } }],
-        AND: [{ OR: [{ closesAt: null }, { closesAt: { gte: now } }] }],
-      },
-    }),
-    prisma.dashboardItem.count({
-      where: { section: { in: ["folder", "resource"] }, active: true },
-    }),
-    prisma.discussionChannel.count({ where: { published: true } }),
-    prisma.user.count(),
-  ]);
+  const [row] = await prisma.$queryRaw<Record<MetricId, bigint>[]>`
+    SELECT
+      (SELECT count(*) FROM "Event"
+        WHERE published = true AND "eventDate" >= ${now})           AS "upcoming-events",
+      (SELECT count(*) FROM "Assignment"
+        WHERE published = true AND status = 'ACTIVE')               AS "pending-assignments",
+      (SELECT count(*) FROM "CareerAlert"
+        WHERE published = true
+          AND (deadline IS NULL OR deadline >= ${now}))             AS "career-alerts",
+      (SELECT count(*) FROM "RegistrationForm"
+        WHERE published = true
+          AND ("opensAt"  IS NULL OR "opensAt"  <= ${now})
+          AND ("closesAt" IS NULL OR "closesAt" >= ${now}))         AS "open-registrations",
+      (SELECT count(*) FROM "DashboardItem"
+        WHERE section IN ('folder','resource') AND active = true)   AS "resources",
+      (SELECT count(*) FROM "DiscussionChannel"
+        WHERE published = true)                                     AS "discussion-channels",
+      (SELECT count(*) FROM "User")                                 AS "members"
+  `;
 
-  return {
-    "upcoming-events": upcomingEvents,
-    "pending-assignments": pendingAssignments,
-    "career-alerts": careerAlerts,
-    "open-registrations": openRegistrations,
-    resources,
-    "discussion-channels": discussionChannels,
-    members,
-  };
+  // Postgres count() arrives as bigint; every caller wants a number.
+  return Object.fromEntries(
+    METRICS.map((m) => [m.id, Number(row[m.id])]),
+  ) as Record<MetricId, number>;
 }
