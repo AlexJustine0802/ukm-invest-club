@@ -3,11 +3,18 @@
 import Link from "next/link";
 import ImageField from "@/components/admin/ImageField";
 import SubmitButton from "@/components/admin/SubmitButton";
+import { PARTNER_CATEGORIES, DEFAULT_PARTNER_CATEGORY } from "@/lib/partners";
 
 interface Props {
   action: (formData: FormData) => void;
   uploadEnabled: boolean;
-  partner?: { id: string; name: string; logoUrl: string | null; order: number };
+  partner?: {
+    id: string;
+    name: string;
+    logoUrl: string | null;
+    order: number;
+    category: string;
+  };
 }
 
 export default function PartnerForm({ action, uploadEnabled, partner }: Props) {
@@ -40,6 +47,27 @@ export default function PartnerForm({ action, uploadEnabled, partner }: Props) {
             className="input"
           />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="category" className="label">
+          Section
+        </label>
+        <select
+          id="category"
+          name="category"
+          defaultValue={partner?.category ?? DEFAULT_PARTNER_CATEGORY}
+          className="input"
+        >
+          {PARTNER_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+        <p className="mt-1.5 text-xs text-slate-400">
+          Which heading this partner appears under on the public site.
+        </p>
       </div>
 
       <ImageField

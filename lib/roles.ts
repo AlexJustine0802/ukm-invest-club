@@ -2,8 +2,14 @@
 // options offered are always derived from here, so the admin cannot invent a
 // position that does not exist.
 //
-// PVPC is the only division without a "Head of …" — its positions already are
-// the leadership.
+// The board is the only division without a "Head of …" — its positions already
+// are the leadership.
+//
+// `slug` is the stored identity (User.division holds it) while `name` is only
+// ever displayed. They are deliberately allowed to drift: renaming a division
+// changes the label everywhere, whereas changing a slug silently orphans every
+// member assigned to the old one. Rename freely; change a slug only alongside
+// a data migration.
 
 export interface DivisionRoles {
   slug: string;
@@ -23,9 +29,12 @@ export interface DivisionRoles {
 // page and the recruitment page can never drift apart.
 export const DIVISIONS: DivisionRoles[] = [
   {
+    // Slug kept as "pvpc" from when this was PVPC: members are stored against
+    // it, and the Controller seat leaving the chart does not change who they
+    // are. Only the displayed name moved to PVP.
     slug: "pvpc",
-    name: "PVPC",
-    positions: ["President", "Vice President", "Controller"],
+    name: "PVP",
+    positions: ["President", "Vice President"],
     hasHead: false,
     description:
       "The board. Sets direction for the club, represents it externally, and keeps every division accountable to the yearly plan.",
@@ -43,28 +52,29 @@ export const DIVISIONS: DivisionRoles[] = [
   {
     slug: "human-resource-development",
     name: "Human Resource Development",
-    positions: ["People Growth & Experience", "Talent Attraction & Acquisition"],
+    positions: [
+      "People Growth & Experience",
+      "Talent Performance & Acquisition",
+    ],
     hasHead: true,
     description:
       "Recruits new members and looks after the people already here — onboarding, internal culture and growth through the year.",
     icon: "Users",
   },
   {
-    slug: "business-development",
-    name: "Business Development",
-    positions: ["Creative Entrepreneur", "Market Research & Strategy"],
-    hasHead: true,
-    description:
-      "Builds the club's revenue side: sponsorship, ventures, and the market research behind where to place the effort.",
-    icon: "TrendingUp",
-  },
-  {
+    // Business Development and External Relationship merged into one division.
+    // Nobody was assigned to either slug, so this keeps the External
+    // Relationship slug rather than inventing a third and stranding rows.
     slug: "external-relationship",
-    name: "External Relationship",
-    positions: ["Media Relations", "Collaboration & Network"],
+    name: "External Relationship & Business Development",
+    positions: [
+      "Creative Entrepreneur",
+      "Market Research & Collaboration",
+      "Media Relations",
+    ],
     hasHead: true,
     description:
-      "Owns relationships outside the club — media, partner organisations, campuses and the wider investment community.",
+      "Owns everything outside the club — media, partners, campuses and the wider investment community — plus the ventures and market research behind where the club places its effort.",
     icon: "Handshake",
   },
   {
@@ -77,6 +87,8 @@ export const DIVISIONS: DivisionRoles[] = [
     icon: "Camera",
   },
   {
+    // No sub-divisions in the chart. The single position exists so staff can
+    // be assigned something other than the head role.
     slug: "project-event",
     name: "Project & Event",
     positions: ["Project & Event"],

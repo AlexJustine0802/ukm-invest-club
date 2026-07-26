@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { resolveImage } from "@/lib/upload";
+import { toPartnerCategory } from "@/lib/partners";
 
 function revalidatePartners() {
   revalidatePath("/");
@@ -24,6 +25,8 @@ export async function createPartner(formData: FormData) {
       name: (formData.get("name") as string).trim(),
       logoUrl,
       order: Number(formData.get("order")) || 0,
+      // Validated rather than trusted: this arrives from a client form.
+      category: toPartnerCategory(formData.get("category") as string),
     },
   });
   revalidatePartners();
@@ -46,6 +49,7 @@ export async function updatePartner(formData: FormData) {
       name: (formData.get("name") as string).trim(),
       logoUrl: resolved ?? existing.logoUrl,
       order: Number(formData.get("order")) || 0,
+      category: toPartnerCategory(formData.get("category") as string),
     },
   });
   revalidatePartners();

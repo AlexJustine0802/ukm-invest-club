@@ -466,6 +466,11 @@ model Partner {
   logoUrl String?
   order   Int     @default(0)
 
+  // Which public section this partner appears under. Values come from
+  // lib/partners.ts (COMPANY | COMMUNITY_MEDIA); existing rows default to
+  // COMPANY so nothing disappears from the site when this column is added.
+  category String @default("COMPANY")
+
   @@index([order])
 }
 

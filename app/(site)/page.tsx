@@ -227,9 +227,8 @@ export default async function HomePage() {
         </div>
       </Reveal>
 
-      <Reveal>
-        <PartnerStrip partners={partners} />
-      </Reveal>
+      {/* Renders its own two sections, each with its own reveal. */}
+      <PartnerStrip partners={partners} />
     </>
   );
 }
