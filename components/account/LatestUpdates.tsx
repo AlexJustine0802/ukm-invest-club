@@ -61,12 +61,17 @@ export default function LatestUpdates({ items }: { items: UpdateItem[] }) {
           <div className="overflow-hidden">
             <div className="space-y-2 border-t border-slate-100 p-3">
               {total === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-6 text-center">
+                // min-h matches roughly the three cards it replaces, so
+                // expanding an empty section is not a jarringly short panel.
+                <div className="flex min-h-[168px] flex-col items-center justify-center gap-2 py-6 text-center">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-300">
                     <Inbox className="h-5 w-5" />
                   </span>
+                  <p className="text-sm font-semibold text-navy">
+                    You&rsquo;re all caught up.
+                  </p>
                   <p className="text-sm text-slate-400">
-                    You&rsquo;re all caught up. No updates available.
+                    No announcements, assignments, or career alerts.
                   </p>
                 </div>
               ) : (

@@ -301,7 +301,7 @@ export default async function AccountPage() {
                   Investment Club Unpar
                 </h2>
                 <p className="mt-2 text-sm text-blue-100">
-                  Announcements and open recruitment will appear here.
+                  No featured announcement available.
                 </p>
               </div>
             )}
@@ -350,7 +350,7 @@ export default async function AccountPage() {
                 <h3 className="font-bold text-navy">Recent Resources</h3>
                 <div className={`flex flex-col ${LIST_BODY}`}>
                   {content.resource.length === 0 ? (
-                    <EmptyState message="No resources yet" />
+                    <EmptyState message="No resources available." />
                   ) : (
                     content.resource.map((r) => (
                       <Link
@@ -401,7 +401,7 @@ export default async function AccountPage() {
                 </div>
                 <div className={`flex flex-col ${LIST_BODY}`}>
                   {channels.length === 0 ? (
-                    <EmptyState message="No discussions yet" />
+                    <EmptyState message="No discussions yet." />
                   ) : (
                     channels.map((c) => {
                       const ChannelIcon = getUiIcon(c.icon ?? "MessageSquare");
@@ -442,8 +442,11 @@ export default async function AccountPage() {
               </section>
             </div>
 
-            {/* Right: events + calendar */}
-            <div className="min-w-0 space-y-6">
+            {/* Right: events + calendar. Stacked on mobile this column comes
+                first, so the order there reads Upcoming Events → Calendar →
+                Recent Resources. Two columns from lg, where source order wins
+                again and the desktop layout is unchanged. */}
+            <div className="order-first min-w-0 space-y-6 lg:order-none">
               <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-navy">Upcoming Events</h3>
@@ -456,7 +459,7 @@ export default async function AccountPage() {
                 </div>
                 <div className={`flex flex-col ${LIST_BODY}`}>
                   {events.length === 0 ? (
-                    <EmptyState message="No upcoming events" />
+                    <EmptyState message="No upcoming events yet." />
                   ) : (
                     events.map((e) => (
                       <div key={e.id} className="flex items-center gap-3">
@@ -527,7 +530,7 @@ export default async function AccountPage() {
                 </div>
                 <div className="mt-4 flex min-h-[96px] flex-col space-y-3">
                   {thisWeekEvents.length === 0 ? (
-                    <EmptyState message="Nothing scheduled this week" />
+                    <EmptyState message="No scheduled events this week." />
                   ) : (
                     thisWeekEvents.map((e) => (
                       <div key={e.id} className="flex items-center gap-2 text-xs">
@@ -575,7 +578,7 @@ export default async function AccountPage() {
             </div>
             <div className={`flex flex-col ${RAIL_BODY}`}>
               {railAnnouncements.length === 0 ? (
-                <EmptyState message="No announcements yet" />
+                <EmptyState message="No announcements yet." />
               ) : (
                 railAnnouncements.map((a) => {
                   const Icon = getUiIcon(a.icon);
@@ -620,7 +623,7 @@ export default async function AccountPage() {
             </div>
             <div className={`flex flex-col ${RAIL_BODY}`}>
               {deadlines.length === 0 ? (
-                <EmptyState message="No assignments due" />
+                <EmptyState message="No assignments due." />
               ) : (
                 deadlines.map((d) => {
                   const Icon = getUiIcon(d.icon);
@@ -676,7 +679,7 @@ export default async function AccountPage() {
             </div>
             <div className={`flex flex-col ${RAIL_BODY}`}>
               {careerAlerts.length === 0 ? (
-                <EmptyState message="No career alerts yet" />
+                <EmptyState message="No career alerts yet." />
               ) : (
                 careerAlerts.map((c) => {
                   const palette = eventPalette(c.color, c.company);
