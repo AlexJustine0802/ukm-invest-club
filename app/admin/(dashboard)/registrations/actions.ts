@@ -7,17 +7,20 @@ import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { parseQuestions, isAudience } from "@/lib/forms";
+import { readEventDetails, syncEventForForm } from "@/lib/eventSync";
 
 function revalidateForms(slug?: string) {
   revalidatePath("/admin/registrations");
-  revalidatePath("/account/registrations");
   revalidatePath("/account/recruitment");
   revalidatePath("/admin/recruitment");
   revalidatePath("/register");
   // Public event cards link to a form, so their buttons depend on it existing.
   revalidatePath("/events");
+  revalidatePath("/admin/events");
+  revalidatePath("/account/events");
   if (slug) revalidatePath(`/register/${slug}`);
 }
+
 
 function dataFrom(formData: FormData) {
   const str = (key: string) => (formData.get(key) as string)?.trim() || null;
@@ -60,7 +63,14 @@ function dataFrom(formData: FormData) {
 export async function createRegistrationForm(formData: FormData) {
   await requireSession();
   const data = dataFrom(formData);
-  await prisma.registrationForm.create({ data });
+  const details = readEventDetails(formData);
+
+  // One transaction so a form is never left without the event it should own.
+  await prisma.$transaction(async (tx) => {
+    const created = await tx.registrationForm.create({ data });
+    await syncEventForForm(tx, created, details);
+  });
+
   revalidateForms(data.slug);
   redirect("/admin/registrations");
 }
@@ -69,11 +79,18 @@ export async function updateRegistrationForm(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
   const data = dataFrom(formData);
+  const details = readEventDetails(formData);
+
   const existing = await prisma.registrationForm.findUnique({
     where: { id },
     select: { slug: true },
   });
-  await prisma.registrationForm.update({ where: { id }, data });
+
+  await prisma.$transaction(async (tx) => {
+    const updated = await tx.registrationForm.update({ where: { id }, data });
+    await syncEventForForm(tx, updated, details);
+  });
+
   revalidateForms(data.slug);
   if (existing && existing.slug !== data.slug) {
     revalidatePath(`/register/${existing.slug}`);
@@ -84,6 +101,7 @@ export async function updateRegistrationForm(formData: FormData) {
 export async function deleteRegistrationForm(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
+  // Event.registrationFormId cascades, so the public event goes with it.
   const form = await prisma.registrationForm.delete({ where: { id } });
   revalidateForms(form.slug);
 }
@@ -97,5 +115,4 @@ export async function deleteResponse(formData: FormData) {
     select: { formId: true },
   });
   revalidatePath(`/admin/registrations/${response.formId}/responses`);
-  revalidatePath("/account/registrations");
 }

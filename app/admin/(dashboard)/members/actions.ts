@@ -13,7 +13,6 @@ import { getDivision, isValidRole, GENERAL_ROLES } from "@/lib/roles";
  */
 function revalidateMember() {
   revalidatePath("/admin/members");
-  revalidatePath("/admin/divisions");
   revalidatePath("/account/members");
   revalidatePath("/account", "layout"); // the role shows in every top bar
   revalidatePath("/about"); // public divisions

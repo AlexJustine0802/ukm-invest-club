@@ -40,11 +40,12 @@ export default async function MembersPage({
     orderBy: [{ division: "asc" }, { role: "asc" }, { name: "asc" }],
   });
 
-  // Filter by division (the org chart), falling back to "no division".
-  const used = DIVISIONS.filter((d) => members.some((m) => m.division === d.slug));
+  // Filter by division (the org chart), falling back to "no division". Every
+  // division is listed whether or not anyone is in it yet — the chart is fixed
+  // in lib/roles, so this row is the same height on an empty database.
   const filters = [
-    ...used.map((d) => ({ id: d.slug, label: d.name })),
-    ...(members.some((m) => !m.division) ? [{ id: "none", label: "No division" }] : []),
+    ...DIVISIONS.map((d) => ({ id: d.slug, label: d.name })),
+    { id: "none", label: "No division" },
   ];
   const role =
     roleParam && filters.some((f) => f.id === roleParam) ? roleParam : "all";

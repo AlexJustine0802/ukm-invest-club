@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import EmptyState from "@/components/EmptyState";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -143,10 +144,11 @@ export default async function AllEventsPage({
 
         {/* Grid */}
         {events.length === 0 ? (
-          <p className="mt-16 text-center text-slate-500">
-            No {tab === "upcoming" ? "upcoming" : "past"} events in this
-            category yet.
-          </p>
+          <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
+            <EmptyState
+              message={`No ${tab === "upcoming" ? "upcoming" : "past"} events in this category yet.`}
+            />
+          </div>
         ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (

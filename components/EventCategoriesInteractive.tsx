@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { getEventIcon } from "@/lib/eventIcons";
+import EmptyState from "@/components/EmptyState";
 
 export type CategoryPreviewEvent = {
   slug: string;
@@ -74,7 +75,15 @@ export default function EventCategoriesInteractive({
 }) {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
 
-  if (categories.length === 0) return null;
+  // The block keeps its footprint with no categories, so the sections below it
+  // do not slide up.
+  if (categories.length === 0) {
+    return (
+      <div className="flex min-h-[280px] items-center justify-center rounded-lg border border-slate-200 bg-white">
+        <EmptyState message="Event categories will appear here soon" />
+      </div>
+    );
+  }
 
   return (
     <div>

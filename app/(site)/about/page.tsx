@@ -23,10 +23,17 @@ import {
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
+import { withDefaultStats } from "@/lib/impactStats";
 import { formatDate } from "@/lib/utils";
 import PartnerStrip from "@/components/PartnerStrip";
 import DivisionsSection from "@/components/DivisionsSection";
-import { sortDivisionPeople, isHead } from "@/lib/roles";
+import EmptyState from "@/components/EmptyState";
+import {
+  DIVISIONS,
+  divisionTagline,
+  sortDivisionPeople,
+  isHead,
+} from "@/lib/roles";
 
 export const dynamic = "force-dynamic";
 
@@ -92,10 +99,7 @@ function MomentCard({
 }
 
 export default async function AboutPage() {
-  const [divisionRows, divisionPeople, stats, partners, communityMoments, settings] = await Promise.all([
-    prisma.division.findMany({
-      orderBy: [{ order: "asc" }, { name: "asc" }],
-    }),
+  const [divisionPeople, stats, partners, communityMoments, settings] = await Promise.all([
     // The people are member accounts — edited once in /admin/members and shown
     // here and in the member area both.
     prisma.user.findMany({
@@ -123,9 +127,15 @@ export default async function AboutPage() {
     prisma.siteSettings.findUnique({ where: { id: 1 } }),
   ]);
 
-  // Attach each division's people, ordered head first then by the org chart.
-  const divisions = divisionRows.map((d) => ({
-    ...d,
+  // The org chart itself is fixed in lib/roles; only the people in it come from
+  // the database, so this section renders in full even with no members yet.
+  const divisions = DIVISIONS.map((d) => ({
+    id: d.slug,
+    slug: d.slug,
+    name: d.name,
+    tagline: divisionTagline(d),
+    description: d.description,
+    icon: d.icon,
     members: sortDivisionPeople(
       divisionPeople.filter((p) => p.division === d.slug),
       d.slug,
@@ -179,7 +189,7 @@ export default async function AboutPage() {
           </p>
 
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((s) => {
+            {withDefaultStats(stats, "home").map((s) => {
               const Icon = getUiIcon(s.icon);
               return (
                 <div
@@ -266,7 +276,13 @@ export default async function AboutPage() {
           </p>
         </div>
 
-        {moments.length > 0 && (
+        {moments.length === 0 ? (
+          // Keeps the section's height so the page does not jump when there
+          // are no moments yet.
+          <div className="mt-12 flex min-h-[420px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
+            <EmptyState message="Community moments will appear here soon" />
+          </div>
+        ) : (
           <div className="mt-12 grid gap-4 lg:grid-cols-2">
             {moments[0] && (
               <MomentCard
@@ -299,7 +315,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {divisions.length > 0 && <DivisionsSection divisions={divisions} />}
+      <DivisionsSection divisions={divisions} />
 
       <PartnerStrip partners={partners} />
     </div>

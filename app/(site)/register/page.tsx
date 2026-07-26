@@ -20,7 +20,7 @@ export default async function PublicRegisterPage() {
       published: true,
       audience: { in: ["PUBLIC", "BOTH"] },
       // Event sign-ups live on the events page; this lists standalone ones.
-      events: { none: {} },
+      event: null,
     },
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     include: { _count: { select: { responses: true } } },

@@ -63,30 +63,28 @@ export default async function ResourcesPage({
 
       {/* Category filters — pills scroll horizontally so the search button on
           the right stays on the same line however many categories exist. */}
-      {categories.length > 1 && (
-        <div className="mt-8 flex items-center gap-3">
-          <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:thin]">
-            <div className="flex w-max items-center gap-2 pb-1">
-              {categories.map((c) => (
-                <Link
-                  key={c}
-                  href={categoryHref(c)}
-                  className={`whitespace-nowrap rounded-lg px-3.5 py-2 text-xs font-semibold ${
-                    c === category
-                      ? "bg-primary text-white"
-                      : "border border-slate-200 bg-white text-navy hover:bg-slate-50"
-                  }`}
-                >
-                  {c}
-                </Link>
-              ))}
-            </div>
-          </div>
-          <div className="shrink-0">
-            <InlineSearch placeholder="Search resources..." />
+      <div className="mt-8 flex items-center gap-3">
+        <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:thin]">
+          <div className="flex w-max items-center gap-2 pb-1">
+            {categories.map((c) => (
+              <Link
+                key={c}
+                href={categoryHref(c)}
+                className={`whitespace-nowrap rounded-lg px-3.5 py-2 text-xs font-semibold ${
+                  c === category
+                    ? "bg-primary text-white"
+                    : "border border-slate-200 bg-white text-navy hover:bg-slate-50"
+                }`}
+              >
+                {c}
+              </Link>
+            ))}
           </div>
         </div>
-      )}
+        <div className="shrink-0">
+          <InlineSearch placeholder="Search resources..." />
+        </div>
+      </div>
 
       {query && (
         <p className="mt-4 text-sm text-slate-500">

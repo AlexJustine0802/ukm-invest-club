@@ -32,7 +32,22 @@ export default function EventHeroSlider({
   }, [paused, slides.length]);
 
   const slide = slides[active];
-  if (!slide) return null;
+
+  // No slides: hold the exact hero box (h-[315px] / sm:h-[390px]) so the hero
+  // row keeps its height instead of the column collapsing.
+  if (!slide) {
+    return (
+      <div className="relative">
+        <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
+          <div className="flex h-[315px] items-center justify-center sm:h-[390px]">
+            <p className="px-6 text-center text-sm text-white/60">
+              Featured events will appear here soon.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

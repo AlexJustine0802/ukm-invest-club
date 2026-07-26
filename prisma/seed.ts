@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Prisma } from "@prisma/client";
+import { defaultEventQuestions } from "../lib/forms";
 
 const prisma = new PrismaClient();
 
@@ -67,9 +68,12 @@ async function main() {
   }
 
   // --- Events ---
+  // Every event is owned by a registration form (Event.registrationFormId is
+  // required and cascades), so seed the form first and hang the event off it.
+  await prisma.registrationForm.deleteMany({ where: { event: { isNot: null } } });
   await prisma.event.deleteMany();
-  await prisma.event.createMany({
-    data: [
+
+  const seedEvents = [
       {
         title: "Stock Market Bootcamp 2026",
         slug: "stock-market-bootcamp-2026",
@@ -174,8 +178,27 @@ async function main() {
         published: true,
         categoryId: eventCategories["networking"],
       },
-    ],
-  });
+  ];
+
+  for (const e of seedEvents) {
+    const form = await prisma.registrationForm.create({
+      data: {
+        title: e.title,
+        slug: e.slug,
+        description: e.description,
+        coverImage: e.coverImage,
+        audience: "BOTH",
+        questions: defaultEventQuestions() as unknown as Prisma.InputJsonValue,
+        closesAt: e.eventDate,
+        published: e.published,
+        icon: "CalendarDays",
+      },
+      select: { id: true },
+    });
+    await prisma.event.create({
+      data: { ...e, registrationFormId: form.id },
+    });
+  }
 
   // --- Research categories ---
   await prisma.publication.updateMany({ data: { categoryId: null } });

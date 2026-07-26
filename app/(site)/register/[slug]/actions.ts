@@ -156,7 +156,6 @@ export async function submitRegistration(
   }
 
   revalidatePath(`/register/${form.slug}`);
-  revalidatePath("/account/registrations");
   revalidatePath(`/admin/registrations/${form.id}/responses`);
   redirect(`/register/${form.slug}?done=1`);
 }

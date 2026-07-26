@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDate, isUpcoming } from "@/lib/utils";
-import DeleteButton from "@/components/admin/DeleteButton";
-import { deleteEvent } from "./actions";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Read-only view. An event is the public face of its registration form, so it
+ * is created, edited and deleted there — Edit links straight to the form.
+ */
 export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({
     include: { category: true },
@@ -16,15 +18,19 @@ export default async function AdminEventsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Events</h1>
-        <Link href="/admin/events/new" className="btn-primary">
+        <Link href="/admin/registrations/new" className="btn-primary">
           + New event
         </Link>
       </div>
+      <p className="mt-1 text-sm text-slate-500">
+        Events are managed as registration forms — one record drives the public
+        site, the member dashboard and the sign-up page.
+      </p>
 
       {events.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No events yet.{" "}
-          <Link href="/admin/events/new" className="text-accent-dark underline">
+          <Link href="/admin/registrations/new" className="text-accent-dark underline">
             Create your first event
           </Link>
           .
@@ -77,16 +83,11 @@ export default async function AdminEventsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
                       <Link
-                        href={`/admin/events/${event.id}/edit`}
+                        href={`/admin/registrations/${event.registrationFormId}/edit`}
                         className="btn-secondary px-3 py-1.5 text-xs"
                       >
                         Edit
                       </Link>
-                      <DeleteButton
-                        action={deleteEvent}
-                        id={event.id}
-                        className="btn-danger px-3 py-1.5 text-xs"
-                      />
                     </div>
                   </td>
                 </tr>

@@ -26,11 +26,26 @@ interface RegistrationFormFormProps {
     icon: string | null;
     color: string | null;
   };
+  /** Event categories for the public listing. */
+  categories?: { id: string; title: string }[];
+  /**
+   * The public event this form owns. Null when the form is a plain sign-up
+   * (recruitment, standalone) with no event.
+   */
+  event?: {
+    eventDate: Date;
+    endDate: Date | null;
+    location: string | null;
+    categoryId: string | null;
+    seatUnit: string;
+  } | null;
 }
 
 export default function RegistrationFormForm({
   action,
   form,
+  categories = [],
+  event,
 }: RegistrationFormFormProps) {
   return (
     <form action={action} className="space-y-6">
@@ -160,6 +175,9 @@ export default function RegistrationFormForm({
               placeholder="unlimited"
               className="input"
             />
+            <p className="mt-1 text-xs text-slate-500">
+              Doubles as the event capacity.
+            </p>
           </div>
         </div>
 
@@ -190,6 +208,96 @@ export default function RegistrationFormForm({
             </span>
           </span>
         </label>
+      </div>
+
+      <div className="card space-y-5 p-5">
+        <div>
+          <p className="font-bold text-navy">Event details</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Fill in a start date and this form also becomes a public event —
+            listed on the website, in the member dashboard, and registering
+            through this form. Leave the start date blank for a plain sign-up
+            (recruitment, standalone) with no event.
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="eventDate" className="label">
+              Start date &amp; time
+            </label>
+            <input
+              id="eventDate"
+              name="eventDate"
+              type="datetime-local"
+              defaultValue={
+                event ? toDateTimeLocalValue(event.eventDate) : undefined
+              }
+              className="input"
+            />
+          </div>
+          <div>
+            <label htmlFor="endDate" className="label">
+              End date &amp; time <span className="text-slate-400">(optional)</span>
+            </label>
+            <input
+              id="endDate"
+              name="endDate"
+              type="datetime-local"
+              defaultValue={
+                event?.endDate ? toDateTimeLocalValue(event.endDate) : undefined
+              }
+              className="input"
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label htmlFor="location" className="label">
+              Location
+            </label>
+            <input
+              id="location"
+              name="location"
+              defaultValue={event?.location ?? ""}
+              placeholder="e.g. Auditorium / Online"
+              className="input"
+            />
+          </div>
+          <div>
+            <label htmlFor="categoryId" className="label">
+              Category
+            </label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              defaultValue={event?.categoryId ?? ""}
+              className="input"
+            >
+              <option value="">None</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="seatUnit" className="label">
+              Seats counted in
+            </label>
+            <select
+              id="seatUnit"
+              name="seatUnit"
+              defaultValue={event?.seatUnit ?? "seats"}
+              className="input"
+            >
+              <option value="seats">seats</option>
+              <option value="teams">teams</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="card space-y-5 p-5">
@@ -266,6 +374,10 @@ export default function RegistrationFormForm({
           />
           <span className="text-sm font-medium text-navy">
             Published — the link works and members can see it
+            <span className="mt-0.5 block text-xs font-normal text-slate-500">
+              Also controls the event: unpublishing hides it from the public
+              events page and the member dashboard.
+            </span>
           </span>
         </label>
       </div>

@@ -5,6 +5,7 @@ import { ChevronRight, Bookmark, MapPin, Clock } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
+import EmptyState from "@/components/EmptyState";
 import { getSections } from "@/lib/dashboardContent";
 import { getUiIcon } from "@/lib/uiIcons";
 import { getMetricValues, resolveMetric } from "@/lib/metrics";
@@ -30,6 +31,49 @@ function weekOf(today: Date) {
     };
   });
 }
+
+/**
+ * Every list card keeps this body height whether it has rows or not, so an
+ * empty database renders the same layout as a full one — no collapsing, no
+ * shifting.
+ */
+const LIST_BODY = "mt-4 min-h-[180px] space-y-4";
+const RAIL_BODY = "mt-4 min-h-[150px] space-y-4";
+
+/**
+ * Shown when nobody has configured Overview cards yet. The values still come
+ * from the live counters, so an empty database simply reads 0.
+ */
+const DEFAULT_OVERVIEW = [
+  {
+    id: "default-resources",
+    title: "Resources Available",
+    icon: "BookOpen",
+    color: "bg-blue-50 text-primary",
+    metric: "resources" as const,
+  },
+  {
+    id: "default-events",
+    title: "Upcoming Events",
+    icon: "CalendarDays",
+    color: "bg-emerald-50 text-emerald-600",
+    metric: "upcoming-events" as const,
+  },
+  {
+    id: "default-assignments",
+    title: "Pending Assignments",
+    icon: "ClipboardList",
+    color: "bg-violet-50 text-violet-600",
+    metric: "pending-assignments" as const,
+  },
+  {
+    id: "default-career",
+    title: "Career Alerts",
+    icon: "Briefcase",
+    color: "bg-amber-50 text-amber-600",
+    metric: "career-alerts" as const,
+  },
+];
 
 export default async function AccountPage() {
   const session = await getUserSession();
@@ -130,6 +174,29 @@ export default async function AccountPage() {
 
   const railAnnouncements = content.announcement.slice(0, 3);
 
+  // Stat cards always render. Admin-configured rows win; with none configured
+  // the defaults above stand in so the row of cards never disappears.
+  const overviewCards = (
+    content.overview.length > 0
+      ? content.overview.map((o) => {
+          const metric = resolveMetric(o.metric, o.title);
+          return {
+            id: o.id,
+            title: o.title,
+            icon: o.icon,
+            color: o.color,
+            value: metric ? String(metrics[metric]) : (o.subtitle ?? "0"),
+            // A typed "↑ 3 this week" cannot be trusted next to a live count.
+            note: metric ? null : o.note,
+          };
+        })
+      : DEFAULT_OVERVIEW.map((d) => ({
+          ...d,
+          value: String(metrics[d.metric]),
+          note: null,
+        }))
+  ).slice(0, 4);
+
   return (
     <>
       <AccountTopBar
@@ -146,98 +213,111 @@ export default async function AccountPage() {
         role={user.role}
       />
 
+      {/* Fixed shell: the rail keeps its 340px whether or not it has content. */}
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
         {/* Center column */}
         <div className="space-y-6">
-          {/* Highlight — managed in /admin/highlights */}
-          {highlight && (
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-8 text-white">
-              <div className="relative max-w-lg">
-                <p className="text-sm font-semibold text-blue-200">
-                  {highlight.eyebrow}
-                </p>
-                <h2 className="mt-2 text-3xl font-extrabold">{highlight.title}</h2>
-                {highlight.description && (
-                  <p className="mt-2 text-sm text-blue-100">
-                    {highlight.description}
+          {/* Highlight — managed in /admin/highlights. Always rendered at a
+              fixed height; with no active highlight it shows a placeholder. */}
+          <div className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-8 text-white">
+            {highlight ? (
+              <>
+                <div className="relative max-w-lg">
+                  <p className="text-sm font-semibold text-blue-200">
+                    {highlight.eyebrow}
                   </p>
-                )}
-                {highlight.buttonLabel && (
-                  <div className="mt-6">
-                    <Link
-                      href={highlight.buttonHref || "#"}
-                      className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-primary"
-                    >
-                      {highlight.buttonLabel} <ChevronRight className="h-4 w-4" />
-                    </Link>
-                  </div>
-                )}
-              </div>
-              {highlight.noteTitle && (
-                <div className="absolute bottom-8 right-8 hidden w-56 rounded-xl bg-white/10 p-4 backdrop-blur xl:block">
-                  <p className="text-sm font-bold">{highlight.noteTitle}</p>
-                  {highlight.noteBody && (
-                    <p className="mt-1 text-xs text-blue-100">
-                      {highlight.noteBody}
+                  <h2 className="mt-2 text-3xl font-extrabold">
+                    {highlight.title}
+                  </h2>
+                  {highlight.description && (
+                    <p className="mt-2 text-sm text-blue-100">
+                      {highlight.description}
                     </p>
                   )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Overview */}
-          {content.overview.length > 0 && (
-            <section>
-              <h3 className="text-lg font-bold text-navy">Overview</h3>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                {content.overview.map((o) => {
-                  const Icon = getUiIcon(o.icon);
-                  // A card wired to a metric — explicitly, or guessed from its
-                  // label — counts itself; otherwise the admin typed the value.
-                  const metric = resolveMetric(o.metric, o.title);
-                  const value = metric ? String(metrics[metric]) : o.subtitle;
-                  return (
-                    <div
-                      key={o.id}
-                      className="rounded-2xl border border-slate-200 bg-white p-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${o.color ?? "bg-blue-50 text-primary"}`}
-                        >
-                          <Icon className="h-5 w-5" />
-                        </span>
-                        <div className="min-w-0">
-                          <p className="text-2xl font-extrabold leading-tight text-navy">
-                            {value}
-                          </p>
-                          <p className="text-sm text-slate-500">{o.title}</p>
-                        </div>
-                      </div>
-                      {/* A typed "↑ 3 this week" cannot be trusted next to a
-                          live count, so it only shows on manual cards. */}
-                      {o.note && !metric && (
-                        <p className="mt-3 text-xs font-semibold text-emerald-600">
-                          {o.note}
-                        </p>
-                      )}
+                  {highlight.buttonLabel && (
+                    <div className="mt-6">
+                      <Link
+                        href={highlight.buttonHref || "#"}
+                        className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-primary"
+                      >
+                        {highlight.buttonLabel}{" "}
+                        <ChevronRight className="h-4 w-4" />
+                      </Link>
                     </div>
-                  );
-                })}
+                  )}
+                </div>
+                {highlight.noteTitle && (
+                  <div className="absolute bottom-8 right-8 hidden w-56 rounded-xl bg-white/10 p-4 backdrop-blur xl:block">
+                    <p className="text-sm font-bold">{highlight.noteTitle}</p>
+                    {highlight.noteBody && (
+                      <p className="mt-1 text-xs text-blue-100">
+                        {highlight.noteBody}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="relative max-w-lg">
+                <p className="text-sm font-semibold text-blue-200">
+                  Welcome back
+                </p>
+                <h2 className="mt-2 text-3xl font-extrabold">
+                  Investment Club Unpar
+                </h2>
+                <p className="mt-2 text-sm text-blue-100">
+                  Announcements and open recruitment will appear here.
+                </p>
               </div>
-            </section>
-          )}
+            )}
+          </div>
 
-          {/* Two-column detail area */}
+          {/* Overview — the stat row is always present, showing 0 when empty. */}
+          <section>
+            <h3 className="text-lg font-bold text-navy">Overview</h3>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              {overviewCards.map((o) => {
+                const Icon = getUiIcon(o.icon);
+                return (
+                  <div
+                    key={o.id}
+                    className="flex min-h-[104px] flex-col justify-center rounded-2xl border border-slate-200 bg-white p-5"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${o.color ?? "bg-blue-50 text-primary"}`}
+                      >
+                        <Icon className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-2xl font-extrabold leading-tight text-navy">
+                          {o.value}
+                        </p>
+                        <p className="text-sm text-slate-500">{o.title}</p>
+                      </div>
+                    </div>
+                    {o.note && (
+                      <p className="mt-3 text-xs font-semibold text-emerald-600">
+                        {o.note}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Detail area — both columns always exist. */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Left: resources + discussions */}
             <div className="space-y-6">
-              {content.resource.length > 0 && (
-                <section className="rounded-2xl border border-slate-200 bg-white p-6">
-                  <h3 className="font-bold text-navy">Recent Resources</h3>
-                  <div className="mt-4 space-y-4">
-                    {content.resource.map((r) => (
+              <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+                <h3 className="font-bold text-navy">Recent Resources</h3>
+                <div className={`flex flex-col ${LIST_BODY}`}>
+                  {content.resource.length === 0 ? (
+                    <EmptyState message="No resources yet" />
+                  ) : (
+                    content.resource.map((r) => (
                       <Link
                         key={r.id}
                         href={r.href || "/account/resources"}
@@ -268,25 +348,27 @@ export default async function AccountPage() {
                         )}
                         <Bookmark className="h-4 w-4 shrink-0 text-slate-300" />
                       </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
+                    ))
+                  )}
+                </div>
+              </section>
 
               {/* Real channels, ordered by the most recent message. */}
-              {channels.length > 0 && (
-                <section className="rounded-2xl border border-slate-200 bg-white p-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-bold text-navy">Recent Discussions</h3>
-                    <Link
-                      href="/account/discussions"
-                      className="text-sm font-semibold text-primary hover:underline"
-                    >
-                      View All
-                    </Link>
-                  </div>
-                  <div className="mt-4 space-y-4">
-                    {channels.map((c) => {
+              <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-navy">Recent Discussions</h3>
+                  <Link
+                    href="/account/discussions"
+                    className="text-sm font-semibold text-primary hover:underline"
+                  >
+                    View All
+                  </Link>
+                </div>
+                <div className={`flex flex-col ${LIST_BODY}`}>
+                  {channels.length === 0 ? (
+                    <EmptyState message="No discussions yet" />
+                  ) : (
+                    channels.map((c) => {
                       const ChannelIcon = getUiIcon(c.icon ?? "MessageSquare");
                       const palette = eventPalette(c.color, c.name);
                       const last = c.posts[0];
@@ -319,15 +401,15 @@ export default async function AccountPage() {
                           </div>
                         </Link>
                       );
-                    })}
-                  </div>
-                </section>
-              )}
+                    })
+                  )}
+                </div>
+              </section>
             </div>
 
             {/* Right: events + calendar */}
             <div className="space-y-6">
-              <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-navy">Upcoming Events</h3>
                   <Link
@@ -337,9 +419,9 @@ export default async function AccountPage() {
                     View All
                   </Link>
                 </div>
-                <div className="mt-4 space-y-4">
+                <div className={`flex flex-col ${LIST_BODY}`}>
                   {events.length === 0 ? (
-                    <p className="text-sm text-slate-400">No upcoming events.</p>
+                    <EmptyState message="No upcoming events" />
                   ) : (
                     events.map((e) => (
                       <div key={e.id} className="flex items-center gap-3">
@@ -354,9 +436,11 @@ export default async function AccountPage() {
                           </span>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-navy">{e.title}</p>
+                          <p className="line-clamp-2 text-sm font-bold text-navy">
+                            {e.title}
+                          </p>
                           <p className="flex items-center gap-1 text-xs text-slate-400">
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-3 w-3 shrink-0" />
                             {e.eventDate.toLocaleTimeString("en-US", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -364,7 +448,8 @@ export default async function AccountPage() {
                           </p>
                           {e.location && (
                             <p className="flex items-center gap-1 text-xs text-slate-400">
-                              <MapPin className="h-3 w-3" /> {e.location}
+                              <MapPin className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{e.location}</span>
                             </p>
                           )}
                         </div>
@@ -405,11 +490,9 @@ export default async function AccountPage() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 space-y-3">
+                <div className="mt-4 flex min-h-[96px] flex-col space-y-3">
                   {thisWeekEvents.length === 0 ? (
-                    <p className="text-xs text-slate-400">
-                      Nothing scheduled this week.
-                    </p>
+                    <EmptyState message="Nothing scheduled this week" />
                   ) : (
                     thisWeekEvents.map((e) => (
                       <div key={e.id} className="flex items-center gap-2 text-xs">
@@ -443,19 +526,21 @@ export default async function AccountPage() {
 
         {/* Right rail */}
         <div className="space-y-6">
-          {railAnnouncements.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-navy">Announcements</h3>
-                <Link
-                  href="/account/announcements"
-                  className="text-sm font-semibold text-primary"
-                >
-                  View All
-                </Link>
-              </div>
-              <div className="mt-4 space-y-4">
-                {railAnnouncements.map((a) => {
+          <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-navy">Announcements</h3>
+              <Link
+                href="/account/announcements"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                View All
+              </Link>
+            </div>
+            <div className={`flex flex-col ${RAIL_BODY}`}>
+              {railAnnouncements.length === 0 ? (
+                <EmptyState message="No announcements yet" />
+              ) : (
+                railAnnouncements.map((a) => {
                   const Icon = getUiIcon(a.icon);
                   return (
                     <div key={a.id} className="flex gap-3">
@@ -480,25 +565,27 @@ export default async function AccountPage() {
                       )}
                     </div>
                   );
-                })}
-              </div>
-            </section>
-          )}
+                })
+              )}
+            </div>
+          </section>
 
           {/* Real assignments — the same rows the Assignments page reads. */}
-          {deadlines.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-navy">Assignment Deadlines</h3>
-                <Link
-                  href="/account/assignments"
-                  className="text-sm font-semibold text-primary hover:underline"
-                >
-                  View All
-                </Link>
-              </div>
-              <div className="mt-4 space-y-4">
-                {deadlines.map((d) => {
+          <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-navy">Assignment Deadlines</h3>
+              <Link
+                href="/account/assignments"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                View All
+              </Link>
+            </div>
+            <div className={`flex flex-col ${RAIL_BODY}`}>
+              {deadlines.length === 0 ? (
+                <EmptyState message="No assignments due" />
+              ) : (
+                deadlines.map((d) => {
                   const Icon = getUiIcon(d.icon);
                   const soon = isDueSoon(d.dueDate, d.status, now);
                   const submitted = submittedAssignmentIds.has(d.id);
@@ -534,25 +621,27 @@ export default async function AccountPage() {
                       </div>
                     </Link>
                   );
-                })}
-              </div>
-            </section>
-          )}
+                })
+              )}
+            </div>
+          </section>
 
           {/* Straight from the Career Alerts admin — no second list to keep in sync. */}
-          {careerAlerts.length > 0 && (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="flex items-center justify-between">
-                <h3 className="font-bold text-navy">Career Alert Highlights</h3>
-                <Link
-                  href="/account/career"
-                  className="text-sm font-semibold text-primary hover:underline"
-                >
-                  View All
-                </Link>
-              </div>
-              <div className="mt-4 space-y-4">
-                {careerAlerts.map((c) => {
+          <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-bold text-navy">Career Alert Highlights</h3>
+              <Link
+                href="/account/career"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                View All
+              </Link>
+            </div>
+            <div className={`flex flex-col ${RAIL_BODY}`}>
+              {careerAlerts.length === 0 ? (
+                <EmptyState message="No career alerts yet" />
+              ) : (
+                careerAlerts.map((c) => {
                   const palette = eventPalette(c.color, c.company);
                   return (
                     <Link
@@ -585,10 +674,10 @@ export default async function AccountPage() {
                       )}
                     </Link>
                   );
-                })}
-              </div>
-            </section>
-          )}
+                })
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </>

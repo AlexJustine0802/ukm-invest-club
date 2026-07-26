@@ -44,7 +44,7 @@ export default async function AdminRegistrationsPage({
     orderBy: [{ order: "asc" }, { createdAt: "desc" }],
     include: {
       _count: { select: { responses: true } },
-      events: { select: { title: true }, take: 1 },
+      event: { select: { title: true } },
     },
   });
   const now = new Date();
@@ -59,9 +59,9 @@ export default async function AdminRegistrationsPage({
       case "recruitment":
         return f.isRecruitment;
       case "event":
-        return f.events.length > 0;
+        return f.event !== null;
       case "standalone":
-        return !f.isRecruitment && f.events.length === 0;
+        return !f.isRecruitment && f.event === null;
       default:
         return true;
     }
@@ -89,8 +89,8 @@ export default async function AdminRegistrationsPage({
         <div>
           <h1 className="text-2xl font-bold text-navy">Registrations</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Recruitment and sign-up forms. Members see them on{" "}
-            <code>/account/registrations</code>; the shareable link is{" "}
+            Recruitment and sign-up forms. A form with a start date is also a
+            public event; the shareable link is{" "}
             <code>/register/&lt;slug&gt;</code>. Responses export to CSV for
             Google Sheets or Excel.
           </p>
@@ -184,9 +184,9 @@ export default async function AdminRegistrationsPage({
                         Recruitment
                       </span>
                     )}
-                    {f.events[0] && (
+                    {f.event && (
                       <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-primary">
-                        Event: {f.events[0].title}
+                        Event: {f.event.title}
                       </span>
                     )}
                   </div>

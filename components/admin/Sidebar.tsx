@@ -23,10 +23,8 @@ const publicGroups: Group[] = [
   {
     label: "About",
     icon: "ℹ️",
-    href: "/admin/team",
+    href: "/admin/community",
     children: [
-      { label: "Divisions", href: "/admin/divisions" },
-      { label: "Team", href: "/admin/team" },
       { label: "Community", href: "/admin/community" },
       { label: "Partners", href: "/admin/partners" },
     ],

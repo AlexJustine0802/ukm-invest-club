@@ -18,7 +18,7 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import { eventPalette, timeRange, eventDateLabel } from "@/lib/eventStyles";
-import { registerForEvent, cancelRegistration } from "./actions";
+import { registerForEvent } from "./actions";
 
 export const metadata: Metadata = { title: "Events" };
 export const dynamic = "force-dynamic";
@@ -294,9 +294,10 @@ export default async function EventsPage({
                       Ended
                     </span>
                   ) : isRegistered ? (
-                    // Plain confirmation, not a disguised cancel button.
-                    <span className="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-navy">
-                      <Check className="h-4 w-4 text-primary" />
+                    // Same solid button as Register, so the card keeps one
+                    // consistent shape before and after signing up.
+                    <span className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white">
+                      <Check className="h-4 w-4" />
                       Registered
                     </span>
                   ) : isFull ? (
@@ -330,17 +331,6 @@ export default async function EventsPage({
                     >
                       {left} / {e.capacity} {e.seatUnit} left
                     </p>
-                  )}
-                  {isRegistered && !isPast && (
-                    <form action={cancelRegistration}>
-                      <input type="hidden" name="eventId" value={e.id} />
-                      <button
-                        type="submit"
-                        className="w-full text-center text-[11px] font-semibold text-slate-400 underline hover:text-rose-600"
-                      >
-                        Cancel registration
-                      </button>
-                    </form>
                   )}
                 </div>
               </article>

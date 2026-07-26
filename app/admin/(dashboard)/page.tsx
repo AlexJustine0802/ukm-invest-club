@@ -5,25 +5,27 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const now = new Date();
-  const [events, upcoming, publications, team, partners] = await Promise.all([
+  const [events, upcoming, publications, members, partners] = await Promise.all([
     prisma.event.count(),
     prisma.event.count({ where: { eventDate: { gte: now } } }),
     prisma.publication.count(),
-    prisma.teamMember.count(),
+    // The About page's people are member accounts, so that is the count worth
+    // showing here.
+    prisma.user.count(),
     prisma.partner.count(),
   ]);
 
   const cards = [
     { label: "Events", value: events, sub: `${upcoming} upcoming`, href: "/admin/events", icon: "📅" },
     { label: "Publications", value: publications, sub: "articles", href: "/admin/publications", icon: "📄" },
-    { label: "Team members", value: team, sub: "committee", href: "/admin/team", icon: "👥" },
+    { label: "Members", value: members, sub: "accounts", href: "/admin/members", icon: "👥" },
     { label: "Partners", value: partners, sub: "collaborations", href: "/admin/partners", icon: "🤝" },
   ];
 
   const quickActions = [
     { label: "New event", href: "/admin/events/new" },
     { label: "New publication", href: "/admin/publications/new" },
-    { label: "Add team member", href: "/admin/team/new" },
+    { label: "Manage members", href: "/admin/members" },
     { label: "Edit home hero", href: "/admin/hero-slides?loc=home" },
   ];
 

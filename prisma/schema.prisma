@@ -30,10 +30,12 @@ model Event {
 
   registrations EventRegistration[]
 
-  // Optional public sign-up form. When set, "Register Now" on the public events
-  // page opens that form instead of the event detail page.
-  registrationFormId String?
-  registrationForm   RegistrationForm? @relation(fields: [registrationFormId], references: [id], onDelete: SetNull)
+  // The form OWNS the event: an event exists only as the public face of its
+  // registration form, and is created, updated and deleted through it. Required
+  // + unique + cascade is what makes "no event without a form" a database rule
+  // rather than a convention someone can forget.
+  registrationFormId String           @unique
+  registrationForm   RegistrationForm @relation(fields: [registrationFormId], references: [id], onDelete: Cascade)
 
   @@index([eventDate])
   @@index([categoryId])
@@ -105,6 +107,9 @@ model ResearchCategory {
   @@index([order])
 }
 
+// DEPRECATED — the public About page builds its people from User accounts
+// (/admin/members). Nothing reads this table; kept so `db push` does not drop it
+// behind your back. Safe to delete with a deliberate push.
 model TeamMember {
   id        String  @id @default(cuid())
   name      String
@@ -209,7 +214,10 @@ model RegistrationForm {
   updatedAt DateTime @updatedAt
 
   responses FormResponse[]
-  events    Event[] // events whose "Register Now" points here
+
+  // The public event this form is the sign-up for. Null for forms that are not
+  // events (recruitment, standalone sign-ups).
+  event Event?
 
   @@index([published, order])
 }
@@ -336,6 +344,9 @@ model DashboardItem {
 // "Our Divisions" on the About page: the division's own description and icon.
 // Its people are User rows with a matching `division` slug — one record per
 // person, edited in /admin/members, shown in both the member and public sites.
+// DEPRECATED — the org chart is hardcoded in lib/roles.ts (DIVISIONS) and is not
+// admin-editable. Nothing reads this table any more; kept only so `db push` does
+// not drop it behind your back. Safe to delete with a deliberate push.
 model Division {
   id          String  @id @default(cuid())
   slug        String  @unique

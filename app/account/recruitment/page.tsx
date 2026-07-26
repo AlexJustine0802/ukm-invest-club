@@ -298,8 +298,8 @@ export default async function RecruitmentPage() {
 
       <p className="mt-6 text-center text-xs text-slate-400">
         Looking for something else?{" "}
-        <Link href="/account/registrations" className="font-semibold text-primary hover:underline">
-          Other open registrations
+        <Link href="/account/events" className="font-semibold text-primary hover:underline">
+          Browse upcoming events
         </Link>
       </p>
     </>

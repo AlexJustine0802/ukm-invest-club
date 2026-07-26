@@ -3,6 +3,8 @@ import { ArrowRight, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
+import { withDefaultStats } from "@/lib/impactStats";
+import EmptyState from "@/components/EmptyState";
 import EventCard from "@/components/EventCard";
 import HeroCarousel from "@/components/HeroCarousel";
 import AboutSlideshow from "@/components/AboutSlideshow";
@@ -85,7 +87,7 @@ export default async function HomePage() {
             Our Impact
           </span>
           <div className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
-            {impact.map((stat) => {
+            {withDefaultStats(impact, "home").map((stat) => {
               const Icon = getUiIcon(stat.icon);
               return (
                 <div key={stat.id} className="card flex items-center gap-4 p-6">
@@ -156,7 +158,10 @@ export default async function HomePage() {
               ))}
             </div>
           ) : (
-            <p className="mt-8 text-slate-500">No publications yet.</p>
+            // Holds roughly one card row so the section keeps its height.
+            <div className="mt-8 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
+              <EmptyState message="No publications yet" />
+            </div>
           )}
         </div>
       </section>
@@ -186,7 +191,9 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <p className="mt-8 text-slate-500">No events yet. Check back soon!</p>
+          <div className="mt-8 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
+            <EmptyState message="No events yet. Check back soon!" />
+          </div>
         )}
       </section>
 

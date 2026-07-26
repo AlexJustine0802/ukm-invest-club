@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { CalendarClock, CheckCircle2, Lock, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
@@ -45,12 +44,36 @@ export default async function RegisterPage({
 
   const form = await prisma.registrationForm.findUnique({
     where: { slug },
-    include: { _count: { select: { responses: true } } },
+    include: {
+      _count: { select: { responses: true } },
+      event: { select: { id: true } },
+    },
   });
-  if (!form) notFound();
 
-  const status = formStatus(form);
-  if (status === "hidden") notFound();
+  const status = form ? formStatus(form) : "hidden";
+
+  // A deleted or unpublished form keeps the page shell rather than dropping to
+  // a 404 — the link is often already shared, and a bare 404 reads as broken.
+  if (!form || status === "hidden") {
+    return (
+      <div className="bg-slate-50">
+        <div className={shell}>
+          <div className="rounded-2xl border-t-8 border-primary bg-white p-6 shadow-sm">
+            <h1 className="text-2xl font-bold text-navy">Registration</h1>
+          </div>
+          <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-12 text-center">
+            <Lock className="h-10 w-10 text-slate-300" />
+            <p className="font-semibold text-navy">
+              Registration is currently unavailable.
+            </p>
+            <p className="text-sm text-slate-500">
+              This form is not open right now. Please check back later.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const session = await getUserSession();
   const questions = parseQuestions(form.questions);
@@ -121,8 +144,11 @@ export default async function RegisterPage({
         {session && (
           <>
             {" "}
-            <Link href="/account/registrations" className="font-semibold text-primary hover:underline">
-              Back to registrations
+            <Link
+              href={form.event ? "/account/events?tab=registration" : "/account"}
+              className="font-semibold text-primary hover:underline"
+            >
+              {form.event ? "Back to events" : "Back to dashboard"}
             </Link>
           </>
         )}

@@ -14,6 +14,8 @@ import {
 import { formatDate } from "@/lib/utils";
 import { getResearchIcon } from "@/lib/researchIcons";
 import { getUiIcon } from "@/lib/uiIcons";
+import { withDefaultStats } from "@/lib/impactStats";
+import EmptyState from "@/components/EmptyState";
 
 export type PublicationSummary = {
   id: string;
@@ -291,7 +293,18 @@ export default function ResearchPageContent({
             </div>
           </div>
 
-          {slide && (
+          {!slide ? (
+            // Same box the slider occupies, so the hero column never empties.
+            <div className="relative">
+              <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
+                <div className="flex h-[300px] items-center justify-center sm:h-[350px]">
+                  <p className="px-6 text-center text-sm text-white/60">
+                    Featured research will appear here soon.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
             <div
               className="relative"
               onMouseEnter={() => setPaused(true)}
@@ -370,9 +383,13 @@ export default function ResearchPageContent({
         </div>
       </section>
 
-      {categories.length > 0 && (
-        <section className="container-page py-8">
-          <SectionHeader title="Research Categories" />
+      <section className="container-page py-8">
+        <SectionHeader title="Research Categories" />
+        {categories.length === 0 ? (
+          <div className="flex min-h-[280px] items-center justify-center rounded-lg border border-slate-200 bg-white">
+            <EmptyState message="Research categories will appear here soon" />
+          </div>
+        ) : (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
             {categories.map((category) => {
               const Icon = getResearchIcon(category.icon);
@@ -415,15 +432,15 @@ export default function ResearchPageContent({
               );
             })}
           </div>
+        )}
 
-          {/* Desktop / tablet: single panel below the whole grid */}
-          {activeCategory && (
-            <div className="mt-6 hidden sm:block">
-              <CategoryPanel category={activeCategory} />
-            </div>
-          )}
-        </section>
-      )}
+        {/* Desktop / tablet: single panel below the whole grid */}
+        {activeCategory && (
+          <div className="mt-6 hidden sm:block">
+            <CategoryPanel category={activeCategory} />
+          </div>
+        )}
+      </section>
 
       {spotlight && (
         <section
@@ -588,7 +605,7 @@ export default function ResearchPageContent({
           <div className="absolute right-0 top-0 h-44 w-36 bg-[radial-gradient(circle_at_center,#93b4ff_1.5px,transparent_1.5px)] opacity-90 [background-size:18px_18px]" />
           <SectionHeader title="Research By The Numbers" />
           <div className="relative mt-14 grid grid-cols-2 gap-6 sm:grid-cols-5">
-            {researchStats.map((stat) => {
+            {withDefaultStats(researchStats, "research").map((stat) => {
               const Icon = getUiIcon(stat.icon);
               return (
                 <div key={stat.id} className="text-center">

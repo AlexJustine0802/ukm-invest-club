@@ -67,23 +67,23 @@ export default async function AnnouncementsPage({
         role={user.role}
       />
 
-      {categories.length > 1 && (
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          {categories.map((c) => (
-            <Link
-              key={c}
-              href={categoryHref(c)}
-              className={`rounded-lg px-5 py-2.5 text-sm font-semibold ${
-                c === category
-                  ? "bg-primary text-white"
-                  : "border border-slate-200 bg-white text-navy hover:bg-slate-50"
-              }`}
-            >
-              {c}
-            </Link>
-          ))}
-        </div>
-      )}
+      {/* Always rendered — with an empty database this is just "All", so the
+          row below it never moves up the page. */}
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        {categories.map((c) => (
+          <Link
+            key={c}
+            href={categoryHref(c)}
+            className={`rounded-lg px-5 py-2.5 text-sm font-semibold ${
+              c === category
+                ? "bg-primary text-white"
+                : "border border-slate-200 bg-white text-navy hover:bg-slate-50"
+            }`}
+          >
+            {c}
+          </Link>
+        ))}
+      </div>
 
       {visible.length === 0 ? (
         <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white py-16">
