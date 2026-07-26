@@ -1,8 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
-import { AlertCircle, CheckCircle2, Paperclip, UploadCloud } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Paperclip,
+  UploadCloud,
+} from "lucide-react";
 import { submitAssignment } from "@/app/account/assignments/[id]/actions";
 import {
   MAX_SUBMISSION_MB,
@@ -18,7 +24,11 @@ function Submit({ label }: { label: string }) {
       disabled={pending}
       className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
     >
-      <UploadCloud className="h-4 w-4" />
+      {pending ? (
+        <Spinner className="mr-0" />
+      ) : (
+        <UploadCloud className="h-4 w-4" />
+      )}
       {pending ? "Uploading…" : label}
     </button>
   );
@@ -88,7 +98,9 @@ export default function SubmitAssignmentForm({
         </p>
       )}
 
-      <Submit label={hasSubmission ? "Update submission" : "Submit assignment"} />
+      <Submit
+        label={hasSubmission ? "Update submission" : "Submit assignment"}
+      />
     </form>
   );
 }

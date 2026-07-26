@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import { DIVISIONS, GENERAL_ROLES, rolesFor } from "@/lib/roles";
 
@@ -12,6 +13,7 @@ function Save() {
       disabled={pending}
       className="btn-primary px-4 py-2 text-xs disabled:opacity-60"
     >
+      {pending && <Spinner />}
       {pending ? "Saving…" : "Save"}
     </button>
   );

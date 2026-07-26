@@ -4,8 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { site } from "@/lib/site";
+import { DUR, EASE } from "@/lib/motion";
 
 export default function Navbar({
   /**
@@ -18,6 +20,7 @@ export default function Navbar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const reduced = useReducedMotion();
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -27,7 +30,7 @@ export default function Navbar({
       <nav className="container-page flex h-16 items-center justify-between">
         <Link
           href={homeHref}
-          className="relative left-0 flex shrink-0 items-center text-navy md:-left-12"
+          className="group relative left-0 flex shrink-0 items-center text-navy md:-left-12"
         >
           <Image
             src="/images/logo-nobg.png"
@@ -35,7 +38,7 @@ export default function Navbar({
             width={156}
             height={100}
             priority
-            className="h-12 w-auto shrink-0 object-contain sm:h-16 md:h-20"
+            className="h-12 w-auto shrink-0 object-contain transition-transform duration-[--dur-ui] ease-[--ease-out] group-hover:scale-[1.03] sm:h-16 md:h-20"
           />
         </Link>
 
@@ -45,15 +48,28 @@ export default function Navbar({
             <li key={item.href}>
               <Link
                 href={item.href}
-                className={`relative rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                className={`group/nav relative rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   isActive(item.href)
                     ? "text-primary"
                     : "text-slate-600 hover:text-navy"
                 }`}
               >
                 {item.label}
+                {/* Hover preview of the underline: grows from the centre on
+                    any inactive link, so the whole bar responds to the pointer
+                    rather than only the page you are already on. */}
+                {!isActive(item.href) && (
+                  <span className="absolute inset-x-3 -bottom-0.5 h-0.5 origin-center scale-x-0 rounded-full bg-primary/40 transition-transform duration-[--dur-ui] ease-[--ease-out] group-hover/nav:scale-x-100" />
+                )}
+                {/* One underline shared across every link via layoutId, so it
+                    slides from the old tab to the new one on navigation
+                    instead of blinking out here and in over there. */}
                 {isActive(item.href) && (
-                  <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary" />
+                  <motion.span
+                    layoutId={reduced ? undefined : "nav-underline"}
+                    className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary"
+                    transition={{ duration: DUR.ui, ease: EASE }}
+                  />
                 )}
               </Link>
             </li>
@@ -81,44 +97,57 @@ export default function Navbar({
         </div>
       </nav>
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="border-t border-slate-200 bg-white md:hidden">
-          <ul className="container-page flex flex-col gap-1 py-3">
-            {site.nav.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={`block rounded-md px-3 py-2 text-sm font-medium ${
-                    isActive(item.href)
-                      ? "bg-primary-light text-primary"
-                      : "text-slate-600 hover:bg-slate-50 hover:text-navy"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-            <li className="mt-2 flex gap-2">
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="btn-secondary flex-1 text-center"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                onClick={() => setOpen(false)}
-                className="btn-primary flex-1 text-center"
-              >
-                Sign Up
-              </Link>
-            </li>
-          </ul>
-        </div>
-      )}
+      {/* Mobile menu. Animating grid-template-rows between 0fr and 1fr is what
+          lets the panel slide open to its natural height — no measuring, no
+          hardcoded max-height that clips longer menus. */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ gridTemplateRows: "0fr", opacity: 0 }}
+            animate={{ gridTemplateRows: "1fr", opacity: 1 }}
+            exit={{ gridTemplateRows: "0fr", opacity: 0 }}
+            transition={{ duration: reduced ? 0 : DUR.ui, ease: EASE }}
+            className="grid overflow-hidden border-t border-slate-200 bg-white md:hidden"
+          >
+            <div className="min-h-0">
+              <ul className="container-page flex flex-col gap-1 py-3">
+                {site.nav.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className={`block rounded-md px-3 py-2 text-sm font-medium ${
+                        isActive(item.href)
+                          ? "bg-primary-light text-primary"
+                          : "text-slate-600 hover:bg-slate-50 hover:text-navy"
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+                <li className="mt-2 flex gap-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setOpen(false)}
+                    className="btn-secondary flex-1 text-center"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setOpen(false)}
+                    className="btn-primary flex-1 text-center"
+                  >
+                    Sign Up
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

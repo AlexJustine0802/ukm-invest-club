@@ -1,9 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
+import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import { Send } from "lucide-react";
-import { submitContact, type ContactFormState } from "@/app/(site)/contact/actions";
+import {
+  submitContact,
+  type ContactFormState,
+} from "@/app/(site)/contact/actions";
 
 const initialState: ContactFormState = { status: "idle" };
 
@@ -11,7 +15,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <button type="submit" className="btn-primary px-6" disabled={pending}>
-      <Send className="mr-2 h-4 w-4" />
+      {pending ? <Spinner /> : <Send className="mr-2 h-4 w-4" />}
       {pending ? "Sending..." : "Send Message"}
     </button>
   );

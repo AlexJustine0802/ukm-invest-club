@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import { AlertCircle, Paperclip } from "lucide-react";
 import {
@@ -17,6 +18,7 @@ function Submit() {
       disabled={pending}
       className="rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
     >
+      {pending && <Spinner />}
       {pending ? "Submitting…" : "Submit"}
     </button>
   );
@@ -49,7 +51,10 @@ export default function RegistrationFormFill({
           <p className="font-semibold text-navy">Your details</p>
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div>
-              <label htmlFor="guestName" className="text-sm font-medium text-slate-600">
+              <label
+                htmlFor="guestName"
+                className="text-sm font-medium text-slate-600"
+              >
                 Full name <span className="text-rose-500">*</span>
               </label>
               <input
@@ -60,7 +65,10 @@ export default function RegistrationFormFill({
               />
             </div>
             <div>
-              <label htmlFor="guestEmail" className="text-sm font-medium text-slate-600">
+              <label
+                htmlFor="guestEmail"
+                className="text-sm font-medium text-slate-600"
+              >
                 Email <span className="text-rose-500">*</span>
               </label>
               <input
@@ -78,7 +86,10 @@ export default function RegistrationFormFill({
       {questions.map((q) => {
         const key = `q_${q.id}`;
         return (
-          <div key={q.id} className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div
+            key={q.id}
+            className="rounded-2xl border border-slate-200 bg-white p-5"
+          >
             <label htmlFor={key} className="font-semibold text-navy">
               {q.label}
               {q.required && <span className="ml-1 text-rose-500">*</span>}
@@ -89,7 +100,12 @@ export default function RegistrationFormFill({
 
             <div className="mt-3">
               {q.type === "SHORT_TEXT" && (
-                <input id={key} name={key} required={q.required} className={fieldClass} />
+                <input
+                  id={key}
+                  name={key}
+                  required={q.required}
+                  className={fieldClass}
+                />
               )}
 
               {q.type === "LONG_TEXT" && (
@@ -134,7 +150,10 @@ export default function RegistrationFormFill({
               {q.type === "CHOICE" && (
                 <div className="space-y-2">
                   {(q.options ?? []).map((o) => (
-                    <label key={o} className="flex items-center gap-3 text-sm text-slate-600">
+                    <label
+                      key={o}
+                      className="flex items-center gap-3 text-sm text-slate-600"
+                    >
                       <input
                         type="radio"
                         name={key}
@@ -151,8 +170,16 @@ export default function RegistrationFormFill({
               {q.type === "CHECKBOX" && (
                 <div className="space-y-2">
                   {(q.options ?? []).map((o) => (
-                    <label key={o} className="flex items-center gap-3 text-sm text-slate-600">
-                      <input type="checkbox" name={key} value={o} className="h-4 w-4" />
+                    <label
+                      key={o}
+                      className="flex items-center gap-3 text-sm text-slate-600"
+                    >
+                      <input
+                        type="checkbox"
+                        name={key}
+                        value={o}
+                        className="h-4 w-4"
+                      />
                       {o}
                     </label>
                   ))}

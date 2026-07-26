@@ -57,8 +57,12 @@ export default async function RecruitmentPage() {
   if (!user) redirect("/login");
 
   // The newest recruitment form wins, so last year's does not linger.
+  //
+  // Unpublished forms are fetched too, but only so the closed state can
+  // announce their opening date. formStatus still reports them as "hidden", so
+  // nothing else about an unpublished form reaches the page.
   const recruitment = await prisma.registrationForm.findFirst({
-    where: { isRecruitment: true, published: true },
+    where: { isRecruitment: true },
     orderBy: { createdAt: "desc" },
     include: { _count: { select: { responses: true } } },
   });
@@ -66,6 +70,13 @@ export default async function RecruitmentPage() {
   const now = new Date();
   const status = recruitment ? formStatus(recruitment, now) : "hidden";
   const isOpen = status === "open";
+
+  // The single admin-editable "when does recruitment open" date: the form's
+  // opensAt, as long as it is still in the future.
+  const opensAt =
+    recruitment?.opensAt && recruitment.opensAt > now
+      ? recruitment.opensAt
+      : null;
 
   const myResponse =
     recruitment &&
@@ -95,19 +106,17 @@ export default async function RecruitmentPage() {
 
   // ---- Closed: nothing published, not open yet, or already ended ----
   if (!isOpen) {
-    const heading =
-      status === "not-yet"
-        ? "Recruitment opens soon"
-        : status === "closed"
-          ? "Recruitment is closed"
-          : "Recruitment is not open";
+    const heading = opensAt
+      ? "Recruitment opens soon"
+      : status === "closed"
+        ? "Recruitment is closed"
+        : "Recruitment is not open";
 
-    const detail =
-      status === "not-yet" && recruitment?.opensAt
-        ? `Applications open ${formatDateTime(recruitment.opensAt)}.`
-        : status === "closed" && recruitment?.closesAt
-          ? `Applications closed on ${formatDateTime(recruitment.closesAt)}.`
-          : "There is no open recruitment right now. When the committee opens one, it will appear here.";
+    const detail = opensAt
+      ? "Applications are not open yet. Mark the date below so you are ready."
+      : status === "closed" && recruitment?.closesAt
+        ? `Applications closed on ${formatDateTime(recruitment.closesAt)}.`
+        : "There is no open recruitment right now. When the committee opens one, it will appear here.";
 
     return (
       <>
@@ -120,6 +129,12 @@ export default async function RecruitmentPage() {
             </span>
             <h2 className="text-2xl font-bold text-navy">{heading}</h2>
             <p className="max-w-md text-sm text-slate-500">{detail}</p>
+            {opensAt && (
+              <p className="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-primary">
+                <CalendarClock className="h-4 w-4" />
+                Opens {formatDateTime(opensAt)}
+              </p>
+            )}
             {myResponse && (
               <p className="flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700">
                 <CheckCircle2 className="h-4 w-4" />
@@ -190,7 +205,8 @@ export default async function RecruitmentPage() {
             {recruitment!.capacity !== null && (
               <span className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-primary-light" />
-                {recruitment!._count.responses} / {recruitment!.capacity} applicants
+                {recruitment!._count.responses} / {recruitment!.capacity}{" "}
+                applicants
               </span>
             )}
           </div>
@@ -265,7 +281,10 @@ export default async function RecruitmentPage() {
               <p className="font-semibold text-navy">{d.name}</p>
               <ul className="mt-2 space-y-1">
                 {d.positions.map((p) => (
-                  <li key={p} className="flex items-start gap-2 text-xs text-slate-500">
+                  <li
+                    key={p}
+                    className="flex items-start gap-2 text-xs text-slate-500"
+                  >
                     <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
                     {p}
                   </li>
@@ -299,7 +318,10 @@ export default async function RecruitmentPage() {
 
       <p className="mt-6 text-center text-xs text-slate-400">
         Looking for something else?{" "}
-        <Link href="/account/events" className="font-semibold text-primary hover:underline">
+        <Link
+          href="/account/events"
+          className="font-semibold text-primary hover:underline"
+        >
           Browse upcoming events
         </Link>
       </p>

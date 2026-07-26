@@ -1,23 +1,32 @@
 "use client";
 
 import Link from "next/link";
+import Spinner from "@/components/Spinner";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
-import { User, Mail, Lock } from "lucide-react";
+import { User, Mail, Phone, Lock } from "lucide-react";
 import { signupUser, type AuthState } from "@/app/signup/actions";
 import { IconInput, PasswordInput } from "./authParts";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className="btn-primary w-full py-3" disabled={pending}>
+    <button
+      type="submit"
+      className="btn-primary w-full py-3"
+      disabled={pending}
+    >
+      {pending && <Spinner />}
       {pending ? "Creating account…" : "Sign Up"}
     </button>
   );
 }
 
 export default function SignupForm() {
-  const [state, formAction] = useActionState<AuthState, FormData>(signupUser, {});
+  const [state, formAction] = useActionState<AuthState, FormData>(
+    signupUser,
+    {},
+  );
 
   return (
     <form action={formAction} className="space-y-5">
@@ -28,7 +37,10 @@ export default function SignupForm() {
       )}
 
       <div>
-        <label htmlFor="name" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="name"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Full Name
         </label>
         <IconInput
@@ -41,7 +53,10 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="email"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Email
         </label>
         <IconInput
@@ -55,7 +70,29 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="phone"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
+          Phone Number
+        </label>
+        {/* type="tel" gets the numeric keypad on mobile; the real check is in
+            the server action, since required/type are trivially bypassed. */}
+        <IconInput
+          id="phone"
+          name="phone"
+          type="tel"
+          placeholder="e.g. 081234567890"
+          autoComplete="tel"
+          icon={Phone}
+        />
+      </div>
+
+      <div>
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Password
         </label>
         <PasswordInput
@@ -72,7 +109,10 @@ export default function SignupForm() {
       </div>
 
       <div>
-        <label htmlFor="confirm" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="confirm"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Confirm Password
         </label>
         <PasswordInput

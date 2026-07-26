@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Spinner from "@/components/Spinner";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Lock } from "lucide-react";
@@ -10,7 +11,12 @@ import { PasswordInput } from "./authParts";
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className="btn-primary w-full py-3" disabled={pending}>
+    <button
+      type="submit"
+      className="btn-primary w-full py-3"
+      disabled={pending}
+    >
+      {pending && <Spinner />}
       {pending ? "Saving…" : "Reset Password"}
     </button>
   );
@@ -33,7 +39,10 @@ export default function ResetPasswordForm({ token }: { token: string }) {
       )}
 
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           New Password
         </label>
         <PasswordInput
@@ -46,7 +55,10 @@ export default function ResetPasswordForm({ token }: { token: string }) {
       </div>
 
       <div>
-        <label htmlFor="confirm" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="confirm"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Confirm Password
         </label>
         <PasswordInput

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import { login, type LoginState } from "@/app/admin/login/actions";
 
@@ -10,6 +11,7 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <button type="submit" className="btn-primary w-full" disabled={pending}>
+      {pending && <Spinner />}
       {pending ? "Signing in…" : "Sign in"}
     </button>
   );

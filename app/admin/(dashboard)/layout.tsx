@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import Sidebar from "@/components/admin/Sidebar";
+import PageTransition from "@/components/PageTransition";
 
 export const metadata = { title: "Admin" };
 
@@ -18,7 +19,7 @@ export default async function AdminLayout({
       <Sidebar />
       <main className="min-w-0 flex-1 overflow-x-hidden">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
-          {children}
+          <PageTransition>{children}</PageTransition>
         </div>
       </main>
     </div>

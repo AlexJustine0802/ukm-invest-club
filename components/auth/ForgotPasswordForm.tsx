@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Spinner from "@/components/Spinner";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { Mail, MailCheck } from "lucide-react";
@@ -13,7 +14,12 @@ import { IconInput } from "./authParts";
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className="btn-primary w-full py-3" disabled={pending}>
+    <button
+      type="submit"
+      className="btn-primary w-full py-3"
+      disabled={pending}
+    >
+      {pending && <Spinner />}
       {pending ? "Sending…" : "Send Reset Link"}
     </button>
   );
@@ -49,7 +55,10 @@ export default function ForgotPasswordForm() {
       )}
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="email"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Email
         </label>
         <IconInput

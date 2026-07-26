@@ -10,6 +10,9 @@ import HeroCarousel from "@/components/HeroCarousel";
 import AboutSlideshow from "@/components/AboutSlideshow";
 import PublicationCard from "@/components/PublicationCard";
 import PartnerStrip from "@/components/PartnerStrip";
+import Reveal from "@/components/Reveal";
+import StaggerGrid from "@/components/StaggerGrid";
+import CountUp from "@/components/CountUp";
 
 export const dynamic = "force-dynamic";
 
@@ -25,31 +28,31 @@ export default async function HomePage() {
     settings,
     aboutSlides,
   ] = await Promise.all([
-      prisma.event.findMany({
-        where: { published: true, eventDate: { gte: now } },
-        orderBy: { eventDate: "asc" },
-        take: 3,
-      }),
-      prisma.publication.findMany({
-        where: { published: true },
-        orderBy: { publishedAt: "desc" },
-        take: 3,
-      }),
-      prisma.heroSlide.findMany({
-        where: { location: "home" },
-        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
-      }),
-      prisma.impactStat.findMany({
-        where: { section: "home" },
-        orderBy: { order: "asc" },
-      }),
-      prisma.partner.findMany({ orderBy: { order: "asc" } }),
-      prisma.siteSettings.findUnique({ where: { id: 1 } }),
-      prisma.heroSlide.findMany({
-        where: { location: "home-about" },
-        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
-      }),
-    ]);
+    prisma.event.findMany({
+      where: { published: true, eventDate: { gte: now } },
+      orderBy: { eventDate: "asc" },
+      take: 3,
+    }),
+    prisma.publication.findMany({
+      where: { published: true },
+      orderBy: { publishedAt: "desc" },
+      take: 3,
+    }),
+    prisma.heroSlide.findMany({
+      where: { location: "home" },
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    }),
+    prisma.impactStat.findMany({
+      where: { section: "home" },
+      orderBy: { order: "asc" },
+    }),
+    prisma.partner.findMany({ orderBy: { order: "asc" } }),
+    prisma.siteSettings.findUnique({ where: { id: 1 } }),
+    prisma.heroSlide.findMany({
+      where: { location: "home-about" },
+      orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    }),
+  ]);
 
   // Fall back to most recent past events if nothing upcoming.
   const featuredEvents =
@@ -81,7 +84,7 @@ export default async function HomePage() {
       <HeroCarousel slides={slides} />
 
       {/* Impact */}
-      <section className="bg-slate-50 py-16">
+      <Reveal as="section" className="bg-slate-50 py-16">
         <div className="container-page">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">
             Our Impact
@@ -96,7 +99,7 @@ export default async function HomePage() {
                   </span>
                   <div>
                     <p className="text-2xl font-extrabold text-navy sm:text-3xl">
-                      {stat.value}
+                      <CountUp value={stat.value} />
                     </p>
                     <p className="text-sm text-slate-500">{stat.label}</p>
                   </div>
@@ -105,10 +108,10 @@ export default async function HomePage() {
             })}
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* About strip */}
-      <section className="container-page py-16">
+      <Reveal as="section" className="container-page py-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
             <span className="text-sm font-semibold uppercase tracking-widest text-primary">
@@ -132,10 +135,10 @@ export default async function HomePage() {
           </div>
           <AboutSlideshow images={aboutImages} />
         </div>
-      </section>
+      </Reveal>
 
       {/* Latest Research */}
-      <section className="bg-slate-50 py-16">
+      <Reveal as="section" className="bg-slate-50 py-16">
         <div className="container-page">
           <div className="flex items-end justify-between">
             <div>
@@ -152,11 +155,11 @@ export default async function HomePage() {
             </Link>
           </div>
           {latestPublications.length > 0 ? (
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <StaggerGrid className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {latestPublications.map((pub) => (
                 <PublicationCard key={pub.id} publication={pub} />
               ))}
-            </div>
+            </StaggerGrid>
           ) : (
             // Holds roughly one card row so the section keeps its height.
             <div className="mt-8 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
@@ -164,10 +167,10 @@ export default async function HomePage() {
             </div>
           )}
         </div>
-      </section>
+      </Reveal>
 
       {/* Upcoming Events */}
-      <section className="container-page py-16">
+      <Reveal as="section" className="container-page py-16">
         <div className="flex items-end justify-between">
           <div>
             <h2 className="text-3xl font-bold text-navy">
@@ -185,20 +188,20 @@ export default async function HomePage() {
           </Link>
         </div>
         {featuredEvents.length > 0 ? (
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <StaggerGrid className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {featuredEvents.map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
-          </div>
+          </StaggerGrid>
         ) : (
           <div className="mt-8 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
             <EmptyState message="No events yet. Check back soon!" />
           </div>
         )}
-      </section>
+      </Reveal>
 
       {/* Contact CTA */}
-      <section className="container-page py-16">
+      <Reveal as="section" className="container-page py-16">
         <div className="relative overflow-hidden rounded-2xl bg-navy p-8 text-white shadow-lg sm:p-12">
           <div className="absolute right-0 top-0 h-full w-44 bg-[radial-gradient(circle_at_center,#93b4ff_1.4px,transparent_1.4px)] opacity-60 [background-size:20px_20px]" />
           <div className="relative flex flex-col items-start gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -222,9 +225,11 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-      </section>
+      </Reveal>
 
-      <PartnerStrip partners={partners} />
+      <Reveal>
+        <PartnerStrip partners={partners} />
+      </Reveal>
     </>
   );
 }

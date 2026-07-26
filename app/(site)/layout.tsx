@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { getUserSession } from "@/lib/userAuth";
 
 export default async function SiteLayout({
@@ -15,7 +16,11 @@ export default async function SiteLayout({
   return (
     <div className="flex min-h-screen flex-col">
       <Navbar homeHref={session ? "/account" : "/"} />
-      <main className="flex-1">{children}</main>
+      {/* The wrapper sits below the navbar on purpose: animating a transform
+          on an ancestor would break the navbar's sticky positioning. */}
+      <main className="flex-1">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
     </div>
   );

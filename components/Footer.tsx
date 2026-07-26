@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 import Image from "next/image";
+import Reveal from "@/components/Reveal";
 
 export default function Footer() {
   return (
-    <footer className="mt-20 bg-navy-dark text-slate-300">
+    <Reveal as="footer" className="mt-20 bg-navy-dark text-slate-300">
       <div className="container-page grid gap-8 py-12 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-3">
@@ -86,6 +87,6 @@ export default function Footer() {
           </Link>
         </div>
       </div>
-    </footer>
+    </Reveal>
   );
 }

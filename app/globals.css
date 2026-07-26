@@ -5,6 +5,18 @@
 :root {
   --background: #f8fafc;
   --foreground: #1e293b;
+
+  /* One motion system. Every transition in the app — CSS or Framer Motion —
+     picks from these. The same numbers live in lib/motion.ts for the Framer
+     side; keep the two in step or a CSS hover and a JS reveal stop matching.
+
+     Ease-out-quint: sheds speed early, then drifts in. Slower than a plain
+     ease-out without feeling sluggish, because the eye reads the arrival, not
+     the total duration. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-hover: 240ms; /* pointer feedback */
+  --dur-ui: 320ms; /* dropdowns, menus, disclosure */
+  --dur-reveal: 1000ms; /* scroll reveal, matches lib/motion.ts DUR.reveal */
 }
 
 html {
@@ -42,8 +54,31 @@ code,
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 
+  /* Buttons lift a hair on hover and press in on click. The press is the part
+     that matters: it acknowledges the click on the same frame, before any
+     navigation or server action has had time to respond. */
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2;
+    transition:
+      background-color var(--dur-hover) var(--ease-out),
+      border-color var(--dur-hover) var(--ease-out),
+      color var(--dur-hover) var(--ease-out),
+      box-shadow var(--dur-hover) var(--ease-out),
+      transform var(--dur-hover) var(--ease-out);
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.985);
+    transition-duration: 80ms;
+  }
+
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-60;
+    transform: none;
   }
 
   .btn-primary {
@@ -62,12 +97,25 @@ code,
     @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-600;
   }
 
+  /* A 2px rise with the shadow. Enough to read as "this is clickable",
+     not enough to make a grid of cards feel restless. */
   .card {
-    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md;
+    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md;
+    transition:
+      box-shadow var(--dur-ui) var(--ease-out),
+      transform var(--dur-ui) var(--ease-out),
+      border-color var(--dur-ui) var(--ease-out);
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
   }
 
   .input {
     @apply block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-navy shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary;
+    transition:
+      border-color var(--dur-hover) var(--ease-out),
+      box-shadow var(--dur-hover) var(--ease-out);
   }
 
   .label {
@@ -123,4 +171,54 @@ code,
 }
 .prose-content img {
   @apply my-4 rounded-lg;
+}
+
+/* Loading placeholder: a slow sheen across a neutral block. Sized by the
+   caller so it occupies exactly the space the real content will, which is what
+   stops the swap-in from shifting the layout. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: theme("colors.slate.100");
+  border-radius: 0.75rem;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+  animation: skeleton-sweep 1.4s infinite;
+}
+
+@keyframes skeleton-sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Honour the OS setting everywhere at once. Framer Motion components read it
+   through useReducedMotion; this covers the CSS half. Nothing is hidden or
+   disabled — transitions simply resolve immediately. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .btn:hover:not(:disabled),
+  .btn:active:not(:disabled),
+  .card:hover {
+    transform: none;
+  }
 }

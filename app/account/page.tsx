@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import EmptyState from "@/components/EmptyState";
 import LatestUpdates from "@/components/account/LatestUpdates";
+import Reveal from "@/components/Reveal";
 import { getSections } from "@/lib/dashboardContent";
 import { getUiIcon } from "@/lib/uiIcons";
 import { getMetricValues, resolveMetric } from "@/lib/metrics";
@@ -102,11 +103,7 @@ export default async function AccountPage() {
       orderBy: { createdAt: "desc" },
     }),
     // Editable blocks, managed from /admin/dashboard-content.
-    getSections([
-      "overview",
-      "announcement",
-      "resource",
-    ]),
+    getSections(["overview", "announcement", "resource"]),
     // Upcoming events reuse the existing public Event model.
     prisma.event.findMany({
       where: { published: true, eventDate: { gte: now } },
@@ -236,8 +233,8 @@ export default async function AccountPage() {
         title={`${greeting}, ${firstName}! 👋`}
         subtitle={
           <span className="italic">
-            &ldquo;The best investment you can make is in yourself.&rdquo; – Warren
-            Buffett
+            &ldquo;The best investment you can make is in yourself.&rdquo; –
+            Warren Buffett
           </span>
         }
         showSearch={false}
@@ -254,7 +251,7 @@ export default async function AccountPage() {
         <div className="min-w-0 space-y-6">
           {/* Highlight — managed in /admin/highlights. Always rendered at a
               fixed height; with no active highlight it shows a placeholder. */}
-          <div className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-6 text-white sm:p-8">
+          <Reveal className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-6 text-white sm:p-8">
             {highlight ? (
               <>
                 <div className="relative max-w-lg">
@@ -305,10 +302,10 @@ export default async function AccountPage() {
                 </p>
               </div>
             )}
-          </div>
+          </Reveal>
 
           {/* Overview — the stat row is always present, showing 0 when empty. */}
-          <section>
+          <Reveal as="section">
             <h3 className="text-lg font-bold text-navy">Overview</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               {overviewCards.map((o) => {
@@ -340,10 +337,10 @@ export default async function AccountPage() {
                 );
               })}
             </div>
-          </section>
+          </Reveal>
 
           {/* Detail area — both columns always exist. */}
-          <div className="grid gap-6 lg:grid-cols-2">
+          <Reveal className="grid gap-6 lg:grid-cols-2">
             {/* Left: resources + discussions */}
             <div className="min-w-0 space-y-6">
               <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
@@ -363,7 +360,9 @@ export default async function AccountPage() {
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-sm font-bold text-navy">{r.title}</p>
+                            <p className="text-sm font-bold text-navy">
+                              {r.title}
+                            </p>
                             {r.badge && (
                               <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
                                 {r.badge}
@@ -533,7 +532,10 @@ export default async function AccountPage() {
                     <EmptyState message="No scheduled events this week." />
                   ) : (
                     thisWeekEvents.map((e) => (
-                      <div key={e.id} className="flex items-center gap-2 text-xs">
+                      <div
+                        key={e.id}
+                        className="flex items-center gap-2 text-xs"
+                      >
                         <span className="shrink-0 text-slate-400">
                           {e.eventDate.toLocaleTimeString("en-US", {
                             hour: "2-digit",
@@ -555,7 +557,7 @@ export default async function AccountPage() {
                 </div>
               </section>
             </div>
-          </div>
+          </Reveal>
 
           <p className="pt-2 text-center text-xs text-slate-400">
             © {now.getFullYear()} Investment Club Unpar. All rights reserved.
@@ -565,7 +567,7 @@ export default async function AccountPage() {
         {/* Right rail. Hidden on mobile — the Latest Updates bar at the top of
             the page surfaces these same three widgets there, so showing them
             again at the bottom was a duplicate. Tablet and desktop unchanged. */}
-        <div className="hidden min-w-0 space-y-6 md:block">
+        <Reveal className="hidden min-w-0 space-y-6 md:block">
           <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-navy">Announcements</h3>
@@ -702,7 +704,9 @@ export default async function AccountPage() {
                         <p className="truncate text-sm font-bold text-navy">
                           {c.company}
                         </p>
-                        <p className="truncate text-xs text-slate-500">{c.role}</p>
+                        <p className="truncate text-xs text-slate-500">
+                          {c.role}
+                        </p>
                         <p className="truncate text-xs text-slate-400">
                           {[c.location, c.workType].filter(Boolean).join(" • ")}
                         </p>
@@ -718,7 +722,7 @@ export default async function AccountPage() {
               )}
             </div>
           </section>
-        </div>
+        </Reveal>
       </div>
     </>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Spinner from "@/components/Spinner";
 import { useSearchParams } from "next/navigation";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
@@ -12,14 +13,22 @@ import { IconInput, PasswordInput } from "./authParts";
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className="btn-primary w-full py-3" disabled={pending}>
+    <button
+      type="submit"
+      className="btn-primary w-full py-3"
+      disabled={pending}
+    >
+      {pending && <Spinner />}
       {pending ? "Logging in…" : "Log In"}
     </button>
   );
 }
 
 export default function LoginForm() {
-  const [state, formAction] = useActionState<AuthState, FormData>(loginUser, {});
+  const [state, formAction] = useActionState<AuthState, FormData>(
+    loginUser,
+    {},
+  );
   const params = useSearchParams();
   const reset = params.get("reset") === "1";
 
@@ -37,7 +46,10 @@ export default function LoginForm() {
       )}
 
       <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="email"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Email
         </label>
         <IconInput
@@ -51,7 +63,10 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-navy">
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-semibold text-navy"
+        >
           Password
         </label>
         <PasswordInput

@@ -10,6 +10,8 @@ import {
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import Reveal from "@/components/Reveal";
+import StaggerGrid from "@/components/StaggerGrid";
 import EventHeroSlider, {
   type HeroEventSlide,
 } from "@/components/EventHeroSlider";
@@ -84,8 +86,7 @@ const fallbackUpcoming: EventDisplay[] = [
   {
     slug: "career-in-finance",
     title: "Career in Finance: Pathways & Preparation",
-    description:
-      "Bersama profesional di bidang keuangan dan investasi.",
+    description: "Bersama profesional di bidang keuangan dan investasi.",
     type: "Talkshow",
     date: new Date("2026-08-22T09:00:00+07:00"),
     endDate: new Date("2026-08-22T12:00:00+07:00"),
@@ -183,18 +184,18 @@ function inferEventType(title: string, index: number) {
   if (lower.includes("challenge") || lower.includes("competition")) {
     return "Competition";
   }
-  if (lower.includes("training") || lower.includes("bootcamp")) return "Training";
-  return ["Seminar", "Workshop", "Talkshow", "Training", "Competition"][index % 5];
+  if (lower.includes("training") || lower.includes("bootcamp"))
+    return "Training";
+  return ["Seminar", "Workshop", "Talkshow", "Training", "Competition"][
+    index % 5
+  ];
 }
 
 function addHours(date: Date, hours: number) {
   return new Date(date.getTime() + hours * 60 * 60 * 1000);
 }
 
-function normalizeEvent(
-  event: DbEvent,
-  index: number,
-): EventDisplay {
+function normalizeEvent(event: DbEvent, index: number): EventDisplay {
   return {
     slug: event.slug,
     title: event.title,
@@ -344,7 +345,10 @@ function UpcomingCard({ event }: { event: EventDisplay }) {
               {event.location}
             </p>
           </div>
-          <Link href={registerHref(event)} className="btn-primary mt-6 px-5 py-2 text-xs">
+          <Link
+            href={registerHref(event)}
+            className="btn-primary mt-6 px-5 py-2 text-xs"
+          >
             Register Now
           </Link>
         </div>
@@ -380,7 +384,10 @@ function CalendarRow({ event }: { event: EventDisplay }) {
           {event.location}
         </p>
       </div>
-      <Link href={registerHref(event)} className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end">
+      <Link
+        href={registerHref(event)}
+        className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end"
+      >
         Register
       </Link>
     </div>
@@ -401,7 +408,9 @@ function PastEventCard({ event }: { event: EventDisplay }) {
       </div>
       <div className="p-5">
         <TypeBadge type={event.type} />
-        <h3 className="mt-3 text-base font-extrabold text-navy">{event.title}</h3>
+        <h3 className="mt-3 text-base font-extrabold text-navy">
+          {event.title}
+        </h3>
         <div className="mt-4 space-y-2 text-sm font-semibold text-slate-600">
           <p className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-slate-500" />
@@ -465,7 +474,10 @@ export default async function EventsPage() {
       })),
     }));
   } catch (error) {
-    console.warn("Unable to load events from database, using fallback content.", error);
+    console.warn(
+      "Unable to load events from database, using fallback content.",
+      error,
+    );
   }
 
   const upcoming =
@@ -477,9 +489,12 @@ export default async function EventsPage() {
     pastEvents.length > 0
       ? pastEvents.map((event, index) => ({
           ...normalizeEvent(event, index),
-          participants: ["120+ Participants", "80+ Participants", "150+ Participants", "200+ Participants"][
-            index % 4
-          ],
+          participants: [
+            "120+ Participants",
+            "80+ Participants",
+            "150+ Participants",
+            "200+ Participants",
+          ][index % 4],
         }))
       : fallbackPast;
 
@@ -512,7 +527,10 @@ export default async function EventsPage() {
 
   return (
     <div className="bg-white text-navy">
-      <section className="relative overflow-hidden border-b border-blue-50 bg-white">
+      <Reveal
+        as="section"
+        className="relative overflow-hidden border-b border-blue-50 bg-white"
+      >
         <div className="absolute left-0 top-0 h-40 w-56 bg-[radial-gradient(circle_at_center,#93b4ff_1.5px,transparent_1.5px)] opacity-60 [background-size:24px_24px]" />
         <div className="absolute bottom-4 left-[19%] h-24 w-24 rounded-full bg-primary-light/75" />
         <div className="absolute bottom-12 right-[54%] h-36 w-36 rounded-full bg-primary-light/70" />
@@ -537,7 +555,10 @@ export default async function EventsPage() {
                 Upcoming Events
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
-              <Link href="#past-events" className="btn-secondary border-slate-300 text-navy hover:border-primary hover:text-primary">
+              <Link
+                href="#past-events"
+                className="btn-secondary border-slate-300 text-navy hover:border-primary hover:text-primary"
+              >
                 Past Events
               </Link>
             </div>
@@ -545,24 +566,39 @@ export default async function EventsPage() {
 
           <EventHeroSlider slides={heroSlides} />
         </div>
-      </section>
+      </Reveal>
 
-      <section id="upcoming-events" className="container-page py-9">
-        <SectionHeader title="Upcoming Events" action="View All Events" href="/events/all" />
-        <div className="grid gap-6 lg:grid-cols-3">
+      <Reveal as="section" id="upcoming-events" className="container-page py-9">
+        <SectionHeader
+          title="Upcoming Events"
+          action="View All Events"
+          href="/events/all"
+        />
+        <StaggerGrid className="grid gap-6 lg:grid-cols-3">
           {upcoming.slice(0, 3).map((event) => (
             <UpcomingCard key={event.slug} event={event} />
           ))}
-        </div>
-      </section>
+        </StaggerGrid>
+      </Reveal>
 
-      <section className="container-page border-t border-slate-100 py-9">
+      <Reveal
+        as="section"
+        className="container-page border-t border-slate-100 py-9"
+      >
         <SectionHeader title="Event Categories" />
         <EventCategoriesInteractive categories={categoriesWithPreview} />
-      </section>
+      </Reveal>
 
-      <section id="calendar" className="container-page border-t border-slate-100 py-9">
-        <SectionHeader title="Upcoming Events Calendar" action="View All Events" href="/events/all" />
+      <Reveal
+        as="section"
+        id="calendar"
+        className="container-page border-t border-slate-100 py-9"
+      >
+        <SectionHeader
+          title="Upcoming Events Calendar"
+          action="View All Events"
+          href="/events/all"
+        />
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           {upcoming.slice(0, 5).map((event) => (
             <CalendarRow key={event.slug} event={event} />
@@ -577,16 +613,24 @@ export default async function EventsPage() {
             <ChevronDown className="h-4 w-4" />
           </Link>
         </div>
-      </section>
+      </Reveal>
 
-      <section id="past-events" className="container-page border-t border-slate-100 py-9">
-        <SectionHeader title="Past Events Highlights" action="View All Past Events" href="/events/all?tab=latest" />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <Reveal
+        as="section"
+        id="past-events"
+        className="container-page border-t border-slate-100 py-9"
+      >
+        <SectionHeader
+          title="Past Events Highlights"
+          action="View All Past Events"
+          href="/events/all?tab=latest"
+        />
+        <StaggerGrid className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {past.slice(0, 4).map((event) => (
             <PastEventCard key={event.slug} event={event} />
           ))}
-        </div>
-      </section>
+        </StaggerGrid>
+      </Reveal>
     </div>
   );
 }

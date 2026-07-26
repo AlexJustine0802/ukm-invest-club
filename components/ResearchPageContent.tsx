@@ -16,6 +16,8 @@ import { getResearchIcon } from "@/lib/researchIcons";
 import { getUiIcon } from "@/lib/uiIcons";
 import { withDefaultStats } from "@/lib/impactStats";
 import EmptyState from "@/components/EmptyState";
+import Reveal from "@/components/Reveal";
+import StaggerGrid from "@/components/StaggerGrid";
 
 export type PublicationSummary = {
   id: string;
@@ -177,7 +179,11 @@ function MarketChart({ type }: { type: string }) {
   );
 }
 
-function CategoryPanel({ category }: { category: ResearchCategoryWithPreview }) {
+function CategoryPanel({
+  category,
+}: {
+  category: ResearchCategoryWithPreview;
+}) {
   return (
     <div className="rounded-lg border border-slate-200 bg-blue-50/70 p-5 shadow-sm">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -185,9 +191,7 @@ function CategoryPanel({ category }: { category: ResearchCategoryWithPreview }) 
           <p className="text-xs font-bold uppercase text-primary">
             Selected Category
           </p>
-          <h3 className="mt-1 text-xl font-bold text-navy">
-            {category.title}
-          </h3>
+          <h3 className="mt-1 text-xl font-bold text-navy">{category.title}</h3>
         </div>
         <Link
           href={`/publications/all?category=${category.slug}`}
@@ -263,7 +267,10 @@ export default function ResearchPageContent({
 
   return (
     <div className="bg-white text-navy">
-      <section className="relative overflow-hidden border-b border-blue-50 bg-white">
+      <Reveal
+        as="section"
+        className="relative overflow-hidden border-b border-blue-50 bg-white"
+      >
         <div className="absolute right-0 top-0 h-64 w-72 bg-[radial-gradient(circle_at_center,#93b4ff_1.5px,transparent_1.5px)] opacity-70 [background-size:22px_22px]" />
         <div className="absolute -bottom-16 right-10 h-40 w-40 rounded-full bg-primary-light/70" />
 
@@ -381,9 +388,9 @@ export default function ResearchPageContent({
             </div>
           )}
         </div>
-      </section>
+      </Reveal>
 
-      <section className="container-page py-8">
+      <Reveal as="section" className="container-page py-8">
         <SectionHeader title="Research Categories" />
         {categories.length === 0 ? (
           <div className="flex min-h-[280px] items-center justify-center rounded-lg border border-slate-200 bg-white">
@@ -440,10 +447,11 @@ export default function ResearchPageContent({
             <CategoryPanel category={activeCategory} />
           </div>
         )}
-      </section>
+      </Reveal>
 
       {spotlight && (
-        <section
+        <Reveal
+          as="section"
           id="featured-research"
           className="container-page border-t border-slate-100 py-8"
         >
@@ -517,10 +525,13 @@ export default function ResearchPageContent({
               ))}
             </div>
           </div>
-        </section>
+        </Reveal>
       )}
 
-      <section className="container-page border-t border-slate-100 py-8">
+      <Reveal
+        as="section"
+        className="container-page border-t border-slate-100 py-8"
+      >
         <SectionHeader title="Market Insights & Data" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {marketCards.map((card) => (
@@ -547,15 +558,18 @@ export default function ResearchPageContent({
         <p className="mt-5 text-xs font-semibold text-slate-500">
           Source: IDX, Bank Indonesia, BPS
         </p>
-      </section>
+      </Reveal>
 
-      <section className="container-page border-t border-slate-100 py-8">
+      <Reveal
+        as="section"
+        className="container-page border-t border-slate-100 py-8"
+      >
         <SectionHeader
           title="Research Publications"
           action="View All Publications"
         />
         {publicationCards.length > 0 ? (
-          <div className="grid gap-6 lg:grid-cols-3">
+          <StaggerGrid className="grid gap-6 lg:grid-cols-3">
             {publicationCards.map((publication) => (
               <Link
                 key={publication.id}
@@ -565,8 +579,7 @@ export default function ResearchPageContent({
                 <div className="relative bg-primary-light">
                   <Image
                     src={
-                      publication.coverImage ||
-                      "/images/research-modeling.png"
+                      publication.coverImage || "/images/research-modeling.png"
                     }
                     alt={publication.title}
                     fill
@@ -592,15 +605,18 @@ export default function ResearchPageContent({
                 </div>
               </Link>
             ))}
-          </div>
+          </StaggerGrid>
         ) : (
           <p className="text-sm text-slate-500">
             No publications yet — check back soon.
           </p>
         )}
-      </section>
+      </Reveal>
 
-      <section className="container-page grid gap-8 py-8 lg:grid-cols-[1fr_0.95fr]">
+      <Reveal
+        as="section"
+        className="container-page grid gap-8 py-8 lg:grid-cols-[1fr_0.95fr]"
+      >
         <div className="relative overflow-hidden rounded-lg bg-blue-50 p-8">
           <div className="absolute right-0 top-0 h-44 w-36 bg-[radial-gradient(circle_at_center,#93b4ff_1.5px,transparent_1.5px)] opacity-90 [background-size:18px_18px]" />
           <SectionHeader title="Research By The Numbers" />
@@ -625,7 +641,11 @@ export default function ResearchPageContent({
         </div>
 
         <div>
-          <SectionHeader title="Upcoming Events" action="View All Events" href="/events" />
+          <SectionHeader
+            title="Upcoming Events"
+            action="View All Events"
+            href="/events"
+          />
           {upcomingEvents.length > 0 ? (
             <div className="space-y-5">
               {upcomingEvents.map((event) => {
@@ -687,7 +707,7 @@ export default function ResearchPageContent({
             </p>
           )}
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

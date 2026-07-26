@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formStatus, parseQuestions, parseAnswers, answerText } from "@/lib/forms";
+import {
+  formStatus,
+  parseQuestions,
+  parseAnswers,
+  answerText,
+} from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -44,8 +49,8 @@ export default async function AdminRecruitmentPage() {
           <h1 className="text-2xl font-bold text-navy">Recruitment</h1>
           <p className="mt-1 text-sm text-slate-500">
             The open-recruitment round members see on{" "}
-            <code>/account/recruitment</code>. The newest form ticked as
-            “club recruitment” is the live one; its open and close dates decide
+            <code>/account/recruitment</code>. The newest form ticked as “club
+            recruitment” is the live one; its open and close dates decide
             whether members see the page or a closed notice.
           </p>
         </div>
@@ -60,9 +65,13 @@ export default async function AdminRecruitmentPage() {
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
             Create a registration form, write its questions, then tick{" "}
             <strong>“This is the club recruitment”</strong> and set the open and
-            close dates. Until then members see a “not open” notice.
+            close dates. A future open date is announced to members straight
+            away, even while the form itself is still unpublished.
           </p>
-          <Link href="/admin/registrations/new" className="btn-primary mt-5 inline-block">
+          <Link
+            href="/admin/registrations/new"
+            className="btn-primary mt-5 inline-block"
+          >
             Create the form
           </Link>
         </div>
@@ -73,7 +82,9 @@ export default async function AdminRecruitmentPage() {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg font-bold text-navy">{current.title}</h2>
+                  <h2 className="text-lg font-bold text-navy">
+                    {current.title}
+                  </h2>
                   <span
                     className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}
                   >
@@ -132,7 +143,8 @@ export default async function AdminRecruitmentPage() {
                 { label: "Applicants", value: current._count.responses },
                 {
                   label: "Capacity",
-                  value: current.capacity === null ? "Unlimited" : current.capacity,
+                  value:
+                    current.capacity === null ? "Unlimited" : current.capacity,
                 },
                 { label: "Questions", value: questions.length },
               ].map((s) => (
@@ -169,10 +181,15 @@ export default async function AdminRecruitmentPage() {
                   const name = a.user?.name ?? a.guestName ?? "—";
                   const preview = questions
                     .slice(0, 2)
-                    .map((q) => `${q.label}: ${answerText(answers[q.id]) || "—"}`)
+                    .map(
+                      (q) => `${q.label}: ${answerText(answers[q.id]) || "—"}`,
+                    )
                     .join(" · ");
                   return (
-                    <div key={a.id} className="card flex flex-wrap items-center gap-4 p-4">
+                    <div
+                      key={a.id}
+                      className="card flex flex-wrap items-center gap-4 p-4"
+                    >
                       <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-bold text-primary">
                         {name.charAt(0).toUpperCase()}
                       </span>
@@ -190,7 +207,9 @@ export default async function AdminRecruitmentPage() {
                           {formatDateTime(a.createdAt)}
                         </p>
                         {preview && (
-                          <p className="mt-1 truncate text-xs text-slate-400">{preview}</p>
+                          <p className="mt-1 truncate text-xs text-slate-400">
+                            {preview}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -206,7 +225,10 @@ export default async function AdminRecruitmentPage() {
               <h2 className="text-lg font-bold text-navy">Past rounds</h2>
               <div className="mt-4 space-y-3">
                 {past.map((f) => (
-                  <div key={f.id} className="card flex flex-wrap items-center gap-4 p-4">
+                  <div
+                    key={f.id}
+                    className="card flex flex-wrap items-center gap-4 p-4"
+                  >
                     <div className="min-w-0 flex-1">
                       <p className="font-semibold text-navy">{f.title}</p>
                       <p className="text-xs text-slate-400">

@@ -28,6 +28,8 @@ import { formatDate } from "@/lib/utils";
 import PartnerStrip from "@/components/PartnerStrip";
 import DivisionsSection from "@/components/DivisionsSection";
 import EmptyState from "@/components/EmptyState";
+import Reveal from "@/components/Reveal";
+import CountUp from "@/components/CountUp";
 import {
   DIVISIONS,
   divisionTagline,
@@ -50,11 +52,36 @@ const missions = [
 ];
 
 const journey = [
-  { year: "2020", icon: Flag, title: "Founded", text: "Started by a group of students with a vision to build a campus investing culture." },
-  { year: "2021", icon: Users, title: "Growing Together", text: "Held educational activities and regular discussions with practitioners and experts." },
-  { year: "2022", icon: FileText, title: "Research Expansion", text: "Began publishing periodic research and building a market-analysis database." },
-  { year: "2023", icon: Handshake, title: "Stronger Collaboration", text: "Partnered with institutions, companies, and other investment communities." },
-  { year: "2024+", icon: Trophy, title: "Impact the Future", text: "Continuing to grow and deliver greater impact for members and society." },
+  {
+    year: "2020",
+    icon: Flag,
+    title: "Founded",
+    text: "Started by a group of students with a vision to build a campus investing culture.",
+  },
+  {
+    year: "2021",
+    icon: Users,
+    title: "Growing Together",
+    text: "Held educational activities and regular discussions with practitioners and experts.",
+  },
+  {
+    year: "2022",
+    icon: FileText,
+    title: "Research Expansion",
+    text: "Began publishing periodic research and building a market-analysis database.",
+  },
+  {
+    year: "2023",
+    icon: Handshake,
+    title: "Stronger Collaboration",
+    text: "Partnered with institutions, companies, and other investment communities.",
+  },
+  {
+    year: "2024+",
+    icon: Trophy,
+    title: "Impact the Future",
+    text: "Continuing to grow and deliver greater impact for members and society.",
+  },
 ];
 
 type MomentView = {
@@ -75,7 +102,9 @@ function MomentCard({
   imageHeight?: string;
 }) {
   return (
-    <div className={`relative overflow-hidden rounded-2xl ${imageHeight} ${className}`}>
+    <div
+      className={`relative overflow-hidden rounded-2xl ${imageHeight} ${className}`}
+    >
       <Image
         src={moment.image}
         alt={moment.title}
@@ -99,33 +128,34 @@ function MomentCard({
 }
 
 export default async function AboutPage() {
-  const [divisionPeople, stats, partners, communityMoments, settings] = await Promise.all([
-    // The people are member accounts — edited once in /admin/members and shown
-    // here and in the member area both.
-    prisma.user.findMany({
-      where: { division: { not: null } },
-      select: {
-        id: true,
-        name: true,
-        role: true,
-        division: true,
-        photo: true,
-        bio: true,
-        instagram: true,
-        linkedin: true,
-      },
-    }),
-    prisma.impactStat.findMany({
-      where: { section: "home" },
-      orderBy: { order: "asc" },
-    }),
-    prisma.partner.findMany({ orderBy: { order: "asc" } }),
-    prisma.moment.findMany({
-      orderBy: [{ order: "asc" }, { date: "desc" }],
-      take: 4,
-    }),
-    prisma.siteSettings.findUnique({ where: { id: 1 } }),
-  ]);
+  const [divisionPeople, stats, partners, communityMoments, settings] =
+    await Promise.all([
+      // The people are member accounts — edited once in /admin/members and shown
+      // here and in the member area both.
+      prisma.user.findMany({
+        where: { division: { not: null } },
+        select: {
+          id: true,
+          name: true,
+          role: true,
+          division: true,
+          photo: true,
+          bio: true,
+          instagram: true,
+          linkedin: true,
+        },
+      }),
+      prisma.impactStat.findMany({
+        where: { section: "home" },
+        orderBy: { order: "asc" },
+      }),
+      prisma.partner.findMany({ orderBy: { order: "asc" } }),
+      prisma.moment.findMany({
+        orderBy: [{ order: "asc" }, { date: "desc" }],
+        take: 4,
+      }),
+      prisma.siteSettings.findUnique({ where: { id: 1 } }),
+    ]);
 
   // The org chart itself is fixed in lib/roles; only the people in it come from
   // the database, so this section renders in full even with no members yet.
@@ -162,7 +192,10 @@ export default async function AboutPage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white">
+      <Reveal
+        as="section"
+        className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white"
+      >
         {settings?.aboutHeroImage && (
           <>
             <Image
@@ -201,7 +234,7 @@ export default async function AboutPage() {
                   </span>
                   <div className="text-left">
                     <p className="text-2xl font-extrabold text-navy">
-                      {s.value}
+                      <CountUp value={s.value} />
                     </p>
                     <p className="text-xs text-slate-500">{s.label}</p>
                   </div>
@@ -210,10 +243,10 @@ export default async function AboutPage() {
             })}
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* Who we are / Vision / Mission */}
-      <section className="container-page py-16">
+      <Reveal as="section" className="container-page py-16">
         <div className="grid gap-8 lg:grid-cols-3">
           <div>
             <span className="text-sm font-semibold uppercase tracking-widest text-primary">
@@ -259,10 +292,10 @@ export default async function AboutPage() {
             </ul>
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* Our Community */}
-      <section id="community" className="container-page py-16">
+      <Reveal as="section" id="community" className="container-page py-16">
         <div className="text-center">
           <span className="text-sm font-semibold uppercase tracking-widest text-primary">
             Our Community
@@ -313,11 +346,15 @@ export default async function AboutPage() {
             <ArrowRight className="ml-2 h-4 w-4" />
           </Link>
         </div>
-      </section>
+      </Reveal>
 
-      <DivisionsSection divisions={divisions} />
+      <Reveal>
+        <DivisionsSection divisions={divisions} />
+      </Reveal>
 
-      <PartnerStrip partners={partners} />
+      <Reveal>
+        <PartnerStrip partners={partners} />
+      </Reveal>
     </div>
   );
 }

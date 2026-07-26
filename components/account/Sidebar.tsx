@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DUR, EASE } from "@/lib/motion";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   Home,
   FolderClosed,
@@ -43,6 +45,7 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const reduced = useReducedMotion();
 
   // Navigating closes the drawer; Escape does too.
   useEffect(() => setOpen(false), [pathname]);
@@ -53,9 +56,19 @@ export default function Sidebar({
     return () => document.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const navLink = (item: { label: string; icon: LucideIcon; href: string }) => {
-    // "/account" is a prefix of every other entry, so it only matches exactly;
-    // the rest match sub-routes too (e.g. a channel page under Discussions).
+  // The drawer and the desktop sidebar are both mounted at once, so each gets
+  // its own layoutId — one shared id across two live copies would make the
+  // indicator try to fly between them.
+  // Takes both arguments rather than currying: a function that returns JSX
+  // from one argument reads as a component to lint rules, and this is a render
+  // helper, not a component.
+  const navLink = (
+    scope: string,
+    item: { label: string; icon: LucideIcon; href: string },
+  ) => {
+    // "/account" is a prefix of every other entry, so it only matches
+    // exactly; the rest match sub-routes too (e.g. a channel page under
+    // Discussions).
     const active =
       item.href === "/account"
         ? pathname === "/account"
@@ -64,13 +77,24 @@ export default function Sidebar({
       <Link
         key={item.label}
         href={item.href}
-        className={`flex items-center gap-3 rounded-lg py-2.5 pl-3 pr-3 text-sm font-medium ${
+        className={`group relative flex items-center gap-3 rounded-lg py-2.5 pl-3 pr-3 text-sm font-medium transition-colors duration-[--dur-hover] ${
           active
-            ? "border-l-4 border-primary bg-blue-50 pl-2 text-primary"
+            ? "bg-blue-50 text-primary"
             : "text-slate-600 hover:bg-slate-50"
         }`}
       >
-        <item.icon className="h-5 w-5" />
+        {/* Was a 4px left border with the padding shaved to match, which
+              nudged the label sideways on every navigation. Positioned
+              absolutely it costs no layout, so the text never moves — and
+              layoutId slides it from the old item to the new one. */}
+        {active && (
+          <motion.span
+            layoutId={reduced ? undefined : `account-nav-${scope}`}
+            className="absolute inset-y-1 left-0 w-1 rounded-r-full bg-primary"
+            transition={{ duration: DUR.ui, ease: EASE }}
+          />
+        )}
+        <item.icon className="h-5 w-5 transition-transform duration-[--dur-hover] ease-[--ease-out] group-hover:scale-110" />
         {item.label}
       </Link>
     );
@@ -88,11 +112,11 @@ export default function Sidebar({
     </Link>
   );
 
-  const links = (
+  const links = (scope: string) => (
     <nav className="mt-4 space-y-1 lg:mt-6">
-      {nav.map(navLink)}
+      {nav.map((item) => navLink(scope, item))}
       <div className="my-3 border-t border-slate-100" />
-      {navSecondary.map(navLink)}
+      {navSecondary.map((item) => navLink(scope, item))}
     </nav>
   );
 
@@ -123,37 +147,50 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-navy/40"
-          />
-          <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col overflow-y-auto bg-white p-4 shadow-xl">
-            <div className="flex items-start justify-between">
-              {logo}
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                aria-label="Close menu"
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            {links}
-            {profile}
+      {/* Mobile drawer. The scrim fades while the panel slides, so the page
+          behind dims as the menu arrives rather than after it. */}
+      <AnimatePresence>
+        {open && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <motion.button
+              type="button"
+              aria-label="Close menu"
+              onClick={() => setOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduced ? 0 : DUR.ui, ease: EASE }}
+              className="absolute inset-0 bg-navy/40"
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ duration: reduced ? 0 : DUR.ui, ease: EASE }}
+              className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col overflow-y-auto bg-white p-4 shadow-xl"
+            >
+              <div className="flex items-start justify-between">
+                {logo}
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close menu"
+                  className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              {links("drawer")}
+              {profile}
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 flex-col border-r border-slate-200 bg-white p-4 lg:flex">
         {logo}
-        {links}
+        {links("desktop")}
       </aside>
     </>
   );
