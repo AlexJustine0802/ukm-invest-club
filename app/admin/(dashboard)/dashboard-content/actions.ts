@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { DASHBOARD_SECTIONS } from "@/lib/dashboardSections";
 import { isMetric } from "@/lib/metrics";
@@ -67,6 +68,6 @@ export async function updateDashboardItem(formData: FormData) {
 export async function deleteDashboardItem(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.dashboardItem.delete({ where: { id } });
+  await deleteIfExists(() => prisma.dashboardItem.delete({ where: { id } }));
   revalidateDashboard();
 }

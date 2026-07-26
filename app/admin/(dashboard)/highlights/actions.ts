@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 
 function revalidateHighlights() {
@@ -42,6 +43,6 @@ export async function updateHighlight(formData: FormData) {
 export async function deleteHighlight(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.highlight.delete({ where: { id } });
+  await deleteIfExists(() => prisma.highlight.delete({ where: { id } }));
   revalidateHighlights();
 }

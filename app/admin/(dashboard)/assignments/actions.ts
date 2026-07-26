@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { ASSIGNMENT_STATUSES } from "@/lib/assignments";
 
@@ -51,6 +52,6 @@ export async function updateAssignment(formData: FormData) {
 export async function deleteAssignment(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.assignment.delete({ where: { id } });
+  await deleteIfExists(() => prisma.assignment.delete({ where: { id } }));
   revalidateAssignments();
 }

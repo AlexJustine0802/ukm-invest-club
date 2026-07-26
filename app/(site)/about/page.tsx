@@ -257,7 +257,7 @@ export default async function AboutPage() {
             </h2>
             <p className="mt-4 text-slate-600">
               {site.fullName} ({site.name}) is a student-run investment club
-              (UKM) dedicated to building financial literacy and a passion for
+              dedicated to building financial literacy and a passion for
               investing among students.
             </p>
             <p className="mt-4 text-slate-600">

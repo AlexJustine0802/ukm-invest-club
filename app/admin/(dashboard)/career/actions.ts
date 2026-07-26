@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 
 function revalidateCareer() {
@@ -49,6 +50,6 @@ export async function updateCareerAlert(formData: FormData) {
 export async function deleteCareerAlert(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.careerAlert.delete({ where: { id } });
+  await deleteIfExists(() => prisma.careerAlert.delete({ where: { id } }));
   revalidateCareer();
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 
@@ -54,6 +55,8 @@ export async function updateChannel(formData: FormData) {
 export async function deleteChannel(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.discussionChannel.delete({ where: { id } });
+  await deleteIfExists(() =>
+    prisma.discussionChannel.delete({ where: { id } }),
+  );
   revalidateDiscussions();
 }

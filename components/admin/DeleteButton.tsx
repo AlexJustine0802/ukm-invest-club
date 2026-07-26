@@ -1,11 +1,32 @@
 "use client";
 
+import { useFormStatus } from "react-dom";
+import Spinner from "@/components/Spinner";
+
 interface DeleteButtonProps {
   action: (formData: FormData) => void;
   id: string;
   label?: string;
   className?: string;
   confirmMessage?: string;
+}
+
+/**
+ * Separate component because useFormStatus only reports the status of a form
+ * above it in the tree — called in the same component that renders <form>, it
+ * always returns false.
+ */
+function Submit({ label, className }: { label: string; className: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button type="submit" className={className} disabled={pending}>
+      {/* Deleting is a round trip to the database. Without this the button
+          looks inert for a second or more, people click again, and the second
+          submit hits an already-deleted row (Prisma P2025). */}
+      {pending && <Spinner />}
+      {pending ? "Deleting…" : label}
+    </button>
+  );
 }
 
 export default function DeleteButton({
@@ -23,9 +44,7 @@ export default function DeleteButton({
       }}
     >
       <input type="hidden" name="id" value={id} />
-      <button type="submit" className={className}>
-        {label}
-      </button>
+      <Submit label={label} className={className} />
     </form>
   );
 }

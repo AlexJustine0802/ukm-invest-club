@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { resolveImage } from "@/lib/upload";
 
@@ -78,7 +79,7 @@ export async function updateMoment(formData: FormData) {
 export async function deleteMoment(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.moment.delete({ where: { id } });
+  await deleteIfExists(() => prisma.moment.delete({ where: { id } }));
   revalidateCommunity();
 }
 
@@ -101,7 +102,7 @@ export async function deleteMomentPhoto(formData: FormData) {
   const id = formData.get("id") as string;
   const photo = await prisma.momentPhoto.findUnique({ where: { id } });
   if (!photo) return;
-  await prisma.momentPhoto.delete({ where: { id } });
+  await deleteIfExists(() => prisma.momentPhoto.delete({ where: { id } }));
   revalidateCommunity();
   revalidatePath(`/admin/community/${photo.momentId}/edit`);
 }

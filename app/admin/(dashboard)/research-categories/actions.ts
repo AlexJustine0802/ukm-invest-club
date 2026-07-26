@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 
@@ -70,6 +71,6 @@ export async function updateResearchCategory(formData: FormData) {
 export async function deleteResearchCategory(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.researchCategory.delete({ where: { id } });
+  await deleteIfExists(() => prisma.researchCategory.delete({ where: { id } }));
   revalidateResearchCategories();
 }

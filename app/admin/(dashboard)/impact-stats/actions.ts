@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 
 function revalidateStats() {
@@ -54,6 +55,6 @@ export async function updateImpactStat(formData: FormData) {
 export async function deleteImpactStat(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.impactStat.delete({ where: { id } });
+  await deleteIfExists(() => prisma.impactStat.delete({ where: { id } }));
   revalidateStats();
 }

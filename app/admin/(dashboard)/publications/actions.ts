@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { resolveImage } from "@/lib/upload";
 import { slugify } from "@/lib/utils";
@@ -90,6 +91,6 @@ export async function updatePublication(formData: FormData) {
 export async function deletePublication(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  await prisma.publication.delete({ where: { id } });
+  await deleteIfExists(() => prisma.publication.delete({ where: { id } }));
   revalidatePublications();
 }

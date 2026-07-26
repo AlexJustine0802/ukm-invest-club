@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { parseQuestions, isAudience } from "@/lib/forms";
@@ -20,7 +21,6 @@ function revalidateForms(slug?: string) {
   revalidatePath("/account/events");
   if (slug) revalidatePath(`/register/${slug}`);
 }
-
 
 function dataFrom(formData: FormData) {
   const str = (key: string) => (formData.get(key) as string)?.trim() || null;
@@ -102,7 +102,11 @@ export async function deleteRegistrationForm(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
   // Event.registrationFormId cascades, so the public event goes with it.
-  const form = await prisma.registrationForm.delete({ where: { id } });
+  const form = await deleteIfExists(() =>
+    prisma.registrationForm.delete({ where: { id } }),
+  );
+  // Already deleted: still refresh the list, which is what the caller wanted.
+  if (!form) return revalidatePath("/admin/registrations");
   revalidateForms(form.slug);
 }
 
@@ -110,9 +114,12 @@ export async function deleteRegistrationForm(formData: FormData) {
 export async function deleteResponse(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;
-  const response = await prisma.formResponse.delete({
-    where: { id },
-    select: { formId: true },
-  });
+  const response = await deleteIfExists(() =>
+    prisma.formResponse.delete({
+      where: { id },
+      select: { formId: true },
+    }),
+  );
+  if (!response) return;
   revalidatePath(`/admin/registrations/${response.formId}/responses`);
 }

@@ -3,7 +3,7 @@ export const site = {
   fullName: "Investment Club Universitas Parahyangan",
   tagline: "Empowering students to invest with confidence.",
   description:
-    "ICUnpar is the student investment club (UKM) of Universitas Parahyangan — hosting events, publishing research, and building a community of young investors.",
+    "ICUnpar is the student investment club of Universitas Parahyangan — hosting events, publishing research, and building a community of young investors.",
   email: "icunpar@example.com",
   instagram: "https://instagram.com/",
   linkedin: "https://linkedin.com/",
