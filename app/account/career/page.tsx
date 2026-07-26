@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
+import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
@@ -28,7 +29,7 @@ export default async function CareerPage({
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const { type: typeParam, q = "" } = await searchParams;

@@ -15,6 +15,26 @@ body {
   color: var(--foreground);
   background: var(--background);
   -webkit-font-smoothing: antialiased;
+  /* Safety net against sideways scroll. `clip` rather than `hidden` because
+     `hidden` turns the body into a scroll container and breaks every
+     `position: sticky` header in the app. */
+  overflow-x: clip;
+}
+
+/* Media never pushes past its column, whatever the intrinsic size is. */
+img,
+svg,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+/* Long unbroken strings — emails, URLs, slugs — wrap instead of widening
+   their container. Applied narrowly so ordinary prose keeps normal wrapping. */
+code,
+.break-anywhere {
+  overflow-wrap: anywhere;
 }
 
 @layer components {
@@ -62,6 +82,14 @@ body {
 /* Markdown / prose rendering */
 .prose-content {
   @apply leading-relaxed text-slate-700;
+  overflow-wrap: anywhere;
+}
+/* Fenced code blocks scroll inside themselves rather than widening the page. */
+.prose-content pre {
+  @apply my-4 overflow-x-auto rounded-lg bg-slate-100 p-4;
+}
+.prose-content table {
+  @apply block w-full overflow-x-auto;
 }
 .prose-content h1 {
   @apply mb-4 mt-8 text-3xl font-bold text-navy;

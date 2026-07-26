@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { FolderClosed, SearchX } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import { getSection } from "@/lib/dashboardContent";
@@ -20,7 +20,7 @@ export default async function ResourcesPage({
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const folders = await getSection("folder");

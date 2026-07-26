@@ -114,7 +114,7 @@ export default function ContactPage() {
           {contactCards.map((card) => (
             <article
               key={card.title}
-              className="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm"
+              className="min-w-0 break-words rounded-lg border border-slate-200 bg-white p-6 text-center shadow-sm sm:p-8"
             >
               <span className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary-light text-primary">
                 <card.icon className="h-11 w-11" />

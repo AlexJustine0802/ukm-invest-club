@@ -1,10 +1,7 @@
 import { Suspense } from "react";
 import TopBarMenus from "./TopBarMenus";
 import TopBarSearch from "./TopBarSearch";
-import { getSection } from "@/lib/dashboardContent";
-import { prisma } from "@/lib/prisma";
-import { NEW_ALERT_DAYS, postedLabel } from "@/lib/career";
-import type { TopBarNotification } from "./TopBarMenus";
+import { getTopBarNotifications } from "@/lib/notifications";
 
 export default async function AccountTopBar({
   title,
@@ -24,43 +21,7 @@ export default async function AccountTopBar({
   initial: string;
   role: string;
 }) {
-  // The bell mirrors announcements plus any recent job posting, so publishing a
-  // career alert announces itself — no second row for the admin to write.
-  const now = new Date();
-  const [announcements, careerAlerts] = await Promise.all([
-    getSection("announcement"),
-    prisma.careerAlert.findMany({
-      where: {
-        published: true,
-        createdAt: {
-          gte: new Date(now.getTime() - NEW_ALERT_DAYS * 24 * 60 * 60 * 1000),
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
-  ]);
-
-  const notifications: TopBarNotification[] = [
-    ...careerAlerts.map((c) => ({
-      id: c.id,
-      title: `New opening: ${c.role}`,
-      body: c.location ? `${c.company} · ${c.location}` : c.company,
-      ago: postedLabel(c.createdAt, now),
-      icon: c.icon ?? "Briefcase",
-      color: "bg-emerald-50 text-emerald-700",
-      href: "/account/career",
-    })),
-    ...announcements.slice(0, 8).map((a) => ({
-      id: a.id,
-      title: a.title,
-      body: a.subtitle ?? "",
-      ago: a.note ?? "",
-      icon: a.icon,
-      color: a.color ?? "bg-blue-50 text-primary",
-      href: "/account/announcements",
-    })),
-  ];
+  const notifications = await getTopBarNotifications();
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -76,12 +37,16 @@ export default async function AccountTopBar({
             <TopBarSearch placeholder={searchPlaceholder} />
           </Suspense>
         )}
-        <TopBarMenus
-          name={name}
-          initial={initial}
-          role={role}
-          notifications={notifications}
-        />
+        {/* Below lg these live in the nav bar instead — anchored to the left
+            of a mobile row, the dropdowns opened off the side of the screen. */}
+        <div className="hidden lg:flex">
+          <TopBarMenus
+            name={name}
+            initial={initial}
+            role={role}
+            notifications={notifications}
+          />
+        </div>
       </div>
     </div>
   );

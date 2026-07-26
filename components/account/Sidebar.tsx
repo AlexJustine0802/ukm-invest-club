@@ -34,7 +34,13 @@ const navSecondary: { label: string; icon: LucideIcon; href: string }[] = [
   { label: "Career Alert", icon: Briefcase, href: "/account/career" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({
+  menus,
+  profile,
+}: {
+  menus?: React.ReactNode;
+  profile?: React.ReactNode;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -103,15 +109,18 @@ export default function Sidebar() {
             className="h-10 w-auto object-contain"
           />
         </Link>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-          aria-expanded={open}
-          className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-        >
-          <Menu className="h-6 w-6" />
-        </button>
+        <div className="flex items-center gap-1">
+          {menus}
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
+            aria-expanded={open}
+            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}
@@ -136,6 +145,7 @@ export default function Sidebar() {
               </button>
             </div>
             {links}
+            {profile}
           </div>
         </div>
       )}

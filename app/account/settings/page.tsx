@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { KeyRound, Mail, Shield, ChevronRight } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -20,7 +20,7 @@ export default async function SettingsPage() {
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   return (

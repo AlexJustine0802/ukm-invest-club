@@ -218,6 +218,17 @@ export default function Sidebar() {
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const switcherRef = useRef<HTMLDivElement>(null);
 
+  // Mobile drawer. Navigating closes it; so does Escape.
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  useEffect(() => setDrawerOpen(false), [pathname, search]);
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) =>
+      e.key === "Escape" && setDrawerOpen(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [drawerOpen]);
+
   // Close the workspace switcher on outside click or Escape.
   useEffect(() => {
     if (!switcherOpen) return;
@@ -235,8 +246,8 @@ export default function Sidebar() {
     };
   }, [switcherOpen]);
 
-  return (
-    <aside className="flex w-full flex-col bg-navy text-slate-200 md:h-screen md:w-64 md:shrink-0">
+  const panel = (
+    <>
       {/* Workspace switcher */}
       <div ref={switcherRef} className="relative border-b border-white/10">
         <button
@@ -363,6 +374,46 @@ export default function Sidebar() {
           </button>
         </form>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile: a bar with a hamburger, so the nav does not sit on top of
+          every page pushing the content down a screenful. */}
+      <div className="flex items-center gap-2 bg-navy px-4 py-3 text-white md:hidden">
+        <button
+          type="button"
+          onClick={() => setDrawerOpen(true)}
+          aria-label="Open menu"
+          aria-expanded={drawerOpen}
+          className="rounded-lg p-2 hover:bg-white/10"
+        >
+          <span className="text-lg leading-none">☰</span>
+        </button>
+        <span className="min-w-0 flex-1 truncate text-sm font-bold">
+          {workspace.label}
+        </span>
+      </div>
+
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setDrawerOpen(false)}
+            className="absolute inset-0 bg-black/40"
+          />
+          <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85%] flex-col bg-navy text-slate-200 shadow-xl">
+            {panel}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
+      <aside className="hidden w-64 shrink-0 flex-col bg-navy text-slate-200 md:flex md:h-screen">
+        {panel}
+      </aside>
+    </>
   );
 }

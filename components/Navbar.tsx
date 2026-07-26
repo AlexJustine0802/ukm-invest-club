@@ -7,7 +7,15 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { site } from "@/lib/site";
 
-export default function Navbar() {
+export default function Navbar({
+  /**
+   * Where the logo goes. Signed-in members land on their dashboard; visitors
+   * get the public home page.
+   */
+  homeHref = "/",
+}: {
+  homeHref?: string;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -18,7 +26,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <nav className="container-page flex h-16 items-center justify-between">
         <Link
-          href="/"
+          href={homeHref}
           className="relative left-0 flex shrink-0 items-center text-navy md:-left-12"
         >
           <Image

@@ -13,6 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
+import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import SubmitAssignmentForm from "@/components/account/SubmitAssignmentForm";
@@ -32,7 +33,7 @@ export default async function AssignmentDetailPage({
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const { id } = await params;

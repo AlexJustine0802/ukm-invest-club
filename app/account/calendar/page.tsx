@@ -11,6 +11,7 @@ import {
   CalendarCheck,
 } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
+import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import {
@@ -35,7 +36,7 @@ export default async function CalendarPage({
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const { m, d } = await searchParams;
@@ -138,12 +139,14 @@ export default async function CalendarPage({
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
         {/* Month grid */}
-        <div className={`${cardClass} lg:col-span-2`}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-navy">
+        {/* min-w-0 so the grid track shrinks to the column instead of to the
+            month grid's min-content. */}
+        <div className={`${cardClass} min-w-0 lg:col-span-2`}>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="min-w-0 truncate text-lg font-bold text-navy">
               {monthLabel(year, month)}
             </h2>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <Link
                 href={`/account/calendar?m=${monthParam(year, month, -1)}`}
                 aria-label="Previous month"
@@ -314,7 +317,7 @@ export default async function CalendarPage({
         </div>
 
         {/* Reminders */}
-        <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+        <div className="min-w-0 space-y-6 lg:sticky lg:top-6 lg:self-start">
           {/* Events */}
           <section className={cardClass}>
             <h3 className="flex items-center gap-2 font-bold text-navy">

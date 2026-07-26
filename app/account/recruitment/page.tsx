@@ -14,6 +14,7 @@ import {
   Users,
 } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
+import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { getUiIcon } from "@/lib/uiIcons";
@@ -52,7 +53,7 @@ export default async function RecruitmentPage() {
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   // The newest recruitment form wins, so last year's does not linger.

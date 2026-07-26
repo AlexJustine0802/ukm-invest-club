@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Inbox, ArrowLeft } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { getSection } from "@/lib/dashboardContent";
 import { getUiIcon } from "@/lib/uiIcons";
@@ -19,7 +19,7 @@ export default async function AnnouncementsPage({
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const all = await getSection("announcement");

@@ -38,11 +38,14 @@ export default function TopBarMenus({
   initial,
   role,
   notifications,
+  showProfile = true,
 }: {
   name: string;
   initial: string;
   role: string;
   notifications: TopBarNotification[];
+  /** Off in the mobile nav bar — the profile lives inside the drawer there. */
+  showProfile?: boolean;
 }) {
   const [open, setOpen] = useState<OpenMenu>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -89,8 +92,11 @@ export default function TopBarMenus({
           )}
         </button>
 
+        {/* On mobile the bell sits next to the hamburger, so anchoring the
+            panel to the button pushed it off the left edge. Pin it to the
+            viewport there; from lg it hangs off the button as before. */}
         {open === "notifications" && (
-          <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+          <div className="fixed inset-x-3 top-16 z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg lg:absolute lg:inset-x-auto lg:right-0 lg:top-auto lg:mt-2 lg:w-80">
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
               <p className="text-sm font-bold text-navy">Notifications</p>
               <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
@@ -132,7 +138,7 @@ export default function TopBarMenus({
       </div>
 
       {/* Profile */}
-      <div className="relative">
+      <div className={`relative ${showProfile ? "" : "hidden"}`}>
         <button
           type="button"
           onClick={() => toggle("profile")}
@@ -147,7 +153,7 @@ export default function TopBarMenus({
         </button>
 
         {open === "profile" && (
-          <div className="absolute right-0 z-50 mt-2 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
+          <div className="absolute right-0 z-50 mt-2 w-64 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg">
             {/* Head */}
             <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-white">

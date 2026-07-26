@@ -3,9 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ChevronRight, Bookmark, MapPin, Clock } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
+import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import EmptyState from "@/components/EmptyState";
+import LatestUpdates from "@/components/account/LatestUpdates";
 import { getSections } from "@/lib/dashboardContent";
 import { getUiIcon } from "@/lib/uiIcons";
 import { getMetricValues, resolveMetric } from "@/lib/metrics";
@@ -79,7 +81,7 @@ export default async function AccountPage() {
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const now = new Date();
@@ -197,8 +199,39 @@ export default async function AccountPage() {
         }))
   ).slice(0, 4);
 
+  // Mobile-only summary bar. Reuses the data already fetched above for the
+  // side rails — no extra queries, no second copy of the widgets.
+  const latestUpdates = [
+    {
+      id: "announcements",
+      label: "Announcements",
+      count: content.announcement.length,
+      href: "/account/announcements",
+      icon: "Megaphone",
+      color: "bg-blue-50 text-primary",
+    },
+    {
+      id: "deadlines",
+      label: "Assignment Deadlines",
+      count: deadlines.length,
+      href: "/account/assignments",
+      icon: "ClipboardList",
+      color: "bg-violet-50 text-violet-600",
+    },
+    {
+      id: "career",
+      label: "Career Alerts",
+      count: careerAlerts.length,
+      href: "/account/career",
+      icon: "Briefcase",
+      color: "bg-amber-50 text-amber-600",
+    },
+  ];
+
   return (
     <>
+      <LatestUpdates items={latestUpdates} />
+
       <AccountTopBar
         title={`${greeting}, ${firstName}! 👋`}
         subtitle={
@@ -215,18 +248,20 @@ export default async function AccountPage() {
 
       {/* Fixed shell: the rail keeps its 340px whether or not it has content. */}
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_340px]">
-        {/* Center column */}
-        <div className="space-y-6">
+        {/* Center column. min-w-0 because a grid item defaults to
+            min-width:auto, which sizes the track to the widest card's
+            min-content and pushes the whole column past the viewport. */}
+        <div className="min-w-0 space-y-6">
           {/* Highlight — managed in /admin/highlights. Always rendered at a
               fixed height; with no active highlight it shows a placeholder. */}
-          <div className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-8 text-white">
+          <div className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-6 text-white sm:p-8">
             {highlight ? (
               <>
                 <div className="relative max-w-lg">
                   <p className="text-sm font-semibold text-blue-200">
                     {highlight.eyebrow}
                   </p>
-                  <h2 className="mt-2 text-3xl font-extrabold">
+                  <h2 className="mt-2 break-words text-3xl font-extrabold">
                     {highlight.title}
                   </h2>
                   {highlight.description && (
@@ -262,7 +297,7 @@ export default async function AccountPage() {
                 <p className="text-sm font-semibold text-blue-200">
                   Welcome back
                 </p>
-                <h2 className="mt-2 text-3xl font-extrabold">
+                <h2 className="mt-2 break-words text-3xl font-extrabold">
                   Investment Club Unpar
                 </h2>
                 <p className="mt-2 text-sm text-blue-100">
@@ -310,7 +345,7 @@ export default async function AccountPage() {
           {/* Detail area — both columns always exist. */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Left: resources + discussions */}
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
               <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
                 <h3 className="font-bold text-navy">Recent Resources</h3>
                 <div className={`flex flex-col ${LIST_BODY}`}>
@@ -408,7 +443,7 @@ export default async function AccountPage() {
             </div>
 
             {/* Right: events + calendar */}
-            <div className="space-y-6">
+            <div className="min-w-0 space-y-6">
               <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold text-navy">Upcoming Events</h3>
@@ -524,8 +559,10 @@ export default async function AccountPage() {
           </p>
         </div>
 
-        {/* Right rail */}
-        <div className="space-y-6">
+        {/* Right rail. Hidden on mobile — the Latest Updates bar at the top of
+            the page surfaces these same three widgets there, so showing them
+            again at the bottom was a duplicate. Tablet and desktop unchanged. */}
+        <div className="hidden min-w-0 space-y-6 md:block">
           <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-navy">Announcements</h3>

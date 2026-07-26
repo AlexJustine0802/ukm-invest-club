@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Mail, AtSign, MessageSquare, ChevronDown } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
-import { prisma } from "@/lib/prisma";
+import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { site } from "@/lib/site";
 
@@ -37,7 +37,7 @@ export default async function HelpPage() {
   const session = await getUserSession();
   if (!session) redirect("/login");
 
-  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  const user = await getCurrentMember();
   if (!user) redirect("/login");
 
   const channels = [
