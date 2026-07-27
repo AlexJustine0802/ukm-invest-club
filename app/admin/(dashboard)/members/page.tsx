@@ -5,7 +5,7 @@ import { DIVISIONS, divisionName, isHead, GENERAL_ROLES } from "@/lib/roles";
 import { formatDate } from "@/lib/utils";
 import { updateMemberRole, clearMemberRole } from "./actions";
 import Can from "@/components/admin/Can";
-import { requireView } from "@/lib/adminAccess";
+import { can, requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -16,10 +16,19 @@ export default async function AdminMembersPage({
 }) {
   await requireView("members");
 
+  // Roles and divisions belong to the super admin. A role granted only
+  // "view" gets the directory  who the members are  without the org chart
+  // around it: no role, no division, no editing controls.
+  const manages = await can("member-roles", "edit");
+
   const { division: divisionParam, q = "" } = await searchParams;
   const query = q.trim().toLowerCase();
+  // ?division= is ignored without role management, or the filter would give
+  // away who is in which division a URL at a time.
   const division =
-    divisionParam === "none" || DIVISIONS.some((d) => d.slug === divisionParam)
+    manages &&
+    (divisionParam === "none" ||
+      DIVISIONS.some((d) => d.slug === divisionParam))
       ? divisionParam
       : "all";
 
@@ -43,7 +52,8 @@ export default async function AdminMembersPage({
       (!query ||
         m.name.toLowerCase().includes(query) ||
         m.email.toLowerCase().includes(query) ||
-        m.role.toLowerCase().includes(query)),
+        // Searching by role would give the org chart back a query at a time.
+        (manages && m.role.toLowerCase().includes(query))),
   );
 
   const countIn = (slug: string) =>
@@ -66,11 +76,22 @@ export default async function AdminMembersPage({
   return (
     <div>
       <div>
-        <h1 className="text-2xl font-bold text-navy">Members &amp; roles</h1>
+        <h1 className="text-2xl font-bold text-navy">
+          {manages ? "Members & roles" : "Members"}
+        </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Every registered account. Set a division and a role  the role list
-          follows the division, and each division except PVPC has a Head.
-          Members see this on <code>/account/members</code>.
+          {manages ? (
+            <>
+              Every registered account. Set a division and a role  the role
+              list follows the division, and each division except PVPC has a
+              Head. Members see this on <code>/account/members</code>.
+            </>
+          ) : (
+            <>
+              Every registered account. Roles and divisions are set by the
+              super admin.
+            </>
+          )}
         </p>
       </div>
 
@@ -81,7 +102,9 @@ export default async function AdminMembersPage({
         <input
           name="q"
           defaultValue={q}
-          placeholder="Search name, email or role..."
+          placeholder={
+            manages ? "Search name, email or role..." : "Search name or email..."
+          }
           className="input max-w-xs"
         />
         <button type="submit" className="btn-secondary">
@@ -94,21 +117,25 @@ export default async function AdminMembersPage({
         )}
       </form>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {chips.map((c) => (
-          <Link
-            key={c.id}
-            href={chipHref(c.id)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              c.id === division
-                ? "bg-navy text-white"
-                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-            }`}
-          >
-            {c.label}
-          </Link>
-        ))}
-      </div>
+      {/* Not merely hidden with CSS: the chips carry every division name and
+          its headcount, so for a view-only role they are never rendered. */}
+      {manages && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {chips.map((c) => (
+            <Link
+              key={c.id}
+              href={chipHref(c.id)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                c.id === division
+                  ? "bg-navy text-white"
+                  : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              {c.label}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {visible.length === 0 ? (
         <p className="mt-8 text-slate-500">No members match that filter.</p>
@@ -123,7 +150,7 @@ export default async function AdminMembersPage({
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-bold text-navy">{m.name}</p>
-                  {isHead(m.role) && (
+                  {manages && isHead(m.role) && (
                     <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-primary-dark">
                       Head
                     </span>
@@ -131,40 +158,52 @@ export default async function AdminMembersPage({
                 </div>
                 <p className="text-sm text-slate-500">{m.email}</p>
                 <p className="mt-1 text-xs text-slate-400">
-                  {m.role}
-                  {divisionName(m.division) ? ` · ${divisionName(m.division)}` : ""} ·
+                  {manages && (
+                    <>
+                      {m.role}
+                      {divisionName(m.division)
+                        ? ` · ${divisionName(m.division)}`
+                        : ""}{" "}
+                      ·{" "}
+                    </>
+                  )}
                   joined {formatDate(m.createdAt)}
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <MemberRoleForm
-                  action={updateMemberRole}
-                  userId={m.id}
-                  division={m.division}
-                  role={m.role}
-                />
-                <Can module="member-roles" action="edit">
-                  <Link
-                    href={`/admin/members/${m.id}/edit`}
-                    className="btn-secondary px-3 py-2 text-xs"
-                  >
-                    Edit profile
-                  </Link>
-                </Can>
-                {(m.division || m.role !== GENERAL_ROLES[0]) && (
-                  <form action={clearMemberRole}>
-                    <input type="hidden" name="id" value={m.id} />
-                    <button
-                      type="submit"
+              {/* The whole controls column is role management, so it is one
+                  permission: the dropdowns carry the org chart in their
+                  options, not just the buttons. */}
+              {manages && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <MemberRoleForm
+                    action={updateMemberRole}
+                    userId={m.id}
+                    division={m.division}
+                    role={m.role}
+                  />
+                  <Can module="member-roles" action="edit">
+                    <Link
+                      href={`/admin/members/${m.id}/edit`}
                       className="btn-secondary px-3 py-2 text-xs"
-                      title="Reset to plain Member with no division"
                     >
-                      Reset
-                    </button>
-                  </form>
-                )}
-              </div>
+                      Edit profile
+                    </Link>
+                  </Can>
+                  {(m.division || m.role !== GENERAL_ROLES[0]) && (
+                    <form action={clearMemberRole}>
+                      <input type="hidden" name="id" value={m.id} />
+                      <button
+                        type="submit"
+                        className="btn-secondary px-3 py-2 text-xs"
+                        title="Reset to plain Member with no division"
+                      >
+                        Reset
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>
