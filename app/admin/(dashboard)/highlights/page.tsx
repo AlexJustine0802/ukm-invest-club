@@ -2,10 +2,14 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { deleteHighlight } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminHighlightsPage() {
+  await requireView("highlights");
+
   const highlights = await prisma.highlight.findMany({
     orderBy: [{ active: "desc" }, { createdAt: "desc" }],
   });
@@ -23,17 +27,21 @@ export default async function AdminHighlightsPage() {
             recruitment, competitions, or any announcement worth featuring.
           </p>
         </div>
-        <Link href="/admin/highlights/new" className="btn-primary">
-          + Add highlight
-        </Link>
+        <Can module="highlights" action="create">
+          <Link href="/admin/highlights/new" className="btn-primary">
+            + Add highlight
+          </Link>
+        </Can>
       </div>
 
       {highlights.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No highlights yet.{" "}
-          <Link href="/admin/highlights/new" className="text-accent-dark underline">
-            Add one
-          </Link>
+          <Can module="highlights" action="create">
+            <Link href="/admin/highlights/new" className="text-accent-dark underline">
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -70,17 +78,21 @@ export default async function AdminHighlightsPage() {
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Link
-                  href={`/admin/highlights/${h.id}/edit`}
-                  className="btn-secondary px-3 py-1.5 text-xs"
-                >
-                  Edit
-                </Link>
-                <DeleteButton
-                  action={deleteHighlight}
-                  id={h.id}
-                  className="btn-danger px-3 py-1.5 text-xs"
-                />
+                <Can module="highlights" action="edit">
+                  <Link
+                    href={`/admin/highlights/${h.id}/edit`}
+                    className="btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    Edit
+                  </Link>
+                </Can>
+                <Can module="highlights" action="delete">
+                  <DeleteButton
+                    action={deleteHighlight}
+                    id={h.id}
+                    className="btn-danger px-3 py-1.5 text-xs"
+                  />
+                </Can>
               </div>
             </div>
           ))}

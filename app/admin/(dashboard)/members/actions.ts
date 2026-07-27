@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireSession } from "@/lib/auth";
+import { requireSuperAdmin } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
 import { getDivision, isValidRole, GENERAL_ROLES } from "@/lib/roles";
 
@@ -24,7 +24,7 @@ function revalidateMember() {
  * not exist or a role that belongs to another division.
  */
 export async function updateMemberRole(formData: FormData) {
-  await requireSession();
+  await requireSuperAdmin();
 
   const id = formData.get("id") as string;
   const role = ((formData.get("role") as string) ?? "").trim();
@@ -47,7 +47,7 @@ export async function updateMemberRole(formData: FormData) {
  * on the About page. One record, one place to change it.
  */
 export async function updateMemberProfile(formData: FormData) {
-  await requireSession();
+  await requireSuperAdmin();
 
   const id = formData.get("id") as string;
   if (!id) return;
@@ -82,7 +82,7 @@ export async function updateMemberProfile(formData: FormData) {
 
 /** Reset someone to a plain member with no division. */
 export async function clearMemberRole(formData: FormData) {
-  await requireSession();
+  await requireSuperAdmin();
   const id = formData.get("id") as string;
   if (!id) return;
 

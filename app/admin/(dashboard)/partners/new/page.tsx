@@ -2,8 +2,11 @@ import Link from "next/link";
 import { isBlobConfigured } from "@/lib/upload";
 import PartnerForm from "@/components/admin/PartnerForm";
 import { createPartner } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewPartnerPage() {
+export default async function NewPartnerPage() {
+  await requirePage("partners", "create");
+
   return (
     <div>
       <Link

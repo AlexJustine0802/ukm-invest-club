@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { deletePublication } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPublicationsPage() {
+  await requireView("publications");
+
   const publications = await prisma.publication.findMany({
     include: { category: true },
     orderBy: { publishedAt: "desc" },
@@ -16,20 +20,24 @@ export default async function AdminPublicationsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Publications</h1>
-        <Link href="/admin/publications/new" className="btn-primary">
-          + New publication
-        </Link>
+        <Can module="publications" action="create">
+          <Link href="/admin/publications/new" className="btn-primary">
+            + New publication
+          </Link>
+        </Can>
       </div>
 
       {publications.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No publications yet.{" "}
-          <Link
-            href="/admin/publications/new"
-            className="text-accent-dark underline"
-          >
-            Write your first one
-          </Link>
+          <Can module="publications" action="create">
+            <Link
+              href="/admin/publications/new"
+              className="text-accent-dark underline"
+            >
+              Write your first one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -77,17 +85,21 @@ export default async function AdminPublicationsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/publications/${pub.id}/edit`}
-                        className="btn-secondary px-3 py-1.5 text-xs"
-                      >
-                        Edit
-                      </Link>
-                      <DeleteButton
-                        action={deletePublication}
-                        id={pub.id}
-                        className="btn-danger px-3 py-1.5 text-xs"
-                      />
+                      <Can module="publications" action="edit">
+                        <Link
+                          href={`/admin/publications/${pub.id}/edit`}
+                          className="btn-secondary px-3 py-1.5 text-xs"
+                        >
+                          Edit
+                        </Link>
+                      </Can>
+                      <Can module="publications" action="delete">
+                        <DeleteButton
+                          action={deletePublication}
+                          id={pub.id}
+                          className="btn-danger px-3 py-1.5 text-xs"
+                        />
+                      </Can>
                     </div>
                   </td>
                 </tr>

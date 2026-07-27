@@ -3,10 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import PublicationForm from "@/components/admin/PublicationForm";
 import { createPublication } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewPublicationPage() {
+  await requirePage("publications", "create");
+
   const categories = await prisma.researchCategory.findMany({
     orderBy: { order: "asc" },
     select: { id: true, title: true },

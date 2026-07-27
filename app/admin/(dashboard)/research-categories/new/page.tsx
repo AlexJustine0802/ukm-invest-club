@@ -1,8 +1,11 @@
 import Link from "next/link";
 import ResearchCategoryForm from "@/components/admin/ResearchCategoryForm";
 import { createResearchCategory } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewResearchCategoryPage() {
+export default async function NewResearchCategoryPage() {
+  await requirePage("research-categories", "create");
+
   return (
     <div>
       <Link

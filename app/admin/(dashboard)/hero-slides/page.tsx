@@ -5,6 +5,8 @@ import DeleteButton from "@/components/admin/DeleteButton";
 import SettingsForm from "@/components/admin/SettingsForm";
 import { deleteHeroSlide } from "./actions";
 import { updateSettings } from "../settings/actions";
+import Can from "@/components/admin/Can";
+import { requireView, requireSuperAdminPage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -45,11 +47,15 @@ export default async function AdminImagesPage({
 }: {
   searchParams: Promise<{ loc?: string }>;
 }) {
+  await requireView("hero-slides");
+
   const { loc } = await searchParams;
   const location = TABS.some((t) => t.loc === loc) ? (loc as string) : "home";
 
   // "Site images" tab = the singleton settings form, not a slide list.
+  // Site settings are never delegable, so this tab is the super admin's.
   if (location === "site") {
+    await requireSuperAdminPage();
     const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
     return (
       <div>
@@ -88,12 +94,14 @@ export default async function AdminImagesPage({
           <h1 className="text-2xl font-bold text-navy">Images</h1>
           <p className="mt-1 text-sm text-slate-500">{HINTS[location]}</p>
         </div>
-        <Link
-          href={`/admin/hero-slides/new?loc=${location}`}
-          className="btn-primary"
-        >
-          + Add slide
-        </Link>
+        <Can module="hero-slides" action="create">
+          <Link
+            href={`/admin/hero-slides/new?loc=${location}`}
+            className="btn-primary"
+          >
+            + Add slide
+          </Link>
+        </Can>
       </div>
 
       <Tabs active={location} />
@@ -101,12 +109,14 @@ export default async function AdminImagesPage({
       {slides.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No slides yet.{" "}
-          <Link
-            href={`/admin/hero-slides/new?loc=${location}`}
-            className="text-accent-dark underline"
-          >
-            Add one
-          </Link>
+          <Can module="hero-slides" action="create">
+            <Link
+              href={`/admin/hero-slides/new?loc=${location}`}
+              className="text-accent-dark underline"
+            >
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -128,17 +138,21 @@ export default async function AdminImagesPage({
                 )}
                 <p className="text-xs text-slate-400">Order: {slide.order}</p>
                 <div className="mt-3 flex items-center gap-2">
-                  <Link
-                    href={`/admin/hero-slides/${slide.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteHeroSlide}
-                    id={slide.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                  />
+                  <Can module="hero-slides" action="edit">
+                    <Link
+                      href={`/admin/hero-slides/${slide.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="hero-slides" action="delete">
+                    <DeleteButton
+                      action={deleteHeroSlide}
+                      id={slide.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                    />
+                  </Can>
                 </div>
               </div>
             </div>

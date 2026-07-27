@@ -1,8 +1,11 @@
 import Link from "next/link";
 import EventCategoryForm from "@/components/admin/EventCategoryForm";
 import { createEventCategory } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewEventCategoryPage() {
+export default async function NewEventCategoryPage() {
+  await requirePage("event-categories", "create");
+
   return (
     <div>
       <Link

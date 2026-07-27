@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { can } from "@/lib/adminAccess";
 import { parseQuestions, parseAnswers, answerText, toCsv } from "@/lib/forms";
 import { slugify } from "@/lib/utils";
 
@@ -12,9 +12,9 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  // The /admin proxy already blocks this, but a data export re-checks its own.
-  const session = await getSession();
-  if (!session) {
+  // The /admin proxy only checks that *a* session exists; a bulk export of
+  // people's answers re-checks the specific permission.
+  if (!(await can("registrations", "export"))) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 

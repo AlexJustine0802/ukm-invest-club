@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import HeroSlideForm from "@/components/admin/HeroSlideForm";
 import { updateHeroSlide } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export default async function EditHeroSlidePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("hero-slides", "edit");
+
   const { id } = await params;
   const slide = await prisma.heroSlide.findUnique({ where: { id } });
   if (!slide) notFound();

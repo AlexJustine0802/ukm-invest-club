@@ -2,10 +2,13 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import RegistrationFormForm from "@/components/admin/RegistrationFormForm";
 import { createRegistrationForm } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewRegistrationFormPage() {
+  await requirePage("registrations", "create");
+
   const categories = await prisma.eventCategory.findMany({
     orderBy: { order: "asc" },
     select: { id: true, title: true },

@@ -5,6 +5,8 @@ import DeleteButton from "@/components/admin/DeleteButton";
 import { parseQuestions, parseAnswers, answerText } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 import { deleteResponse } from "../../actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,8 @@ export default async function ResponsesPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireView("registrations");
+
   const { id } = await params;
 
   const form = await prisma.registrationForm.findUnique({
@@ -115,13 +119,15 @@ export default async function ResponsesPage({
                       );
                     })}
                     <td className="px-4 py-3">
-                      <DeleteButton
-                        action={deleteResponse}
-                        id={r.id}
-                        label="Delete"
-                        className="btn-danger px-3 py-1.5 text-xs"
-                        confirmMessage="Delete this response? This cannot be undone."
-                      />
+                      <Can module="registrations" action="delete">
+                        <DeleteButton
+                          action={deleteResponse}
+                          id={r.id}
+                          label="Delete"
+                          className="btn-danger px-3 py-1.5 text-xs"
+                          confirmMessage="Delete this response? This cannot be undone."
+                        />
+                      </Can>
                     </td>
                   </tr>
                 );

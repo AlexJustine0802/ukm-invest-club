@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
 import { uniqueSlug as sharedUniqueSlug } from "@/lib/slugs";
 
@@ -41,7 +41,7 @@ function parseFields(formData: FormData) {
 }
 
 export async function createPublication(formData: FormData) {
-  await requireSession();
+  await requirePermission("publications", "create");
   const fields = parseFields(formData);
   const coverImage = await resolveImage(
     formData.get("imageFile") as File | null,
@@ -61,7 +61,7 @@ export async function createPublication(formData: FormData) {
 }
 
 export async function updatePublication(formData: FormData) {
-  await requireSession();
+  await requirePermission("publications", "edit");
   const id = formData.get("id") as string;
   const fields = parseFields(formData);
   const coverImage = await resolveImage(
@@ -83,7 +83,7 @@ export async function updatePublication(formData: FormData) {
 }
 
 export async function deletePublication(formData: FormData) {
-  await requireSession();
+  await requirePermission("publications", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.publication.delete({ where: { id } }));
   revalidatePublications();

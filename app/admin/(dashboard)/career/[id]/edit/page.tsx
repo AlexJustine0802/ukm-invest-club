@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import CareerAlertForm from "@/components/admin/CareerAlertForm";
 import { updateCareerAlert } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditCareerAlertPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("career", "edit");
+
   const { id } = await params;
   const alert = await prisma.careerAlert.findUnique({ where: { id } });
   if (!alert) notFound();

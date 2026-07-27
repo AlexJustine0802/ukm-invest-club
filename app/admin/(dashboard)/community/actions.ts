@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
 
 function revalidateCommunity() {
@@ -22,7 +22,7 @@ function parsePhotoUrls(raw: string | null): string[] {
 }
 
 export async function createMoment(formData: FormData) {
-  await requireSession();
+  await requirePermission("community", "create");
   const coverImage = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
@@ -52,7 +52,7 @@ export async function createMoment(formData: FormData) {
 }
 
 export async function updateMoment(formData: FormData) {
-  await requireSession();
+  await requirePermission("community", "edit");
   const id = formData.get("id") as string;
   const existing = await prisma.moment.findUnique({ where: { id } });
   if (!existing) throw new Error("Moment not found");
@@ -77,14 +77,14 @@ export async function updateMoment(formData: FormData) {
 }
 
 export async function deleteMoment(formData: FormData) {
-  await requireSession();
+  await requirePermission("community", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.moment.delete({ where: { id } }));
   revalidateCommunity();
 }
 
 export async function addMomentPhoto(formData: FormData) {
-  await requireSession();
+  await requirePermission("community", "edit");
   const momentId = formData.get("momentId") as string;
   const imageUrl = (formData.get("imageUrl") as string)?.trim();
   if (!imageUrl) return;
@@ -98,7 +98,7 @@ export async function addMomentPhoto(formData: FormData) {
 }
 
 export async function deleteMomentPhoto(formData: FormData) {
-  await requireSession();
+  await requirePermission("community", "edit");
   const id = formData.get("id") as string;
   const photo = await prisma.momentPhoto.findUnique({ where: { id } });
   if (!photo) return;

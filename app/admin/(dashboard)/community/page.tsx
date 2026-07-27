@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { deleteMoment } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +14,8 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 export default async function AdminCommunityPage() {
+  await requireView("community");
+
   const moments = await prisma.moment.findMany({
     include: { _count: { select: { photos: true } } },
     orderBy: [{ order: "asc" }, { date: "desc" }],
@@ -21,20 +25,24 @@ export default async function AdminCommunityPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Community Moments</h1>
-        <Link href="/admin/community/new" className="btn-primary">
-          + Add moment
-        </Link>
+        <Can module="community" action="create">
+          <Link href="/admin/community/new" className="btn-primary">
+            + Add moment
+          </Link>
+        </Can>
       </div>
 
       {moments.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No moments yet.{" "}
-          <Link
-            href="/admin/community/new"
-            className="text-accent-dark underline"
-          >
-            Add one
-          </Link>
+          <Can module="community" action="create">
+            <Link
+              href="/admin/community/new"
+              className="text-accent-dark underline"
+            >
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -62,17 +70,21 @@ export default async function AdminCommunityPage() {
                   {m._count.photos === 1 ? "" : "s"}
                 </p>
                 <div className="mt-3 flex items-center gap-2">
-                  <Link
-                    href={`/admin/community/${m.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteMoment}
-                    id={m.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                  />
+                  <Can module="community" action="edit">
+                    <Link
+                      href={`/admin/community/${m.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="community" action="delete">
+                    <DeleteButton
+                      action={deleteMoment}
+                      id={m.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                    />
+                  </Can>
                 </div>
               </div>
             </div>

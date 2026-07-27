@@ -3,10 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import FeaturedSelectForm from "@/components/admin/FeaturedSelectForm";
 import { setFeaturedPublications } from "./actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function PublicationsHeroPage() {
+  await requirePage("publications", "manage");
+
   const publications = await prisma.publication.findMany({
     where: { published: true },
     orderBy: { publishedAt: "desc" },

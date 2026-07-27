@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { DASHBOARD_SECTIONS, sectionConfig } from "@/lib/dashboardSections";
 import { deleteDashboardItem } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +13,8 @@ export default async function AdminDashboardContentPage({
 }: {
   searchParams: Promise<{ section?: string }>;
 }) {
+  await requireView("dashboard-content");
+
   const { section: sectionParam } = await searchParams;
   const config = sectionConfig(sectionParam);
   const section = config.id;
@@ -29,9 +33,11 @@ export default async function AdminDashboardContentPage({
           <h1 className="text-2xl font-bold text-navy">{config.label}</h1>
           <p className="mt-1 text-sm text-slate-500">{config.description}</p>
         </div>
-        <Link href={newHref} className="btn-primary">
-          + Add item
-        </Link>
+        <Can module="dashboard-content" action="create">
+          <Link href={newHref} className="btn-primary">
+            + Add item
+          </Link>
+        </Can>
       </div>
 
       {/* Section tabs */}
@@ -54,9 +60,11 @@ export default async function AdminDashboardContentPage({
       {items.length === 0 ? (
         <p className="mt-8 text-slate-500">
           Nothing here yet.{" "}
-          <Link href={newHref} className="text-accent-dark underline">
-            Add one
-          </Link>
+          <Can module="dashboard-content" action="create">
+            <Link href={newHref} className="text-accent-dark underline">
+              Add one
+            </Link>
+          </Can>
           . While this section is empty it is hidden on the dashboard.
         </p>
       ) : (
@@ -89,17 +97,21 @@ export default async function AdminDashboardContentPage({
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <Link
-                  href={`/admin/dashboard-content/${item.id}/edit`}
-                  className="btn-secondary px-3 py-1.5 text-xs"
-                >
-                  Edit
-                </Link>
-                <DeleteButton
-                  action={deleteDashboardItem}
-                  id={item.id}
-                  className="btn-danger px-3 py-1.5 text-xs"
-                />
+                <Can module="dashboard-content" action="edit">
+                  <Link
+                    href={`/admin/dashboard-content/${item.id}/edit`}
+                    className="btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    Edit
+                  </Link>
+                </Can>
+                <Can module="dashboard-content" action="delete">
+                  <DeleteButton
+                    action={deleteDashboardItem}
+                    id={item.id}
+                    className="btn-danger px-3 py-1.5 text-xs"
+                  />
+                </Can>
               </div>
             </div>
           ))}

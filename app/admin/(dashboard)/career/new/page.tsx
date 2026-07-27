@@ -1,8 +1,11 @@
 import Link from "next/link";
 import CareerAlertForm from "@/components/admin/CareerAlertForm";
 import { createCareerAlert } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewCareerAlertPage() {
+export default async function NewCareerAlertPage() {
+  await requirePage("career", "create");
+
   return (
     <div>
       <Link href="/admin/career" className="text-sm text-accent-dark hover:text-accent">

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
 
 function revalidateSlides() {
@@ -47,7 +47,7 @@ function backTo(location: string) {
 }
 
 export async function createHeroSlide(formData: FormData) {
-  await requireSession();
+  await requirePermission("hero-slides", "create");
   const imageUrl = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
@@ -62,7 +62,7 @@ export async function createHeroSlide(formData: FormData) {
 }
 
 export async function updateHeroSlide(formData: FormData) {
-  await requireSession();
+  await requirePermission("hero-slides", "edit");
   const id = formData.get("id") as string;
   const existing = await prisma.heroSlide.findUnique({ where: { id } });
   if (!existing) throw new Error("Slide not found");
@@ -78,7 +78,7 @@ export async function updateHeroSlide(formData: FormData) {
 }
 
 export async function deleteHeroSlide(formData: FormData) {
-  await requireSession();
+  await requirePermission("hero-slides", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.heroSlide.delete({ where: { id } }));
   revalidateSlides();

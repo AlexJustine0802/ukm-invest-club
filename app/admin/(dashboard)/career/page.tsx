@@ -5,10 +5,14 @@ import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
 import { isNewAlert, postedLabel, deadlineLabel } from "@/lib/career";
 import { deleteCareerAlert } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminCareerPage() {
+  await requireView("career");
+
   const alerts = await prisma.careerAlert.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -25,17 +29,21 @@ export default async function AdminCareerPage() {
             announcement needed.
           </p>
         </div>
-        <Link href="/admin/career/new" className="btn-primary">
-          + Post job
-        </Link>
+        <Can module="career" action="create">
+          <Link href="/admin/career/new" className="btn-primary">
+            + Post job
+          </Link>
+        </Can>
       </div>
 
       {alerts.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No job postings yet.{" "}
-          <Link href="/admin/career/new" className="text-accent-dark underline">
-            Add one
-          </Link>
+          <Can module="career" action="create">
+            <Link href="/admin/career/new" className="text-accent-dark underline">
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -77,17 +85,21 @@ export default async function AdminCareerPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link
-                    href={`/admin/career/${a.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteCareerAlert}
-                    id={a.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                  />
+                  <Can module="career" action="edit">
+                    <Link
+                      href={`/admin/career/${a.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="career" action="delete">
+                    <DeleteButton
+                      action={deleteCareerAlert}
+                      id={a.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                    />
+                  </Can>
                 </div>
               </div>
             );

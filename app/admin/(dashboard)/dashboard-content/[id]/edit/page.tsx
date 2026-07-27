@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import DashboardItemForm from "@/components/admin/DashboardItemForm";
 import { sectionConfig } from "@/lib/dashboardSections";
 import { updateDashboardItem } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export default async function EditDashboardItemPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("dashboard-content", "edit");
+
   const { id } = await params;
   const item = await prisma.dashboardItem.findUnique({ where: { id } });
   if (!item) notFound();

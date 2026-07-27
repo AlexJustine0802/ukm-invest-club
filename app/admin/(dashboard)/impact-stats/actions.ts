@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 
 function revalidateStats() {
   revalidatePath("/");
@@ -36,7 +36,7 @@ function backTo(section: string) {
 }
 
 export async function createImpactStat(formData: FormData) {
-  await requireSession();
+  await requirePermission("impact-stats", "create");
   const data = dataFrom(formData);
   await prisma.impactStat.create({ data });
   revalidateStats();
@@ -44,7 +44,7 @@ export async function createImpactStat(formData: FormData) {
 }
 
 export async function updateImpactStat(formData: FormData) {
-  await requireSession();
+  await requirePermission("impact-stats", "edit");
   const id = formData.get("id") as string;
   const data = dataFrom(formData);
   await prisma.impactStat.update({ where: { id }, data });
@@ -53,7 +53,7 @@ export async function updateImpactStat(formData: FormData) {
 }
 
 export async function deleteImpactStat(formData: FormData) {
-  await requireSession();
+  await requirePermission("impact-stats", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.impactStat.delete({ where: { id } }));
   revalidateStats();

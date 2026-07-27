@@ -76,7 +76,10 @@ const dashboardGroups: Group[] = [
     label: "Members",
     icon: "🧑‍🎓",
     href: "/admin/members",
-    children: [{ label: "Members & Roles", href: "/admin/members" }],
+    children: [
+      { label: "Members & Roles", href: "/admin/members" },
+      { label: "Permissions", href: "/admin/members/permissions" },
+    ],
   },
   {
     label: "Registrations",
@@ -264,7 +267,7 @@ export default function Sidebar() {
             <p className="truncate text-sm font-bold leading-tight">
               {workspace.label}
             </p>
-            <p className="truncate text-xs text-slate-400">Admin</p>
+            <p className="truncate text-xs text-slate-400">Super Admin</p>
           </div>
           <span
             className={`text-xs transition-transform ${switcherOpen ? "rotate-180" : ""}`}

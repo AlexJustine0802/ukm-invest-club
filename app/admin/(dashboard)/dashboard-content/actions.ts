@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { DASHBOARD_SECTIONS } from "@/lib/dashboardSections";
 import { isMetric } from "@/lib/metrics";
 
@@ -49,7 +49,7 @@ function backTo(section: string) {
 }
 
 export async function createDashboardItem(formData: FormData) {
-  await requireSession();
+  await requirePermission("dashboard-content", "create");
   const data = dataFrom(formData);
   await prisma.dashboardItem.create({ data });
   revalidateDashboard();
@@ -57,7 +57,7 @@ export async function createDashboardItem(formData: FormData) {
 }
 
 export async function updateDashboardItem(formData: FormData) {
-  await requireSession();
+  await requirePermission("dashboard-content", "edit");
   const id = formData.get("id") as string;
   const data = dataFrom(formData);
   await prisma.dashboardItem.update({ where: { id }, data });
@@ -66,7 +66,7 @@ export async function updateDashboardItem(formData: FormData) {
 }
 
 export async function deleteDashboardItem(formData: FormData) {
-  await requireSession();
+  await requirePermission("dashboard-content", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.dashboardItem.delete({ where: { id } }));
   revalidateDashboard();

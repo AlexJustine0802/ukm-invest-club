@@ -1,9 +1,25 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import AdminHome from "@/components/admin/AdminHome";
+import { getAdminActor, allowedModules } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  // A division member gets shortcuts to what their role can open. The counts
+  // below are deliberately not computed for them: they read five tables the
+  // member may have no permission to see.
+  const actor = await getAdminActor();
+  if (actor?.kind === "member") {
+    return (
+      <AdminHome
+        name={actor.user.name}
+        role={actor.user.role}
+        modules={await allowedModules()}
+      />
+    );
+  }
+
   const now = new Date();
   const [events, upcoming, publications, members, partners] = await Promise.all([
     prisma.event.count(),
@@ -23,7 +39,9 @@ export default async function AdminDashboard() {
   ];
 
   const quickActions = [
-    { label: "New event", href: "/admin/events/new" },
+    // Events are created through their registration form  there is no
+    // /admin/events/new route.
+    { label: "New event", href: "/admin/registrations/new" },
     { label: "New publication", href: "/admin/publications/new" },
     { label: "Manage members", href: "/admin/members" },
     { label: "Edit home hero", href: "/admin/hero-slides?loc=home" },

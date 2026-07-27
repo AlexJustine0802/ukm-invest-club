@@ -1,8 +1,11 @@
 import Link from "next/link";
 import DiscussionChannelForm from "@/components/admin/DiscussionChannelForm";
 import { createChannel } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewChannelPage() {
+export default async function NewChannelPage() {
+  await requirePage("discussions", "create");
+
   return (
     <div>
       <Link href="/admin/discussions" className="text-sm text-accent-dark hover:text-accent">

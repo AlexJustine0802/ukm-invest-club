@@ -7,6 +7,8 @@ import {
   answerText,
 } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +20,8 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
 };
 
 export default async function AdminRecruitmentPage() {
+  await requireView("recruitment");
+
   const forms = await prisma.registrationForm.findMany({
     where: { isRecruitment: true },
     orderBy: { createdAt: "desc" },
@@ -54,9 +58,11 @@ export default async function AdminRecruitmentPage() {
             whether members see the page or a closed notice.
           </p>
         </div>
-        <Link href="/admin/registrations/new" className="btn-primary">
-          + New recruitment form
-        </Link>
+        <Can module="registrations" action="create">
+          <Link href="/admin/registrations/new" className="btn-primary">
+            + New recruitment form
+          </Link>
+        </Can>
       </div>
 
       {!current ? (
@@ -68,12 +74,14 @@ export default async function AdminRecruitmentPage() {
             close dates. A future open date is announced to members straight
             away, even while the form itself is still unpublished.
           </p>
-          <Link
-            href="/admin/registrations/new"
-            className="btn-primary mt-5 inline-block"
-          >
-            Create the form
-          </Link>
+          <Can module="registrations" action="create">
+            <Link
+              href="/admin/registrations/new"
+              className="btn-primary mt-5 inline-block"
+            >
+              Create the form
+            </Link>
+          </Can>
         </div>
       ) : (
         <>
@@ -122,12 +130,14 @@ export default async function AdminRecruitmentPage() {
                 >
                   ⬇ CSV
                 </a>
-                <Link
-                  href={`/admin/registrations/${current.id}/edit`}
-                  className="btn-secondary px-3 py-1.5 text-xs"
-                >
-                  Edit form
-                </Link>
+                <Can module="registrations" action="edit">
+                  <Link
+                    href={`/admin/registrations/${current.id}/edit`}
+                    className="btn-secondary px-3 py-1.5 text-xs"
+                  >
+                    Edit form
+                  </Link>
+                </Can>
                 <Link
                   href={`/register/${current.slug}`}
                   target="_blank"

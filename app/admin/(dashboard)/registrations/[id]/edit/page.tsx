@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import RegistrationFormForm from "@/components/admin/RegistrationFormForm";
 import { updateRegistrationForm } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditRegistrationFormPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("registrations", "edit");
+
   const { id } = await params;
   const [form, categories] = await Promise.all([
     prisma.registrationForm.findUnique({

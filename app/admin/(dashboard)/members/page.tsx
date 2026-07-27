@@ -4,6 +4,8 @@ import MemberRoleForm from "@/components/admin/MemberRoleForm";
 import { DIVISIONS, divisionName, isHead, GENERAL_ROLES } from "@/lib/roles";
 import { formatDate } from "@/lib/utils";
 import { updateMemberRole, clearMemberRole } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +14,8 @@ export default async function AdminMembersPage({
 }: {
   searchParams: Promise<{ division?: string; q?: string }>;
 }) {
+  await requireView("members");
+
   const { division: divisionParam, q = "" } = await searchParams;
   const query = q.trim().toLowerCase();
   const division =
@@ -140,12 +144,14 @@ export default async function AdminMembersPage({
                   division={m.division}
                   role={m.role}
                 />
-                <Link
-                  href={`/admin/members/${m.id}/edit`}
-                  className="btn-secondary px-3 py-2 text-xs"
-                >
-                  Edit profile
-                </Link>
+                <Can module="member-roles" action="edit">
+                  <Link
+                    href={`/admin/members/${m.id}/edit`}
+                    className="btn-secondary px-3 py-2 text-xs"
+                  >
+                    Edit profile
+                  </Link>
+                </Can>
                 {(m.division || m.role !== GENERAL_ROLES[0]) && (
                   <form action={clearMemberRole}>
                     <input type="hidden" name="id" value={m.id} />

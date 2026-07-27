@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { ASSIGNMENT_STATUSES } from "@/lib/assignments";
 
 function revalidateAssignments() {
@@ -35,14 +35,14 @@ function dataFrom(formData: FormData) {
 }
 
 export async function createAssignment(formData: FormData) {
-  await requireSession();
+  await requirePermission("assignments", "create");
   await prisma.assignment.create({ data: dataFrom(formData) });
   revalidateAssignments();
   redirect("/admin/assignments");
 }
 
 export async function updateAssignment(formData: FormData) {
-  await requireSession();
+  await requirePermission("assignments", "edit");
   const id = formData.get("id") as string;
   await prisma.assignment.update({ where: { id }, data: dataFrom(formData) });
   revalidateAssignments();
@@ -50,7 +50,7 @@ export async function updateAssignment(formData: FormData) {
 }
 
 export async function deleteAssignment(formData: FormData) {
-  await requireSession();
+  await requirePermission("assignments", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.assignment.delete({ where: { id } }));
   revalidateAssignments();

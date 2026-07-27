@@ -1,8 +1,11 @@
 import Link from "next/link";
 import AssignmentForm from "@/components/admin/AssignmentForm";
 import { createAssignment } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewAssignmentPage() {
+export default async function NewAssignmentPage() {
+  await requirePage("assignments", "create");
+
   return (
     <div>
       <Link href="/admin/assignments" className="text-sm text-accent-dark hover:text-accent">

@@ -2,8 +2,11 @@ import Link from "next/link";
 import { isBlobConfigured } from "@/lib/upload";
 import MomentForm from "@/components/admin/MomentForm";
 import { createMoment } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewMomentPage() {
+export default async function NewMomentPage() {
+  await requirePage("community", "create");
+
   return (
     <div>
       <Link

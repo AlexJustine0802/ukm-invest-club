@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ImpactStatForm from "@/components/admin/ImpactStatForm";
 import { updateImpactStat } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditImpactStatPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("impact-stats", "edit");
+
   const { id } = await params;
   const stat = await prisma.impactStat.findUnique({ where: { id } });
   if (!stat) notFound();

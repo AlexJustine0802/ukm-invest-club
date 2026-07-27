@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { PARTNER_CATEGORIES, toPartnerCategory } from "@/lib/partners";
 import { deletePartner } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPartnersPage() {
+  await requireView("partners");
+
   const partners = await prisma.partner.findMany({
     orderBy: [{ order: "asc" }],
   });
@@ -28,20 +32,24 @@ export default async function AdminPartnersPage() {
             Community &amp; Media Partners.
           </p>
         </div>
-        <Link href="/admin/partners/new" className="btn-primary">
-          + Add partner
-        </Link>
+        <Can module="partners" action="create">
+          <Link href="/admin/partners/new" className="btn-primary">
+            + Add partner
+          </Link>
+        </Can>
       </div>
 
       {partners.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No partners yet.{" "}
-          <Link
-            href="/admin/partners/new"
-            className="text-accent-dark underline"
-          >
-            Add one
-          </Link>
+          <Can module="partners" action="create">
+            <Link
+              href="/admin/partners/new"
+              className="text-accent-dark underline"
+            >
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -82,17 +90,21 @@ export default async function AdminPartnersPage() {
                       Order: {partner.order}
                     </p>
                     <div className="mt-3 flex items-center gap-2">
-                      <Link
-                        href={`/admin/partners/${partner.id}/edit`}
-                        className="btn-secondary px-3 py-1.5 text-xs"
-                      >
-                        Edit
-                      </Link>
-                      <DeleteButton
-                        action={deletePartner}
-                        id={partner.id}
-                        className="btn-danger px-3 py-1.5 text-xs"
-                      />
+                      <Can module="partners" action="edit">
+                        <Link
+                          href={`/admin/partners/${partner.id}/edit`}
+                          className="btn-secondary px-3 py-1.5 text-xs"
+                        >
+                          Edit
+                        </Link>
+                      </Can>
+                      <Can module="partners" action="delete">
+                        <DeleteButton
+                          action={deletePartner}
+                          id={partner.id}
+                          className="btn-danger px-3 py-1.5 text-xs"
+                        />
+                      </Can>
                     </div>
                   </div>
                 ))}

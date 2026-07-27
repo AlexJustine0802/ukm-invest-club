@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { uniqueSlug as sharedUniqueSlug } from "@/lib/slugs";
 
 const lookup = (slug: string) =>
@@ -30,7 +30,7 @@ function parseFields(formData: FormData) {
 }
 
 export async function createEventCategory(formData: FormData) {
-  await requireSession();
+  await requirePermission("event-categories", "create");
   const fields = parseFields(formData);
 
   await prisma.eventCategory.create({
@@ -45,7 +45,7 @@ export async function createEventCategory(formData: FormData) {
 }
 
 export async function updateEventCategory(formData: FormData) {
-  await requireSession();
+  await requirePermission("event-categories", "edit");
   const id = formData.get("id") as string;
   const fields = parseFields(formData);
 
@@ -62,7 +62,7 @@ export async function updateEventCategory(formData: FormData) {
 }
 
 export async function deleteEventCategory(formData: FormData) {
-  await requireSession();
+  await requirePermission("event-categories", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.eventCategory.delete({ where: { id } }));
   revalidateEventCategories();

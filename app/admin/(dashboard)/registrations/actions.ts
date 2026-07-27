@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { slugify } from "@/lib/utils";
 import { uniqueSlug } from "@/lib/slugs";
 import { parseQuestions, isAudience } from "@/lib/forms";
@@ -63,7 +63,7 @@ function dataFrom(formData: FormData) {
 }
 
 export async function createRegistrationForm(formData: FormData) {
-  await requireSession();
+  await requirePermission("registrations", "create");
   const data = dataFrom(formData);
   const details = readEventDetails(formData);
 
@@ -88,7 +88,7 @@ export async function createRegistrationForm(formData: FormData) {
 }
 
 export async function updateRegistrationForm(formData: FormData) {
-  await requireSession();
+  await requirePermission("registrations", "edit");
   const id = formData.get("id") as string;
   const data = dataFrom(formData);
   const details = readEventDetails(formData);
@@ -123,7 +123,7 @@ export async function updateRegistrationForm(formData: FormData) {
 }
 
 export async function deleteRegistrationForm(formData: FormData) {
-  await requireSession();
+  await requirePermission("registrations", "delete");
   const id = formData.get("id") as string;
   // Event.registrationFormId cascades, so the public event goes with it.
   const form = await deleteIfExists(() =>
@@ -136,7 +136,7 @@ export async function deleteRegistrationForm(formData: FormData) {
 
 /** Delete one submitted response  for spam or a duplicate someone asked to redo. */
 export async function deleteResponse(formData: FormData) {
-  await requireSession();
+  await requirePermission("registrations", "delete");
   const id = formData.get("id") as string;
   const response = await deleteIfExists(() =>
     prisma.formResponse.delete({

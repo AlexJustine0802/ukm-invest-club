@@ -5,6 +5,7 @@ import SubmitButton from "@/components/admin/SubmitButton";
 import { divisionName } from "@/lib/roles";
 import { formatDateTime } from "@/lib/utils";
 import { gradeSubmission, unmarkSubmission } from "./actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,8 @@ export default async function SubmissionsPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("assignments", "approve");
+
   const { id } = await params;
 
   const assignment = await prisma.assignment.findUnique({

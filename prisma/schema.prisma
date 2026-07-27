@@ -423,6 +423,21 @@ model AssignmentSubmission {
   @@index([userId])
 }
 
+// What one role may do in the admin workspace. A missing row means "nothing":
+// every role starts denied and the super admin switches things on.
+//
+// The role string is the primary key because role names are unique across the
+// whole org chart  scripts/check-roles.ts asserts it  so no division column
+// is needed. Permissions live in one JSON blob rather than a row per toggle:
+// the editor saves the whole grid at once, so a blob is one write instead of a
+// delete-all + insert-many, and there is no join table to keep in step with
+// lib/permissions.ts. Same trade-off as RegistrationForm.questions.
+model RolePermission {
+  role        String   @id // a role from lib/roles.ts
+  permissions Json     @default("{}") // { "events": ["view", "create"], ... }
+  updatedAt   DateTime @updatedAt
+}
+
 model SiteSettings {
   id             Int      @id @default(1) // singleton row
   homeAboutImage String? // home "About Us" strip picture

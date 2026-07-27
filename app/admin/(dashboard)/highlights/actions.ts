@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 
 function revalidateHighlights() {
   revalidatePath("/account");
@@ -26,14 +26,14 @@ function dataFrom(formData: FormData) {
 }
 
 export async function createHighlight(formData: FormData) {
-  await requireSession();
+  await requirePermission("highlights", "create");
   await prisma.highlight.create({ data: dataFrom(formData) });
   revalidateHighlights();
   redirect("/admin/highlights");
 }
 
 export async function updateHighlight(formData: FormData) {
-  await requireSession();
+  await requirePermission("highlights", "edit");
   const id = formData.get("id") as string;
   await prisma.highlight.update({ where: { id }, data: dataFrom(formData) });
   revalidateHighlights();
@@ -41,7 +41,7 @@ export async function updateHighlight(formData: FormData) {
 }
 
 export async function deleteHighlight(formData: FormData) {
-  await requireSession();
+  await requirePermission("highlights", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.highlight.delete({ where: { id } }));
   revalidateHighlights();

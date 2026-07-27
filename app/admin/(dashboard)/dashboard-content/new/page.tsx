@@ -2,12 +2,15 @@ import Link from "next/link";
 import DashboardItemForm from "@/components/admin/DashboardItemForm";
 import { sectionConfig } from "@/lib/dashboardSections";
 import { createDashboardItem } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export default async function NewDashboardItemPage({
   searchParams,
 }: {
   searchParams: Promise<{ section?: string }>;
 }) {
+  await requirePage("dashboard-content", "create");
+
   const { section: sectionParam } = await searchParams;
   const config = sectionConfig(sectionParam);
 

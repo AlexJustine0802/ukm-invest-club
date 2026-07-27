@@ -5,6 +5,8 @@ import { isBlobConfigured } from "@/lib/upload";
 import MomentForm from "@/components/admin/MomentForm";
 import DeleteButton from "@/components/admin/DeleteButton";
 import SubmitButton from "@/components/admin/SubmitButton";
+import Can from "@/components/admin/Can";
+import { requirePage } from "@/lib/adminAccess";
 import {
   updateMoment,
   addMomentPhoto,
@@ -18,6 +20,8 @@ export default async function EditMomentPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("community", "edit");
+
   const { id } = await params;
   const moment = await prisma.moment.findUnique({
     where: { id },
@@ -59,13 +63,15 @@ export default async function EditMomentPage({
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <DeleteButton
-                  action={deleteMomentPhoto}
-                  id={p.id}
-                  label="Remove"
-                  className="btn-danger w-full px-2 py-1 text-xs"
-                  confirmMessage="Remove this photo?"
-                />
+                <Can module="community" action="delete">
+                  <DeleteButton
+                    action={deleteMomentPhoto}
+                    id={p.id}
+                    label="Remove"
+                    className="btn-danger w-full px-2 py-1 text-xs"
+                    confirmMessage="Remove this photo?"
+                  />
+                </Can>
               </div>
             ))}
           </div>

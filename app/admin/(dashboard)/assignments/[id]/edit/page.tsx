@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AssignmentForm from "@/components/admin/AssignmentForm";
 import { updateAssignment } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditAssignmentPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("assignments", "edit");
+
   const { id } = await params;
   const assignment = await prisma.assignment.findUnique({ where: { id } });
   if (!assignment) notFound();

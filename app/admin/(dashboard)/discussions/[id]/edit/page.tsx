@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import DiscussionChannelForm from "@/components/admin/DiscussionChannelForm";
 import { updateChannel } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditChannelPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("discussions", "edit");
+
   const { id } = await params;
   const channel = await prisma.discussionChannel.findUnique({ where: { id } });
   if (!channel) notFound();

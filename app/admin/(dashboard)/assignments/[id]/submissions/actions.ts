@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 
 function revalidateSubmission(assignmentId: string) {
   revalidatePath(`/admin/assignments/${assignmentId}/submissions`);
@@ -15,7 +15,7 @@ function revalidateSubmission(assignmentId: string) {
  * and freezes their file.
  */
 export async function gradeSubmission(formData: FormData) {
-  await requireSession();
+  await requirePermission("assignments", "approve");
 
   const id = formData.get("id") as string;
   if (!id) return;
@@ -42,7 +42,7 @@ export async function gradeSubmission(formData: FormData) {
 
 /** Undo marking so the member can replace their file again. */
 export async function unmarkSubmission(formData: FormData) {
-  await requireSession();
+  await requirePermission("assignments", "approve");
 
   const id = formData.get("id") as string;
   if (!id) return;

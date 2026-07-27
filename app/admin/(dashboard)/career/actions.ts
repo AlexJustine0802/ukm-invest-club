@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 
 function revalidateCareer() {
   revalidatePath("/admin/career");
@@ -33,14 +33,14 @@ function dataFrom(formData: FormData) {
 }
 
 export async function createCareerAlert(formData: FormData) {
-  await requireSession();
+  await requirePermission("career", "create");
   await prisma.careerAlert.create({ data: dataFrom(formData) });
   revalidateCareer();
   redirect("/admin/career");
 }
 
 export async function updateCareerAlert(formData: FormData) {
-  await requireSession();
+  await requirePermission("career", "edit");
   const id = formData.get("id") as string;
   await prisma.careerAlert.update({ where: { id }, data: dataFrom(formData) });
   revalidateCareer();
@@ -48,7 +48,7 @@ export async function updateCareerAlert(formData: FormData) {
 }
 
 export async function deleteCareerAlert(formData: FormData) {
-  await requireSession();
+  await requirePermission("career", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.careerAlert.delete({ where: { id } }));
   revalidateCareer();

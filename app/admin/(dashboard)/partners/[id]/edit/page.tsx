@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import PartnerForm from "@/components/admin/PartnerForm";
 import { updatePartner } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ export default async function EditPartnerPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("partners", "edit");
+
   const { id } = await params;
   const partner = await prisma.partner.findUnique({ where: { id } });
   if (!partner) notFound();

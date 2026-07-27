@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { getEventIcon } from "@/lib/eventIcons";
 import { deleteEventCategory } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminEventCategoriesPage() {
+  await requireView("event-categories");
+
   const categories = await prisma.eventCategory.findMany({
     include: { _count: { select: { events: true } } },
     orderBy: { order: "asc" },
@@ -16,20 +20,24 @@ export default async function AdminEventCategoriesPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Event Categories</h1>
-        <Link href="/admin/event-categories/new" className="btn-primary">
-          + Add category
-        </Link>
+        <Can module="event-categories" action="create">
+          <Link href="/admin/event-categories/new" className="btn-primary">
+            + Add category
+          </Link>
+        </Can>
       </div>
 
       {categories.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No categories yet.{" "}
-          <Link
-            href="/admin/event-categories/new"
-            className="text-accent-dark underline"
-          >
-            Add one
-          </Link>
+          <Can module="event-categories" action="create">
+            <Link
+              href="/admin/event-categories/new"
+              className="text-accent-dark underline"
+            >
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -56,18 +64,22 @@ export default async function AdminEventCategoriesPage() {
                   </p>
                 )}
                 <div className="mt-4 flex items-center gap-2">
-                  <Link
-                    href={`/admin/event-categories/${c.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteEventCategory}
-                    id={c.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                    confirmMessage="Delete this category? Events in it will become uncategorized."
-                  />
+                  <Can module="event-categories" action="edit">
+                    <Link
+                      href={`/admin/event-categories/${c.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="event-categories" action="delete">
+                    <DeleteButton
+                      action={deleteEventCategory}
+                      id={c.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                      confirmMessage="Delete this category? Events in it will become uncategorized."
+                    />
+                  </Can>
                 </div>
               </div>
             );

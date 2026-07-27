@@ -16,6 +16,7 @@ import {
   ClipboardCheck,
   Users,
   Briefcase,
+  Settings,
   Menu,
   X,
   type LucideIcon,
@@ -36,12 +37,20 @@ const navSecondary: { label: string; icon: LucideIcon; href: string }[] = [
   { label: "Career Alert", icon: Briefcase, href: "/account/career" },
 ];
 
+// Shown only to members whose role has admin permissions. It opens the admin
+// workspace inside this same chrome  the sidebar stays put and only the
+// content area changes  so it belongs in the nav, below its own divider.
+const navAdmin = { label: "Admin", icon: Settings, href: "/admin" };
+
 export default function Sidebar({
   menus,
   profile,
+  showAdmin = false,
 }: {
   menus?: React.ReactNode;
   profile?: React.ReactNode;
+  /** True when this member's role has been granted admin permissions. */
+  showAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -117,6 +126,12 @@ export default function Sidebar({
       {nav.map((item) => navLink(scope, item))}
       <div className="my-3 border-t border-slate-100" />
       {navSecondary.map((item) => navLink(scope, item))}
+      {showAdmin && (
+        <>
+          <div className="my-3 border-t border-slate-100" />
+          {navLink(scope, navAdmin)}
+        </>
+      )}
     </nav>
   );
 

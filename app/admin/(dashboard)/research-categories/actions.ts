@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { uniqueSlug as sharedUniqueSlug } from "@/lib/slugs";
 
 const lookup = (slug: string) =>
@@ -29,7 +29,7 @@ function parseFields(formData: FormData) {
 }
 
 export async function createResearchCategory(formData: FormData) {
-  await requireSession();
+  await requirePermission("research-categories", "create");
   const fields = parseFields(formData);
 
   await prisma.researchCategory.create({
@@ -44,7 +44,7 @@ export async function createResearchCategory(formData: FormData) {
 }
 
 export async function updateResearchCategory(formData: FormData) {
-  await requireSession();
+  await requirePermission("research-categories", "edit");
   const id = formData.get("id") as string;
   const fields = parseFields(formData);
 
@@ -61,7 +61,7 @@ export async function updateResearchCategory(formData: FormData) {
 }
 
 export async function deleteResearchCategory(formData: FormData) {
-  await requireSession();
+  await requirePermission("research-categories", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.researchCategory.delete({ where: { id } }));
   revalidateResearchCategories();

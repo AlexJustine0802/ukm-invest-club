@@ -4,10 +4,14 @@ import DeleteButton from "@/components/admin/DeleteButton";
 import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
 import { deleteChannel } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDiscussionsPage() {
+  await requireView("discussions");
+
   const channels = await prisma.discussionChannel.findMany({
     orderBy: [{ order: "asc" }, { name: "asc" }],
     include: { _count: { select: { members: true, posts: true } } },
@@ -23,17 +27,21 @@ export default async function AdminDiscussionsPage() {
             channel before they can read or post in it.
           </p>
         </div>
-        <Link href="/admin/discussions/new" className="btn-primary">
-          + Add channel
-        </Link>
+        <Can module="discussions" action="create">
+          <Link href="/admin/discussions/new" className="btn-primary">
+            + Add channel
+          </Link>
+        </Can>
       </div>
 
       {channels.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No channels yet.{" "}
-          <Link href="/admin/discussions/new" className="text-accent-dark underline">
-            Add one
-          </Link>
+          <Can module="discussions" action="create">
+            <Link href="/admin/discussions/new" className="text-accent-dark underline">
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -67,18 +75,22 @@ export default async function AdminDiscussionsPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link
-                    href={`/admin/discussions/${c.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteChannel}
-                    id={c.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                    confirmMessage="Delete this channel? Its messages and memberships go with it. This cannot be undone."
-                  />
+                  <Can module="discussions" action="edit">
+                    <Link
+                      href={`/admin/discussions/${c.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="discussions" action="delete">
+                    <DeleteButton
+                      action={deleteChannel}
+                      id={c.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                      confirmMessage="Delete this channel? Its messages and memberships go with it. This cannot be undone."
+                    />
+                  </Can>
                 </div>
               </div>
             );

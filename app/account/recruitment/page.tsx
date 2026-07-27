@@ -273,14 +273,14 @@ export default async function RecruitmentPage() {
           preference inside the form.
         </p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {DIVISIONS.filter((d) => d.hasHead).map((d) => (
+          {DIVISIONS.filter((d) => d.structure !== "EXECUTIVE").map((d) => (
             <div
               key={d.slug}
               className="rounded-xl border border-slate-200 p-4 transition hover:border-primary/50"
             >
               <p className="font-semibold text-navy">{d.name}</p>
               <ul className="mt-2 space-y-1">
-                {d.positions.map((p) => (
+                {d.units.map((p) => (
                   <li
                     key={p}
                     className="flex items-start gap-2 text-xs text-slate-500"

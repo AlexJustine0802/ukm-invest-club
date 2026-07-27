@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 
 // Tick events to feature them in the Events page hero.
 export async function setFeaturedEvents(formData: FormData) {
-  await requireSession();
+  await requirePermission("events", "manage");
   const all = ((formData.get("allIds") as string) ?? "")
     .split(",")
     .filter(Boolean);

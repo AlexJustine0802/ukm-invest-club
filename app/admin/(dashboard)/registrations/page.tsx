@@ -6,6 +6,8 @@ import { eventPalette } from "@/lib/eventStyles";
 import { formStatus, parseQuestions, AUDIENCES } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 import { deleteRegistrationForm } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +36,8 @@ export default async function AdminRegistrationsPage({
 }: {
   searchParams: Promise<{ tab?: string; q?: string }>;
 }) {
+  await requireView("registrations");
+
   const { tab: tabParam, q = "" } = await searchParams;
   const tab: TabId = TABS.some((t) => t.id === tabParam)
     ? (tabParam as TabId)
@@ -95,9 +99,11 @@ export default async function AdminRegistrationsPage({
             Google Sheets or Excel.
           </p>
         </div>
-        <Link href="/admin/registrations/new" className="btn-primary">
-          + New form
-        </Link>
+        <Can module="registrations" action="create">
+          <Link href="/admin/registrations/new" className="btn-primary">
+            + New form
+          </Link>
+        </Can>
       </div>
 
       {/* Filters */}
@@ -143,9 +149,11 @@ export default async function AdminRegistrationsPage({
           {all.length === 0 ? (
             <>
               No forms yet.{" "}
-              <Link href="/admin/registrations/new" className="text-accent-dark underline">
-                Create one
-              </Link>
+              <Can module="registrations" action="create">
+                <Link href="/admin/registrations/new" className="text-accent-dark underline">
+                  Create one
+                </Link>
+              </Can>
               .
             </>
           ) : (
@@ -213,18 +221,22 @@ export default async function AdminRegistrationsPage({
                   >
                     Open link
                   </Link>
-                  <Link
-                    href={`/admin/registrations/${f.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteRegistrationForm}
-                    id={f.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                    confirmMessage="Delete this form? Every submitted response goes with it. This cannot be undone."
-                  />
+                  <Can module="registrations" action="edit">
+                    <Link
+                      href={`/admin/registrations/${f.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="registrations" action="delete">
+                    <DeleteButton
+                      action={deleteRegistrationForm}
+                      id={f.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                      confirmMessage="Delete this form? Every submitted response goes with it. This cannot be undone."
+                    />
+                  </Can>
                 </div>
               </div>
             );

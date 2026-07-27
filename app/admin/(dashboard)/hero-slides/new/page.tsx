@@ -2,12 +2,15 @@ import Link from "next/link";
 import { isBlobConfigured } from "@/lib/upload";
 import HeroSlideForm from "@/components/admin/HeroSlideForm";
 import { createHeroSlide } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export default async function NewHeroSlidePage({
   searchParams,
 }: {
   searchParams: Promise<{ loc?: string }>;
 }) {
+  await requirePage("hero-slides", "create");
+
   const { loc } = await searchParams;
   const location = loc === "home-about" ? "home-about" : "home";
 

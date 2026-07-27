@@ -1,8 +1,11 @@
 import Link from "next/link";
 import HighlightForm from "@/components/admin/HighlightForm";
 import { createHighlight } from "../actions";
+import { requirePage } from "@/lib/adminAccess";
 
-export default function NewHighlightPage() {
+export default async function NewHighlightPage() {
+  await requirePage("highlights", "create");
+
   return (
     <div>
       <Link href="/admin/highlights" className="text-sm text-accent-dark hover:text-accent">

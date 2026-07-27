@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
 import { toPartnerCategory } from "@/lib/partners";
 
@@ -15,7 +15,7 @@ function revalidatePartners() {
 }
 
 export async function createPartner(formData: FormData) {
-  await requireSession();
+  await requirePermission("partners", "create");
   const logoUrl = await resolveImage(
     formData.get("imageFile") as File | null,
     formData.get("imageUrl") as string | null,
@@ -34,7 +34,7 @@ export async function createPartner(formData: FormData) {
 }
 
 export async function updatePartner(formData: FormData) {
-  await requireSession();
+  await requirePermission("partners", "edit");
   const id = formData.get("id") as string;
   const existing = await prisma.partner.findUnique({ where: { id } });
   if (!existing) throw new Error("Partner not found");
@@ -57,7 +57,7 @@ export async function updatePartner(formData: FormData) {
 }
 
 export async function deletePartner(formData: FormData) {
-  await requireSession();
+  await requirePermission("partners", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() => prisma.partner.delete({ where: { id } }));
   revalidatePartners();

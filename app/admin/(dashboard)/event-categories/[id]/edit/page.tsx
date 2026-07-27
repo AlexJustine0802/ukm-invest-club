@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import EventCategoryForm from "@/components/admin/EventCategoryForm";
 import { updateEventCategory } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditEventCategoryPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("event-categories", "edit");
+
   const { id } = await params;
   const category = await prisma.eventCategory.findUnique({ where: { id } });
   if (!category) notFound();

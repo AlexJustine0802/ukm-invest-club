@@ -2,7 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import LoginForm from "@/components/admin/LoginForm";
 
-export const metadata = { title: "Admin Login" };
+export const metadata = { title: "Super Admin Login" };
 
 export default async function LoginPage({
   searchParams,
@@ -21,7 +21,7 @@ export default async function LoginPage({
             </span>
             <span className="text-xl font-bold">{site.name}</span>
           </Link>
-          <p className="mt-2 text-sm text-slate-400">Admin Dashboard</p>
+          <p className="mt-2 text-sm text-slate-400">Super Admin</p>
         </div>
 
         <div className="rounded-2xl bg-white p-8 shadow-xl">

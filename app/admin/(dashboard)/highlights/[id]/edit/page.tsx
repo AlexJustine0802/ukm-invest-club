@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import HighlightForm from "@/components/admin/HighlightForm";
 import { updateHighlight } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditHighlightPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("highlights", "edit");
+
   const { id } = await params;
   const highlight = await prisma.highlight.findUnique({ where: { id } });
   if (!highlight) notFound();

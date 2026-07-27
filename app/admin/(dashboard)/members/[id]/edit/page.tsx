@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import MemberProfileForm from "@/components/admin/MemberProfileForm";
 import { updateMemberProfile } from "../../actions";
+import { requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -11,6 +12,8 @@ export default async function EditMemberPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePage("member-roles", "edit");
+
   const { id } = await params;
   const member = await prisma.user.findUnique({
     where: { id },

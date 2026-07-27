@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDate, isUpcoming } from "@/lib/utils";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +11,8 @@ export const dynamic = "force-dynamic";
  * is created, edited and deleted there  Edit links straight to the form.
  */
 export default async function AdminEventsPage() {
+  await requireView("events");
+
   const events = await prisma.event.findMany({
     include: { category: true },
     orderBy: { eventDate: "desc" },
@@ -18,9 +22,11 @@ export default async function AdminEventsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Events</h1>
-        <Link href="/admin/registrations/new" className="btn-primary">
-          + New event
-        </Link>
+        <Can module="registrations" action="create">
+          <Link href="/admin/registrations/new" className="btn-primary">
+            + New event
+          </Link>
+        </Can>
       </div>
       <p className="mt-1 text-sm text-slate-500">
         Events are managed as registration forms  one record drives the public
@@ -30,9 +36,11 @@ export default async function AdminEventsPage() {
       {events.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No events yet.{" "}
-          <Link href="/admin/registrations/new" className="text-accent-dark underline">
-            Create your first event
-          </Link>
+          <Can module="registrations" action="create">
+            <Link href="/admin/registrations/new" className="text-accent-dark underline">
+              Create your first event
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -82,12 +90,14 @@ export default async function AdminEventsPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-2">
-                      <Link
-                        href={`/admin/registrations/${event.registrationFormId}/edit`}
-                        className="btn-secondary px-3 py-1.5 text-xs"
-                      >
-                        Edit
-                      </Link>
+                      <Can module="registrations" action="edit">
+                        <Link
+                          href={`/admin/registrations/${event.registrationFormId}/edit`}
+                          className="btn-secondary px-3 py-1.5 text-xs"
+                        >
+                          Edit
+                        </Link>
+                      </Can>
                     </div>
                   </td>
                 </tr>

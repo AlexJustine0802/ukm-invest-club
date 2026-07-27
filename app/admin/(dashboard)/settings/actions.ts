@@ -3,11 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { requireSession } from "@/lib/auth";
+import { requireSuperAdmin } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
 
 export async function updateSettings(formData: FormData) {
-  await requireSession();
+  await requireSuperAdmin();
 
   const existing = await prisma.siteSettings.findUnique({ where: { id: 1 } });
 

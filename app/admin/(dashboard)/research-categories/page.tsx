@@ -3,10 +3,14 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { getResearchIcon } from "@/lib/researchIcons";
 import { deleteResearchCategory } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminResearchCategoriesPage() {
+  await requireView("research-categories");
+
   const categories = await prisma.researchCategory.findMany({
     include: { _count: { select: { publications: true } } },
     orderBy: { order: "asc" },
@@ -16,20 +20,24 @@ export default async function AdminResearchCategoriesPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Research Categories</h1>
-        <Link href="/admin/research-categories/new" className="btn-primary">
-          + Add category
-        </Link>
+        <Can module="research-categories" action="create">
+          <Link href="/admin/research-categories/new" className="btn-primary">
+            + Add category
+          </Link>
+        </Can>
       </div>
 
       {categories.length === 0 ? (
         <p className="mt-8 text-slate-500">
           No categories yet.{" "}
-          <Link
-            href="/admin/research-categories/new"
-            className="text-accent-dark underline"
-          >
-            Add one
-          </Link>
+          <Can module="research-categories" action="create">
+            <Link
+              href="/admin/research-categories/new"
+              className="text-accent-dark underline"
+            >
+              Add one
+            </Link>
+          </Can>
           .
         </p>
       ) : (
@@ -56,18 +64,22 @@ export default async function AdminResearchCategoriesPage() {
                   </p>
                 )}
                 <div className="mt-4 flex items-center gap-2">
-                  <Link
-                    href={`/admin/research-categories/${c.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteResearchCategory}
-                    id={c.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                    confirmMessage="Delete this category? Publications in it will become uncategorized."
-                  />
+                  <Can module="research-categories" action="edit">
+                    <Link
+                      href={`/admin/research-categories/${c.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="research-categories" action="delete">
+                    <DeleteButton
+                      action={deleteResearchCategory}
+                      id={c.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                      confirmMessage="Delete this category? Publications in it will become uncategorized."
+                    />
+                  </Can>
                 </div>
               </div>
             );

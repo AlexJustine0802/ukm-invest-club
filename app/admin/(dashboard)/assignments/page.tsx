@@ -4,6 +4,8 @@ import DeleteButton from "@/components/admin/DeleteButton";
 import { getUiIcon } from "@/lib/uiIcons";
 import { dueLabel, isDueSoon } from "@/lib/assignments";
 import { deleteAssignment } from "./actions";
+import Can from "@/components/admin/Can";
+import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +26,8 @@ export default async function AdminAssignmentsPage({
 }: {
   searchParams: Promise<{ tab?: string; q?: string }>;
 }) {
+  await requireView("assignments");
+
   const { tab: tabParam, q = "" } = await searchParams;
   const tab: TabId = TABS.some((t) => t.id === tabParam)
     ? (tabParam as TabId)
@@ -79,9 +83,11 @@ export default async function AdminAssignmentsPage({
             tab are worked out from each due date.
           </p>
         </div>
-        <Link href="/admin/assignments/new" className="btn-primary">
-          + Add assignment
-        </Link>
+        <Can module="assignments" action="create">
+          <Link href="/admin/assignments/new" className="btn-primary">
+            + Add assignment
+          </Link>
+        </Can>
       </div>
 
       {/* Filters */}
@@ -127,9 +133,11 @@ export default async function AdminAssignmentsPage({
           {all.length === 0 ? (
             <>
               No assignments yet.{" "}
-              <Link href="/admin/assignments/new" className="text-accent-dark underline">
-                Add one
-              </Link>
+              <Can module="assignments" action="create">
+                <Link href="/admin/assignments/new" className="text-accent-dark underline">
+                  Add one
+                </Link>
+              </Can>
               .
             </>
           ) : (
@@ -185,17 +193,21 @@ export default async function AdminAssignmentsPage({
                   >
                     Submissions ({a._count.submissions})
                   </Link>
-                  <Link
-                    href={`/admin/assignments/${a.id}/edit`}
-                    className="btn-secondary px-3 py-1.5 text-xs"
-                  >
-                    Edit
-                  </Link>
-                  <DeleteButton
-                    action={deleteAssignment}
-                    id={a.id}
-                    className="btn-danger px-3 py-1.5 text-xs"
-                  />
+                  <Can module="assignments" action="edit">
+                    <Link
+                      href={`/admin/assignments/${a.id}/edit`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Edit
+                    </Link>
+                  </Can>
+                  <Can module="assignments" action="delete">
+                    <DeleteButton
+                      action={deleteAssignment}
+                      id={a.id}
+                      className="btn-danger px-3 py-1.5 text-xs"
+                    />
+                  </Can>
                 </div>
               </div>
             );

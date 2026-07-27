@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { DASHBOARD_SECTIONS } from "@/lib/dashboardSections";
+import { requireSuperAdminPage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
 export default async function MemberDashboardHomePage() {
+  // The workspace overview counts rows across several modules at once, so it
+  // is the super admin's view. A division member gets their own shortcuts at
+  // /admin instead.
+  await requireSuperAdminPage();
+
   const [counts, highlight, members] = await Promise.all([
     prisma.dashboardItem.groupBy({
       by: ["section"],

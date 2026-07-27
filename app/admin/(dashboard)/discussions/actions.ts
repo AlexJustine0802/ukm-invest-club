@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
-import { requireSession } from "@/lib/auth";
+import { requirePermission } from "@/lib/adminAccess";
 import { slugify } from "@/lib/utils";
 import { uniqueSlug } from "@/lib/slugs";
 
@@ -32,7 +32,7 @@ const lookupChannel = (slug: string) =>
   prisma.discussionChannel.findUnique({ where: { slug } });
 
 export async function createChannel(formData: FormData) {
-  await requireSession();
+  await requirePermission("discussions", "create");
   const data = dataFrom(formData);
   // Channel slugs are unique; a repeated name would otherwise throw P2002.
   const slug = await uniqueSlug(lookupChannel, data.slug, "channel");
@@ -42,7 +42,7 @@ export async function createChannel(formData: FormData) {
 }
 
 export async function updateChannel(formData: FormData) {
-  await requireSession();
+  await requirePermission("discussions", "edit");
   const id = formData.get("id") as string;
   const data = dataFrom(formData);
   const existing = await prisma.discussionChannel.findUnique({
@@ -64,7 +64,7 @@ export async function updateChannel(formData: FormData) {
 }
 
 export async function deleteChannel(formData: FormData) {
-  await requireSession();
+  await requirePermission("discussions", "delete");
   const id = formData.get("id") as string;
   await deleteIfExists(() =>
     prisma.discussionChannel.delete({ where: { id } }),
