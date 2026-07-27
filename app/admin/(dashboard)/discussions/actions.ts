@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { uniqueSlug } from "@/lib/slugs";
 
 function revalidateDiscussions() {
   revalidatePath("/admin/discussions");
@@ -27,9 +28,15 @@ function dataFrom(formData: FormData) {
   };
 }
 
+const lookupChannel = (slug: string) =>
+  prisma.discussionChannel.findUnique({ where: { slug } });
+
 export async function createChannel(formData: FormData) {
   await requireSession();
-  await prisma.discussionChannel.create({ data: dataFrom(formData) });
+  const data = dataFrom(formData);
+  // Channel slugs are unique; a repeated name would otherwise throw P2002.
+  const slug = await uniqueSlug(lookupChannel, data.slug, "channel");
+  await prisma.discussionChannel.create({ data: { ...data, slug } });
   revalidateDiscussions();
   redirect("/admin/discussions");
 }
@@ -42,13 +49,17 @@ export async function updateChannel(formData: FormData) {
     where: { id },
     select: { slug: true },
   });
-  await prisma.discussionChannel.update({ where: { id }, data });
+  const slug = await uniqueSlug(lookupChannel, data.slug, "channel", id);
+  await prisma.discussionChannel.update({
+    where: { id },
+    data: { ...data, slug },
+  });
   revalidateDiscussions();
   // The old slug had its own cached path; drop it too when the slug changed.
-  if (existing && existing.slug !== data.slug) {
+  if (existing && existing.slug !== slug) {
     revalidatePath(`/account/discussions/${existing.slug}`);
   }
-  revalidatePath(`/account/discussions/${data.slug}`);
+  revalidatePath(`/account/discussions/${slug}`);
   redirect("/admin/discussions");
 }
 

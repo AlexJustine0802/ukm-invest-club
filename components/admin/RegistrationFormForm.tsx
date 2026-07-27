@@ -17,6 +17,7 @@ interface RegistrationFormFormProps {
     audience: string;
     multipleResponses: boolean;
     isRecruitment: boolean;
+    registrationEnabled: boolean;
     questions: unknown;
     opensAt: Date | null;
     closesAt: Date | null;
@@ -80,7 +81,8 @@ export default function RegistrationFormForm({
             className="input"
           />
           <p className="mt-1 text-xs text-slate-500">
-            The form lives at <code>/register/&lt;slug&gt;</code> — share that link.
+            The form lives at <code>/register/&lt;slug&gt;</code> — share that
+            link.
           </p>
         </div>
 
@@ -114,6 +116,27 @@ export default function RegistrationFormForm({
 
       <div className="card space-y-5 p-5">
         <p className="font-bold text-navy">Who and when</p>
+
+        {/* First control in the card because it gates everything under it:
+            with registration off, the dates and capacity below do nothing. */}
+        <label className="flex items-start gap-3 rounded-lg border border-slate-200 p-4">
+          <input
+            type="checkbox"
+            name="registrationEnabled"
+            defaultChecked={form?.registrationEnabled ?? true}
+            className="mt-0.5 h-4 w-4"
+          />
+          <span>
+            <span className="font-semibold text-navy">
+              This event needs registration
+            </span>
+            <span className="mt-0.5 block text-xs text-slate-500">
+              Turn off for events anyone can just turn up to. The Register
+              button disappears from the public Events page and the member
+              dashboard, and the form stops accepting responses.
+            </span>
+          </span>
+        </label>
 
         <div>
           <label htmlFor="audience" className="label">
@@ -238,7 +261,8 @@ export default function RegistrationFormForm({
           </div>
           <div>
             <label htmlFor="endDate" className="label">
-              End date &amp; time <span className="text-slate-400">(optional)</span>
+              End date &amp; time{" "}
+              <span className="text-slate-400">(optional)</span>
             </label>
             <input
               id="endDate"

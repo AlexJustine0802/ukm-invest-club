@@ -79,7 +79,9 @@ export default async function EventsPage({
       include: {
         category: true,
         _count: { select: { registrations: true } },
-        registrationForm: { select: { slug: true, published: true } },
+        registrationForm: {
+          select: { slug: true, published: true, registrationEnabled: true },
+        },
       },
     }),
     prisma.eventRegistration.findMany({
@@ -212,7 +214,9 @@ export default async function EventsPage({
         <div className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white py-16">
           <SearchX className="h-10 w-10 text-slate-300" />
           <p className="font-semibold text-navy">
-            {tab === "registration" ? "No registrations yet" : "No events found"}
+            {tab === "registration"
+              ? "No registrations yet"
+              : "No events found"}
           </p>
           <p className="text-sm text-slate-500">
             {tab === "registration"
@@ -228,13 +232,19 @@ export default async function EventsPage({
               e.category?.title ?? e.title,
             );
             const taken = e._count.registrations;
-            const left = e.capacity === null ? null : Math.max(e.capacity - taken, 0);
+            const left =
+              e.capacity === null ? null : Math.max(e.capacity - taken, 0);
             const isRegistered = registeredIds.has(e.id);
             const isPast = e.eventDate < now;
             const isFull = left !== null && left === 0;
-            const formSlug = e.registrationForm?.published
-              ? e.registrationForm.slug
-              : null;
+            // An event with no form, or one with registration switched off,
+            // takes no sign-ups at all.
+            const needsRegistration =
+              e.registrationForm?.registrationEnabled ?? false;
+            const formSlug =
+              needsRegistration && e.registrationForm?.published
+                ? e.registrationForm.slug
+                : null;
 
             return (
               <article
@@ -267,7 +277,9 @@ export default async function EventsPage({
                       {e.category.title}
                     </span>
                   )}
-                  <h2 className="mt-2 text-lg font-bold text-navy">{e.title}</h2>
+                  <h2 className="mt-2 text-lg font-bold text-navy">
+                    {e.title}
+                  </h2>
                   <p className="mt-1 text-sm text-slate-500">{e.description}</p>
 
                   <div className="mt-3 space-y-1.5 text-sm text-slate-600">
@@ -293,6 +305,12 @@ export default async function EventsPage({
                   {isPast ? (
                     <span className="rounded-lg bg-slate-100 px-6 py-2.5 text-center text-sm font-semibold text-slate-400">
                       Ended
+                    </span>
+                  ) : !needsRegistration ? (
+                    // Registration switched off in the admin: no button, but
+                    // the slot keeps its size so cards stay the same shape.
+                    <span className="rounded-lg bg-slate-50 px-6 py-2.5 text-center text-sm font-semibold text-slate-400">
+                      No registration needed
                     </span>
                   ) : isRegistered ? (
                     // Same solid button as Register, so the card keeps one

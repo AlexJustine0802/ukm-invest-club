@@ -27,7 +27,38 @@ function assertPoolerFlags(url: string | undefined) {
   }
 }
 
+/**
+ * DATABASE_URL and DIRECT_URL must be the same Supabase project.
+ *
+ * Migrations run through DIRECT_URL while the app reads DATABASE_URL, so if
+ * they drift apart `prisma db push` reports success and the site then fails
+ * with "column ... does not exist" — pointing at the schema when the real
+ * problem is two different databases. The project ref is the subdomain in the
+ * direct host, or the part after "postgres." in a pooler username.
+ */
+function projectRef(url: string): string | null {
+  return (
+    /postgres\.([a-z0-9]{16,})/.exec(url)?.[1] ??
+    /db\.([a-z0-9]{16,})\.supabase\./.exec(url)?.[1] ??
+    null
+  );
+}
+
+function assertSameProject(runtime?: string, direct?: string) {
+  if (!runtime || !direct) return;
+  const a = projectRef(runtime);
+  const b = projectRef(direct);
+  if (a && b && a !== b) {
+    console.error(
+      `[prisma] DATABASE_URL points at project "${a}" but DIRECT_URL points at ` +
+        `"${b}". Migrations would be written to one database and read from the ` +
+        `other. Point both at the same project.`,
+    );
+  }
+}
+
 assertPoolerFlags(process.env.DATABASE_URL);
+assertSameProject(process.env.DATABASE_URL, process.env.DIRECT_URL);
 
 export const prisma =
   globalForPrisma.prisma ??

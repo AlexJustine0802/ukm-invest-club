@@ -209,6 +209,11 @@ model RegistrationForm {
   // /account/recruitment; when none is open that page shows a closed notice.
   isRecruitment Boolean @default(false)
 
+  // Off for events that need no sign-up (an open talk, a notice). The Register
+  // button disappears from the public and member event pages and the form
+  // stops accepting responses. Defaults on so existing events keep theirs.
+  registrationEnabled Boolean @default(true)
+
   opensAt   DateTime?
   closesAt  DateTime?
   capacity  Int? // null = unlimited

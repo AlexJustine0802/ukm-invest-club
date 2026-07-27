@@ -5,21 +5,13 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
-import { slugify } from "@/lib/utils";
+import { uniqueSlug as sharedUniqueSlug } from "@/lib/slugs";
 
-async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
-  const root = slugify(base) || "category";
-  let slug = root;
-  let n = 1;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const existing = await prisma.researchCategory.findUnique({
-      where: { slug },
-    });
-    if (!existing || existing.id === ignoreId) return slug;
-    slug = `${root}-${++n}`;
-  }
-}
+const lookup = (slug: string) =>
+  prisma.researchCategory.findUnique({ where: { slug } });
+
+const uniqueSlug = (base: string, ignoreId?: string) =>
+  sharedUniqueSlug(lookup, base, "category", ignoreId);
 
 function revalidateResearchCategories() {
   revalidatePath("/publications");

@@ -43,8 +43,16 @@ export type FormAnswers = Record<string, string | string[]>;
 
 export const AUDIENCES = [
   { id: "MEMBERS", label: "Members only", hint: "Signed-in members only." },
-  { id: "PUBLIC", label: "Public only", hint: "Anyone with the link, no account needed." },
-  { id: "BOTH", label: "Members and public", hint: "Open to everyone; members are recorded by name." },
+  {
+    id: "PUBLIC",
+    label: "Public only",
+    hint: "Anyone with the link, no account needed.",
+  },
+  {
+    id: "BOTH",
+    label: "Members and public",
+    hint: "Open to everyone; members are recorded by name.",
+  },
 ] as const;
 
 export type Audience = (typeof AUDIENCES)[number]["id"];
@@ -97,7 +105,8 @@ export function parseAnswers(value: unknown): FormAnswers {
   const out: FormAnswers = {};
   for (const [key, v] of Object.entries(value as Record<string, unknown>)) {
     if (typeof v === "string") out[key] = v;
-    else if (Array.isArray(v)) out[key] = v.filter((x): x is string => typeof x === "string");
+    else if (Array.isArray(v))
+      out[key] = v.filter((x): x is string => typeof x === "string");
   }
   return out;
 }
@@ -110,9 +119,17 @@ export function answerText(answer: string | string[] | undefined): string {
 
 /** Whether a form is accepting submissions right now. */
 export function formStatus(
-  form: { published: boolean; opensAt: Date | null; closesAt: Date | null },
+  form: {
+    published: boolean;
+    opensAt: Date | null;
+    closesAt: Date | null;
+    /** Optional so callers selecting fewer columns still type-check. */
+    registrationEnabled?: boolean;
+  },
   now: Date = new Date(),
 ): "open" | "closed" | "not-yet" | "hidden" {
+  // Registration switched off entirely: not open, and not "opening later".
+  if (form.registrationEnabled === false) return "hidden";
   if (!form.published) return "hidden";
   if (form.opensAt && form.opensAt > now) return "not-yet";
   if (form.closesAt && form.closesAt < now) return "closed";

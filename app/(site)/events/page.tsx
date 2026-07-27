@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import EmptyState from "@/components/EmptyState";
 import Reveal from "@/components/Reveal";
 import StaggerGrid from "@/components/StaggerGrid";
 import EventHeroSlider, {
@@ -38,8 +39,8 @@ type EventDisplay = {
   participants?: string;
   /** Slug of the linked public registration form, when the admin set one. */
   registrationSlug?: string | null;
-  /** True for real rows; the demo placeholders below have no detail page. */
-  fromDb?: boolean;
+  /** False when the admin switched registration off for this event. */
+  registrationEnabled: boolean;
 };
 
 type DbEvent = {
@@ -49,7 +50,11 @@ type DbEvent = {
   eventDate: Date;
   location: string | null;
   coverImage: string | null;
-  registrationForm?: { slug: string; published: boolean } | null;
+  registrationForm?: {
+    slug: string;
+    published: boolean;
+    registrationEnabled: boolean;
+  } | null;
 };
 
 const eventImages = [
@@ -58,116 +63,6 @@ const eventImages = [
   "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
   "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
-];
-
-const fallbackUpcoming: EventDisplay[] = [
-  {
-    slug: "investment-outlook-2026",
-    title: "Investment Outlook 2026: Navigating the Uncertainty",
-    description:
-      "Analisis kondisi pasar global dan strategi investasi di tengah ketidakpastian ekonomi.",
-    type: "Seminar",
-    date: new Date("2026-07-25T09:00:00+07:00"),
-    endDate: new Date("2026-07-25T12:00:00+07:00"),
-    location: "Auditorium FEB Unpar",
-    image: "/images/research-seminar.png",
-  },
-  {
-    slug: "financial-modeling-for-investment-analysis",
-    title: "Financial Modeling for Investment Analysis",
-    description:
-      "Belajar membangun model keuangan untuk analisis dan valuasi perusahaan.",
-    type: "Workshop",
-    date: new Date("2026-08-08T13:00:00+07:00"),
-    endDate: new Date("2026-08-08T16:00:00+07:00"),
-    location: "Lab. Capital Market",
-    image: "/images/research-modeling.png",
-  },
-  {
-    slug: "career-in-finance",
-    title: "Career in Finance: Pathways & Preparation",
-    description: "Bersama profesional di bidang keuangan dan investasi.",
-    type: "Talkshow",
-    date: new Date("2026-08-22T09:00:00+07:00"),
-    endDate: new Date("2026-08-22T12:00:00+07:00"),
-    location: "Auditorium FEB Unpar",
-    image:
-      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    slug: "introduction-to-stock-valuation",
-    title: "Introduction to Stock Valuation",
-    description:
-      "Program pelatihan valuasi saham menggunakan pendekatan fundamental.",
-    type: "Training",
-    date: new Date("2026-09-06T13:00:00+07:00"),
-    endDate: new Date("2026-09-06T16:00:00+07:00"),
-    location: "Lab. Capital Market",
-    image: "/images/research-modeling.png",
-  },
-  {
-    slug: "icu-investment-challenge-2026",
-    title: "ICU Investment Challenge 2026",
-    description:
-      "Kompetisi analisis investasi untuk mengasah riset dan presentasi.",
-    type: "Competition",
-    date: new Date("2026-09-20T09:00:00+07:00"),
-    endDate: new Date("2026-09-20T17:00:00+07:00"),
-    location: "Auditorium FEB Unpar",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
-  },
-];
-
-const fallbackPast: EventDisplay[] = [
-  {
-    slug: "economic-outlook-2026",
-    title: "Economic Outlook 2026",
-    description: "Market outlook seminar with guest speakers.",
-    type: "Seminar",
-    date: new Date("2026-04-15T09:00:00+07:00"),
-    endDate: new Date("2026-04-15T12:00:00+07:00"),
-    location: "Auditorium FEB Unpar",
-    image:
-      "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1200&q=80",
-    participants: "120+ Participants",
-  },
-  {
-    slug: "technical-analysis-workshop",
-    title: "Technical Analysis Workshop",
-    description: "Hands-on session for reading charts and indicators.",
-    type: "Workshop",
-    date: new Date("2026-03-30T13:00:00+07:00"),
-    endDate: new Date("2026-03-30T16:00:00+07:00"),
-    location: "Lab. Capital Market",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
-    participants: "80+ Participants",
-  },
-  {
-    slug: "women-in-finance",
-    title: "Women in Finance",
-    description: "Panel discussion with finance professionals.",
-    type: "Talkshow",
-    date: new Date("2026-03-10T09:00:00+07:00"),
-    endDate: new Date("2026-03-10T12:00:00+07:00"),
-    location: "Auditorium FEB Unpar",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80",
-    participants: "150+ Participants",
-  },
-  {
-    slug: "investment-challenge-2025",
-    title: "Investment Challenge 2025",
-    description: "Student investment analysis competition.",
-    type: "Competition",
-    date: new Date("2026-01-28T09:00:00+07:00"),
-    endDate: new Date("2026-01-28T17:00:00+07:00"),
-    location: "Auditorium FEB Unpar",
-    image:
-      "https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=80",
-    participants: "200+ Participants",
-  },
 ];
 
 function cleanDescription(description: string) {
@@ -205,10 +100,14 @@ function normalizeEvent(event: DbEvent, index: number): EventDisplay {
     endDate: addHours(event.eventDate, 3),
     location: event.location ?? "Universitas Katolik Parahyangan",
     image: event.coverImage ?? eventImages[index % eventImages.length],
-    registrationSlug: event.registrationForm?.published
-      ? event.registrationForm.slug
-      : null,
-    fromDb: true,
+    registrationSlug:
+      event.registrationForm?.published &&
+      event.registrationForm.registrationEnabled
+        ? event.registrationForm.slug
+        : null,
+    // No form at all still counts as "no registration needed" rather than a
+    // broken button, so the default here is false, not true.
+    registrationEnabled: event.registrationForm?.registrationEnabled ?? false,
   };
 }
 
@@ -250,10 +149,10 @@ function formatTimeRange(start: Date, end: Date) {
     .replace(":", ".")} WIB`;
 }
 
-// Demo placeholders (used only when the database has no events) have no detail
-// page of their own. A real row always does, even if its slug matches a demo.
+// Every event on this page now comes from the database, so its detail page
+// always exists.
 function eventHref(event: EventDisplay) {
-  return event.fromDb ? `/events/${event.slug}` : "/events";
+  return `/events/${event.slug}`;
 }
 
 /**
@@ -345,12 +244,15 @@ function UpcomingCard({ event }: { event: EventDisplay }) {
               {event.location}
             </p>
           </div>
-          <Link
-            href={registerHref(event)}
-            className="btn-primary mt-6 px-5 py-2 text-xs"
-          >
-            Register Now
-          </Link>
+          {/* No button at all when the event needs no sign-up. */}
+          {event.registrationEnabled && (
+            <Link
+              href={registerHref(event)}
+              className="btn-primary mt-6 px-5 py-2 text-xs"
+            >
+              Register Now
+            </Link>
+          )}
         </div>
       </div>
     </article>
@@ -384,12 +286,19 @@ function CalendarRow({ event }: { event: EventDisplay }) {
           {event.location}
         </p>
       </div>
-      <Link
-        href={registerHref(event)}
-        className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end"
-      >
-        Register
-      </Link>
+      {/* The grid column stays either way, so rows keep their alignment. */}
+      {event.registrationEnabled ? (
+        <Link
+          href={registerHref(event)}
+          className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end"
+        >
+          Register
+        </Link>
+      ) : (
+        <span className="justify-self-start text-xs font-semibold text-slate-400 lg:justify-self-end">
+          No registration needed
+        </span>
+      )}
     </div>
   );
 }
@@ -439,7 +348,13 @@ export default async function EventsPage() {
         orderBy: { eventDate: "asc" },
         take: 5,
         include: {
-          registrationForm: { select: { slug: true, published: true } },
+          registrationForm: {
+            select: {
+              slug: true,
+              published: true,
+              registrationEnabled: true,
+            },
+          },
         },
       }),
       prisma.event.findMany({
@@ -480,23 +395,23 @@ export default async function EventsPage() {
     );
   }
 
-  const upcoming =
-    upcomingEvents.length > 0
-      ? upcomingEvents.map((event, index) => normalizeEvent(event, index))
-      : fallbackUpcoming;
+  // No fallback content. These used to fall back to a hardcoded demo list,
+  // which meant deleting every event in the admin left five invented ones on
+  // the public page with Register buttons that went nowhere. An empty database
+  // must read as empty.
+  const upcoming = upcomingEvents.map((event, index) =>
+    normalizeEvent(event, index),
+  );
 
-  const past =
-    pastEvents.length > 0
-      ? pastEvents.map((event, index) => ({
-          ...normalizeEvent(event, index),
-          participants: [
-            "120+ Participants",
-            "80+ Participants",
-            "150+ Participants",
-            "200+ Participants",
-          ][index % 4],
-        }))
-      : fallbackPast;
+  const past = pastEvents.map((event, index) => ({
+    ...normalizeEvent(event, index),
+    participants: [
+      "120+ Participants",
+      "80+ Participants",
+      "150+ Participants",
+      "200+ Participants",
+    ][index % 4],
+  }));
 
   // Hero shows the ticked ("featured") events; falls back to upcoming events.
   const featuredRows = await prisma.event
@@ -505,7 +420,9 @@ export default async function EventsPage() {
       orderBy: { eventDate: "asc" },
       take: 5,
       include: {
-        registrationForm: { select: { slug: true, published: true } },
+        registrationForm: {
+          select: { slug: true, published: true, registrationEnabled: true },
+        },
       },
     })
     .catch(() => [] as DbEvent[]);
@@ -574,11 +491,19 @@ export default async function EventsPage() {
           action="View All Events"
           href="/events/all"
         />
-        <StaggerGrid className="grid gap-6 lg:grid-cols-3">
-          {upcoming.slice(0, 3).map((event) => (
-            <UpcomingCard key={event.slug} event={event} />
-          ))}
-        </StaggerGrid>
+        {/* min-h matches one card row, so the section keeps its shape with no
+            events rather than collapsing the page around it. */}
+        {upcoming.length > 0 ? (
+          <StaggerGrid className="grid gap-6 lg:grid-cols-3">
+            {upcoming.slice(0, 3).map((event) => (
+              <UpcomingCard key={event.slug} event={event} />
+            ))}
+          </StaggerGrid>
+        ) : (
+          <div className="flex min-h-[285px] items-center justify-center rounded-lg border border-slate-200 bg-white">
+            <EmptyState message="No upcoming events scheduled. Check back soon!" />
+          </div>
+        )}
       </Reveal>
 
       <Reveal
@@ -599,20 +524,29 @@ export default async function EventsPage() {
           action="View All Events"
           href="/events/all"
         />
-        <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-          {upcoming.slice(0, 5).map((event) => (
-            <CalendarRow key={event.slug} event={event} />
-          ))}
+        <div className="flex min-h-[140px] flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          {upcoming.length > 0 ? (
+            upcoming
+              .slice(0, 5)
+              .map((event) => <CalendarRow key={event.slug} event={event} />)
+          ) : (
+            <div className="flex flex-1 items-center justify-center py-10">
+              <EmptyState message="Nothing on the calendar yet." />
+            </div>
+          )}
         </div>
-        <div className="mt-5 flex justify-center">
-          <Link
-            href="/events/all"
-            className="inline-flex min-w-72 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-navy shadow-sm transition-colors hover:bg-slate-50"
-          >
-            Load More Events
-            <ChevronDown className="h-4 w-4" />
-          </Link>
-        </div>
+        {/* Nothing to load more of when the calendar is empty. */}
+        {upcoming.length > 0 && (
+          <div className="mt-5 flex justify-center">
+            <Link
+              href="/events/all"
+              className="inline-flex min-w-72 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-6 py-3 text-sm font-extrabold text-navy shadow-sm transition-colors hover:bg-slate-50"
+            >
+              Load More Events
+              <ChevronDown className="h-4 w-4" />
+            </Link>
+          </div>
+        )}
       </Reveal>
 
       <Reveal
@@ -625,11 +559,17 @@ export default async function EventsPage() {
           action="View All Past Events"
           href="/events/all?tab=latest"
         />
-        <StaggerGrid className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {past.slice(0, 4).map((event) => (
-            <PastEventCard key={event.slug} event={event} />
-          ))}
-        </StaggerGrid>
+        {past.length > 0 ? (
+          <StaggerGrid className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {past.slice(0, 4).map((event) => (
+              <PastEventCard key={event.slug} event={event} />
+            ))}
+          </StaggerGrid>
+        ) : (
+          <div className="flex min-h-[240px] items-center justify-center rounded-lg border border-slate-200 bg-white">
+            <EmptyState message="No past events to show yet." />
+          </div>
+        )}
       </Reveal>
     </div>
   );

@@ -6,19 +6,13 @@ import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { resolveImage } from "@/lib/upload";
-import { slugify } from "@/lib/utils";
+import { uniqueSlug as sharedUniqueSlug } from "@/lib/slugs";
 
-async function uniqueSlug(base: string, ignoreId?: string): Promise<string> {
-  const root = slugify(base) || "publication";
-  let slug = root;
-  let n = 1;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const existing = await prisma.publication.findUnique({ where: { slug } });
-    if (!existing || existing.id === ignoreId) return slug;
-    slug = `${root}-${++n}`;
-  }
-}
+const lookup = (slug: string) =>
+  prisma.publication.findUnique({ where: { slug } });
+
+const uniqueSlug = (base: string, ignoreId?: string) =>
+  sharedUniqueSlug(lookup, base, "publication", ignoreId);
 
 function revalidatePublications() {
   revalidatePath("/publications");

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requireSession } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
+import { uniqueSlug } from "@/lib/slugs";
 import { parseQuestions, isAudience } from "@/lib/forms";
 import { readEventDetails, syncEventForForm } from "@/lib/eventSync";
 
@@ -46,6 +47,7 @@ function dataFrom(formData: FormData) {
     audience: isAudience(audience) ? audience : "MEMBERS",
     multipleResponses: formData.get("multipleResponses") === "on",
     isRecruitment: formData.get("isRecruitment") === "on",
+    registrationEnabled: formData.get("registrationEnabled") === "on",
     // Prisma types Json columns structurally; our typed array needs the cast.
     questions: parseQuestions(questions).filter(
       (q) => q.label.trim() !== "",
@@ -65,13 +67,23 @@ export async function createRegistrationForm(formData: FormData) {
   const data = dataFrom(formData);
   const details = readEventDetails(formData);
 
+  // Two forms called "Tes" would collide on the unique slug and throw P2002
+  // out of a form with nowhere to show it. Take the next free slug instead.
+  const slug = await uniqueSlug(
+    (s) => prisma.registrationForm.findUnique({ where: { slug: s } }),
+    data.slug,
+    "form",
+  );
+
   // One transaction so a form is never left without the event it should own.
   await prisma.$transaction(async (tx) => {
-    const created = await tx.registrationForm.create({ data });
+    const created = await tx.registrationForm.create({
+      data: { ...data, slug },
+    });
     await syncEventForForm(tx, created, details);
   });
 
-  revalidateForms(data.slug);
+  revalidateForms(slug);
   redirect("/admin/registrations");
 }
 
@@ -86,13 +98,25 @@ export async function updateRegistrationForm(formData: FormData) {
     select: { slug: true },
   });
 
+  // ignoreId keeps this form's own slug free, so saving without renaming does
+  // not bump it to "-2" every time.
+  const slug = await uniqueSlug(
+    (s) => prisma.registrationForm.findUnique({ where: { slug: s } }),
+    data.slug,
+    "form",
+    id,
+  );
+
   await prisma.$transaction(async (tx) => {
-    const updated = await tx.registrationForm.update({ where: { id }, data });
+    const updated = await tx.registrationForm.update({
+      where: { id },
+      data: { ...data, slug },
+    });
     await syncEventForForm(tx, updated, details);
   });
 
-  revalidateForms(data.slug);
-  if (existing && existing.slug !== data.slug) {
+  revalidateForms(slug);
+  if (existing && existing.slug !== slug) {
     revalidatePath(`/register/${existing.slug}`);
   }
   redirect("/admin/registrations");
