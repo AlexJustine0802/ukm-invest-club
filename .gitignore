@@ -23,8 +23,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env
-.env*.local
+# Ignore every .env variant, not just .env and .env*.local: backup copies like
+# .env.backup-before-pooler fell through the old pattern and were committed
+# with live credentials in them.
+.env*
+!.env.example
 
 # vercel
 .vercel
