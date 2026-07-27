@@ -35,7 +35,7 @@ export default function AdminHome({
     <div>
       <h1 className="text-2xl font-bold text-navy">Admin</h1>
       <p className="mt-1 text-slate-500">
-        {name} · {role} — the sections your role can manage.
+        {name} · {role}  the sections your role can manage.
       </p>
 
       {groups.length === 0 && (
