@@ -6,7 +6,7 @@ import { Prisma } from "@prisma/client";
  * `delete()` throws P2025 when nothing matches, which turns an ordinary race
  * into a 500: a double-clicked button, two admins on the same list, or a tab
  * left open after someone else deleted the row. In every one of those cases
- * the caller's intent — that this record should not exist — is already
+ * the caller's intent  that this record should not exist  is already
  * satisfied, so failing is the wrong answer.
  *
  * Returns the deleted record, or null if it had already gone. Anything other

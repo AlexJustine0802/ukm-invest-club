@@ -123,7 +123,7 @@ export default function DiscussionChannelForm({
           className="h-4 w-4"
         />
         <span className="text-sm font-medium text-navy">
-          Published — members can find and join it
+          Published  members can find and join it
         </span>
       </label>
 

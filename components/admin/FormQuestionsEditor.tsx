@@ -13,7 +13,7 @@ import {
 /**
  * The question builder. Everything is kept in local state and serialised into
  * one hidden input, so the whole form saves through the same plain server
- * action as every other admin page — no per-question endpoints.
+ * action as every other admin page  no per-question endpoints.
  */
 export default function FormQuestionsEditor({
   name,
@@ -103,7 +103,7 @@ export default function FormQuestionsEditor({
 
                 {isChoice && (
                   <div>
-                    <label className="label">Options — one per line</label>
+                    <label className="label">Options  one per line</label>
                     <textarea
                       rows={3}
                       value={(q.options ?? []).join("\n")}

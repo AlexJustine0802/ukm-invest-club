@@ -1,8 +1,8 @@
 /**
  * Shown while a member-dashboard page's data is being fetched.
  *
- * The block sizes deliberately mirror the real dashboard — a top bar, a
- * banner, a two-up stat row, then two panels — so the swap to real content
+ * The block sizes deliberately mirror the real dashboard  a top bar, a
+ * banner, a two-up stat row, then two panels  so the swap to real content
  * lands in roughly the same places instead of jolting the page.
  */
 export default function AccountLoading() {

@@ -1,6 +1,6 @@
 // Helpers shared by the member career page and the notification bell.
 
-/** A posting stays "New" — and stays in the bell — for this many days. */
+/** A posting stays "New"  and stays in the bell  for this many days. */
 export const NEW_ALERT_DAYS = 14;
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -9,7 +9,7 @@ export function isNewAlert(createdAt: Date, now: Date = new Date()): boolean {
   return now.getTime() - createdAt.getTime() < NEW_ALERT_DAYS * MS_PER_DAY;
 }
 
-/** "Posted today" / "Posted 3 days ago" — the bell's age line. */
+/** "Posted today" / "Posted 3 days ago"  the bell's age line. */
 export function postedLabel(createdAt: Date, now: Date = new Date()): string {
   const days = Math.floor((now.getTime() - createdAt.getTime()) / MS_PER_DAY);
   if (days <= 0) return "Posted today";

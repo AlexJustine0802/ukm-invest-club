@@ -7,7 +7,7 @@ import { DUR, EASE } from "@/lib/motion";
  * Fades a section up as it scrolls into view, once.
  *
  * `as` exists so the reveal can *replace* the element it animates instead of
- * wrapping it — passing the original tag and classes through keeps the DOM
+ * wrapping it  passing the original tag and classes through keeps the DOM
  * identical to what it was before, which is what stops the effect from moving
  * anything. Only opacity and transform animate, so it can never shift layout.
  */

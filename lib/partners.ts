@@ -2,7 +2,7 @@
  * The two partner groups the public site renders as separate sections.
  *
  * Defined once here so the admin dropdown, the stored value, and the section
- * headings can never disagree — the same reason lib/roles.ts owns the division
+ * headings can never disagree  the same reason lib/roles.ts owns the division
  * list rather than each page hardcoding it.
  */
 export const PARTNER_CATEGORIES = [

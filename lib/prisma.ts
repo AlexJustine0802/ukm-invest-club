@@ -7,7 +7,7 @@ const globalForPrisma = globalThis as unknown as {
 /**
  * Port 6543 is Supabase's transaction pooler: it hands each query whichever
  * backend is free, so a statement prepared on one connection is missing on the
- * next — Postgres 26000, `prepared statement "sN" does not exist`. The
+ * next  Postgres 26000, `prepared statement "sN" does not exist`. The
  * `pgbouncer=true` flag tells Prisma to stop using named prepared statements.
  *
  * Without the flag the app still starts and most queries still work, then
@@ -32,7 +32,7 @@ function assertPoolerFlags(url: string | undefined) {
  *
  * Migrations run through DIRECT_URL while the app reads DATABASE_URL, so if
  * they drift apart `prisma db push` reports success and the site then fails
- * with "column ... does not exist" — pointing at the schema when the real
+ * with "column ... does not exist"  pointing at the schema when the real
  * problem is two different databases. The project ref is the subdomain in the
  * direct host, or the part after "postgres." in a pooler username.
  */

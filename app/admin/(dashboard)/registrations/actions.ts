@@ -134,7 +134,7 @@ export async function deleteRegistrationForm(formData: FormData) {
   revalidateForms(form.slug);
 }
 
-/** Delete one submitted response — for spam or a duplicate someone asked to redo. */
+/** Delete one submitted response  for spam or a duplicate someone asked to redo. */
 export async function deleteResponse(formData: FormData) {
   await requireSession();
   const id = formData.get("id") as string;

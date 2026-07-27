@@ -6,7 +6,7 @@ import type { TopBarNotification } from "@/components/account/TopBarMenus";
 
 /**
  * Bell contents: announcements plus any recent job posting, so publishing a
- * career alert announces itself — no second row for the admin to write.
+ * career alert announces itself  no second row for the admin to write.
  *
  * Lives here rather than in AccountTopBar because the mobile nav bar renders
  * the same menu, and both need the identical list.

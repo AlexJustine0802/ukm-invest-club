@@ -9,7 +9,7 @@ import { DUR } from "@/lib/motion";
  *
  * Stat values are admin-typed strings like "150+", "1.2k" or "Top 3", so the
  * leading number is animated and everything around it is passed through
- * untouched. Anything without a leading number renders as-is — no parsing
+ * untouched. Anything without a leading number renders as-is  no parsing
  * surprises on the page.
  */
 export default function CountUp({ value }: { value: string }) {
@@ -50,7 +50,7 @@ export default function CountUp({ value }: { value: string }) {
     return () => cancelAnimationFrame(raf);
   }, [inView, target, reduced]);
 
-  // No leading number — nothing to count, so show the value verbatim.
+  // No leading number  nothing to count, so show the value verbatim.
   if (target === null || !match) return <span ref={ref}>{value}</span>;
 
   // tabular-nums fixes every digit to the same advance width, so the figure

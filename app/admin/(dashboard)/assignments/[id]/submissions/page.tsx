@@ -54,7 +54,7 @@ export default async function SubmissionsPage({
         {[
           { label: "Submissions", value: assignment.submissions.length },
           { label: "Waiting to mark", value: pending.length },
-          { label: "Average score", value: average === null ? "—" : `${average} / 100` },
+          { label: "Average score", value: average === null ? "" : `${average} / 100` },
         ].map((stat) => (
           <div key={stat.label} className="card p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">

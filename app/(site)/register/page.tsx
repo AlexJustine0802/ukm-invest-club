@@ -30,7 +30,7 @@ export default async function PublicRegisterPage() {
   const open = forms.filter((f) => formStatus(f, now) === "open");
   const upcoming = forms.filter((f) => formStatus(f, now) === "not-yet");
 
-  // With a single open form there is nothing to choose — go straight to it.
+  // With a single open form there is nothing to choose  go straight to it.
   if (open.length === 1) redirect(`/register/${open[0].slug}`);
 
   const listed = [...open, ...upcoming];
@@ -53,7 +53,7 @@ export default async function PublicRegisterPage() {
               Nothing open at the moment
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              Follow our socials or check back soon — new recruitment opens here.
+              Follow our socials or check back soon  new recruitment opens here.
             </p>
             <Link
               href="/events"

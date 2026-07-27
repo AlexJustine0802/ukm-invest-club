@@ -1,6 +1,6 @@
 /**
  * Horizontal-overflow audit. Drives headless Chrome over the DevTools protocol
- * (Node's built-in WebSocket — no dependencies) and, for each page at each
+ * (Node's built-in WebSocket  no dependencies) and, for each page at each
  * width, reports any element wider than the viewport.
  *
  *   node scripts/check-responsive.mjs [--base http://localhost:3000]
@@ -40,7 +40,7 @@ const PAGES = process.env.PAGES
 /**
  * Runs in the page: find anything sticking out past the viewport.
  *
- * Only rightward overflow counts — carousels legitimately park slides off to
+ * Only rightward overflow counts  carousels legitimately park slides off to
  * the left. Anything inside an element that clips or scrolls horizontally is
  * skipped too: a filter rail with `overflow-x-auto` is doing its job, not
  * widening the page.
@@ -181,7 +181,7 @@ try {
         awaitPromise: false,
       });
       if (typeof result.value !== "string") {
-        console.log(`SKIP ${path} @${width}px — page did not render a result`);
+        console.log(`SKIP ${path} @${width}px  page did not render a result`);
         continue;
       }
       const data = JSON.parse(result.value);

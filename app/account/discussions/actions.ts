@@ -32,7 +32,7 @@ export async function joinChannel(formData: FormData) {
   await prisma.channelMember
     .create({ data: { channelId, userId: session.userId } })
     .catch(() => {
-      // Unique constraint — already a member, nothing to do.
+      // Unique constraint  already a member, nothing to do.
     });
 
   revalidateChannel(channel.slug);
@@ -58,7 +58,7 @@ export async function leaveChannel(formData: FormData) {
 
 /**
  * Post a message. Membership is re-checked here because the page-level gate is
- * only UI — this is the trust boundary. Someone who left in another tab and
+ * only UI  this is the trust boundary. Someone who left in another tab and
  * resubmits an old form gets nothing written.
  */
 export async function createPost(formData: FormData) {

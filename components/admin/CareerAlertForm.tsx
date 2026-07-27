@@ -171,7 +171,7 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
           className="h-4 w-4"
         />
         <span className="text-sm font-medium text-navy">
-          Published — visible on /account/career and pushed to the member
+          Published  visible on /account/career and pushed to the member
           notification bell for 14 days
         </span>
       </label>

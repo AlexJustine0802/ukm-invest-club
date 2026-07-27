@@ -1,4 +1,4 @@
-# Palet Warna Website — Investment Club
+# Palet Warna Website  Investment Club
 
 Palet warna profesional, terpercaya, dan modern yang mencerminkan pertumbuhan, analisis, dan kolaborasi.
 
@@ -46,8 +46,8 @@ Biru melambangkan kepercayaan, profesionalisme, stabilitas, dan pertumbuhan inve
 
 | Elemen | Background | Text / Border |
 |--------|-----------|---------------|
-| Primary Button | `#144DC8` | — |
-| Hover / Active | `#103FA5` | — |
+| Primary Button | `#144DC8` |  |
+| Hover / Active | `#103FA5` |  |
 | Secondary Button | `#FFFFFF` | Border & Text `#144DC8` |
 | Success Message | `#ECFDF5` | Text `#16A34A` |
 | Warning Message | `#FFFBEB` | Text `#B45309` |

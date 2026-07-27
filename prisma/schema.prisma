@@ -4,9 +4,9 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // Pooled, transaction mode (port 6543) — every runtime query.
+  // Pooled, transaction mode (port 6543)  every runtime query.
   url       = env("DATABASE_URL")
-  // Session mode (port 5432) — migrations only. Prisma needs advisory locks
+  // Session mode (port 5432)  migrations only. Prisma needs advisory locks
   // and DDL that the transaction pooler cannot carry.
   directUrl = env("DIRECT_URL")
 }
@@ -111,7 +111,7 @@ model ResearchCategory {
   @@index([order])
 }
 
-// DEPRECATED — the public About page builds its people from User accounts
+// DEPRECATED  the public About page builds its people from User accounts
 // (/admin/members). Nothing reads this table; kept so `db push` does not drop it
 // behind your back. Safe to delete with a deliberate push.
 model TeamMember {
@@ -193,7 +193,7 @@ model ChannelMember {
 // A Google-Forms-style registration: staff recruitment, event sign-up, anything
 // with a custom question list. The questions live in one JSON column (see
 // lib/forms.ts for the shape) because they are only ever read and written as a
-// whole form — a table per question would buy nothing.
+// whole form  a table per question would buy nothing.
 model RegistrationForm {
   id          String  @id @default(cuid())
   title       String
@@ -256,7 +256,7 @@ model FormResponse {
 }
 
 // Job / internship openings on /account/career. Publishing one makes it show up
-// in the member notification bell automatically — there is no separate
+// in the member notification bell automatically  there is no separate
 // announcement row to keep in sync.
 model CareerAlert {
   id          String    @id @default(cuid())
@@ -354,9 +354,9 @@ model DashboardItem {
 }
 
 // "Our Divisions" on the About page: the division's own description and icon.
-// Its people are User rows with a matching `division` slug — one record per
+// Its people are User rows with a matching `division` slug  one record per
 // person, edited in /admin/members, shown in both the member and public sites.
-// DEPRECATED — the org chart is hardcoded in lib/roles.ts (DIVISIONS) and is not
+// DEPRECATED  the org chart is hardcoded in lib/roles.ts (DIVISIONS) and is not
 // admin-editable. Nothing reads this table any more; kept only so `db push` does
 // not drop it behind your back. Safe to delete with a deliberate push.
 model Division {

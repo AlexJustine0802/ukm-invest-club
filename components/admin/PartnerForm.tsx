@@ -71,7 +71,7 @@ export default function PartnerForm({ action, uploadEnabled, partner }: Props) {
       </div>
 
       <ImageField
-        label="Logo (optional — shows the name as text if empty)"
+        label="Logo (optional  shows the name as text if empty)"
         defaultUrl={partner?.logoUrl}
         uploadEnabled={uploadEnabled}
       />

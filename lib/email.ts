@@ -19,7 +19,7 @@ export async function sendContactEmail(msg: ContactMessage): Promise<void> {
     process.env.CONTACT_EMAIL_FROM || "ICUnpar Website <onboarding@resend.dev>";
 
   if (!apiKey || !to) {
-    console.log("[contact] Resend not configured — message logged instead:");
+    console.log("[contact] Resend not configured  message logged instead:");
     console.log(JSON.stringify(msg, null, 2));
     return;
   }
@@ -32,7 +32,7 @@ export async function sendContactEmail(msg: ContactMessage): Promise<void> {
     subject: `[ICUnpar Contact] ${msg.subject}`,
     text: `New message from the ICUnpar website contact form:\n\nName: ${msg.name}\nEmail: ${msg.email}\nSubject: ${msg.subject}\n\n${msg.message}`,
     html: `
-      <h2>New contact message — ICUnpar website</h2>
+      <h2>New contact message  ICUnpar website</h2>
       <p><strong>Name:</strong> ${escapeHtml(msg.name)}</p>
       <p><strong>Email:</strong> ${escapeHtml(msg.email)}</p>
       <p><strong>Subject:</strong> ${escapeHtml(msg.subject)}</p>
@@ -68,7 +68,7 @@ export async function sendAuthEmail(
     process.env.CONTACT_EMAIL_FROM || "ICUnpar Website <onboarding@resend.dev>";
 
   if (!apiKey) {
-    console.log(`[auth] Resend not configured — ${kind} link for ${to}:`);
+    console.log(`[auth] Resend not configured  ${kind} link for ${to}:`);
     console.log(link);
     return;
   }

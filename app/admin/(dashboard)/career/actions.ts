@@ -10,7 +10,7 @@ function revalidateCareer() {
   revalidatePath("/admin/career");
   revalidatePath("/account/career");
   // The notification bell reads career alerts, and it renders on every member
-  // page — so a new posting has to invalidate the whole member area.
+  // page  so a new posting has to invalidate the whole member area.
   revalidatePath("/account", "layout");
 }
 

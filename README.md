@@ -1,4 +1,4 @@
-# ICUnpar — Investment Club UKM Website
+# ICUnpar  Investment Club UKM Website
 
 A modern website for **ICUnpar** (Investment Club Universitas Parahyangan) with a
 public site (events, publications, team, gallery, contact) and a password-protected
@@ -8,11 +8,11 @@ Built with **Next.js (App Router) + TypeScript + Tailwind CSS + Prisma + Postgre
 
 ## Features
 
-- 🏠 **Public site** — home, events, publications/articles, about + team, gallery, contact
-- 🔐 **Admin dashboard** (`/admin`) — create/edit/delete events, publications, team members, and gallery photos
-- 👥 **Single shared admin login** — multiple committee members can be logged in at the same time
-- ✉️ **Contact form** — sends messages to your inbox via [Resend](https://resend.com) (falls back to server logs when not configured)
-- 🖼️ **Image handling** — upload via Vercel Blob, or simply paste an image URL
+- 🏠 **Public site**  home, events, publications/articles, about + team, gallery, contact
+- 🔐 **Admin dashboard** (`/admin`)  create/edit/delete events, publications, team members, and gallery photos
+- 👥 **Single shared admin login**  multiple committee members can be logged in at the same time
+- ✉️ **Contact form**  sends messages to your inbox via [Resend](https://resend.com) (falls back to server logs when not configured)
+- 🖼️ **Image handling**  upload via Vercel Blob, or simply paste an image URL
 - 📝 **Markdown** support for event and publication content
 
 ## Tech stack
@@ -37,7 +37,7 @@ npm install
 
 ### 2. Set up a PostgreSQL database
 
-Use any Postgres — a free [Neon](https://neon.tech) or [Supabase](https://supabase.com)
+Use any Postgres  a free [Neon](https://neon.tech) or [Supabase](https://supabase.com)
 database works great. Copy its connection string.
 
 ### 3. Configure environment variables
@@ -48,11 +48,11 @@ cp .env.example .env
 
 Then edit `.env`:
 
-- `DATABASE_URL` — your Postgres connection string
-- `AUTH_SECRET` — a long random string (`openssl rand -base64 32`)
-- `ADMIN_USERNAME` — the admin login username
-- `ADMIN_PASSWORD_HASH` — generate it (see below)
-- `RESEND_API_KEY`, `CONTACT_EMAIL_TO`, `CONTACT_EMAIL_FROM` — for the contact form (optional locally)
+- `DATABASE_URL`  your Postgres connection string
+- `AUTH_SECRET`  a long random string (`openssl rand -base64 32`)
+- `ADMIN_USERNAME`  the admin login username
+- `ADMIN_PASSWORD_HASH`  generate it (see below)
+- `RESEND_API_KEY`, `CONTACT_EMAIL_TO`, `CONTACT_EMAIL_FROM`  for the contact form (optional locally)
 
 Generate the admin password hash:
 
@@ -100,10 +100,10 @@ npm run dev
 
 Log in at `/admin` and use the sidebar to manage:
 
-- **Events** — title, date/time, location, Markdown description, cover image, published toggle
-- **Publications** — title, excerpt, Markdown body, author, publish date, cover image
-- **Team** — name, role, bio, photo, display order, social links
-- **Gallery** — photos with titles/captions and display order
+- **Events**  title, date/time, location, Markdown description, cover image, published toggle
+- **Publications**  title, excerpt, Markdown body, author, publish date, cover image
+- **Team**  name, role, bio, photo, display order, social links
+- **Gallery**  photos with titles/captions and display order
 
 ## Environment variables reference
 
@@ -133,5 +133,5 @@ Log in at `/admin` and use the sidebar to manage:
 
 ---
 
-> Placeholder branding is in `lib/site.ts` (name, socials, email) — update it and
+> Placeholder branding is in `lib/site.ts` (name, socials, email)  update it and
 > drop in the real ICUnpar logo when ready.

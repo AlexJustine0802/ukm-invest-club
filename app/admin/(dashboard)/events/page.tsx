@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 /**
  * Read-only view. An event is the public face of its registration form, so it
- * is created, edited and deleted there — Edit links straight to the form.
+ * is created, edited and deleted there  Edit links straight to the form.
  */
 export default async function AdminEventsPage() {
   const events = await prisma.event.findMany({
@@ -23,7 +23,7 @@ export default async function AdminEventsPage() {
         </Link>
       </div>
       <p className="mt-1 text-sm text-slate-500">
-        Events are managed as registration forms — one record drives the public
+        Events are managed as registration forms  one record drives the public
         site, the member dashboard and the sign-up page.
       </p>
 
@@ -57,7 +57,7 @@ export default async function AdminEventsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
-                    {event.category?.title ?? "—"}
+                    {event.category?.title ?? ""}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {formatDate(event.eventDate)}

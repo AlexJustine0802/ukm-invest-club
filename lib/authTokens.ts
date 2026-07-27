@@ -13,7 +13,7 @@ function hashToken(token: string): string {
 
 /**
  * Issue a single-use token for a user. Any existing token of the same type is
- * dropped first, so only the newest link ever works. Returns the raw token —
+ * dropped first, so only the newest link ever works. Returns the raw token 
  * it is never stored, only its hash.
  */
 export async function issueAuthToken(

@@ -67,7 +67,7 @@ export async function getSession(): Promise<SessionPayload | null> {
   return verifySessionToken(token);
 }
 
-/** Throw if there is no valid session — use to guard Server Actions. */
+/** Throw if there is no valid session  use to guard Server Actions. */
 export async function requireSession(): Promise<SessionPayload> {
   const session = await getSession();
   if (!session) {

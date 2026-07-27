@@ -28,7 +28,7 @@ export default async function MembersPage({
   const { role: roleParam, q = "" } = await searchParams;
   const query = q.trim().toLowerCase();
 
-  // Explicit select — passwordHash must never leave the database.
+  // Explicit select  passwordHash must never leave the database.
   const members = await prisma.user.findMany({
     select: {
       id: true,
@@ -42,7 +42,7 @@ export default async function MembersPage({
   });
 
   // Filter by division (the org chart), falling back to "no division". Every
-  // division is listed whether or not anyone is in it yet — the chart is fixed
+  // division is listed whether or not anyone is in it yet  the chart is fixed
   // in lib/roles, so this row is the same height on an empty database.
   const filters = [
     ...DIVISIONS.map((d) => ({ id: d.slug, label: d.name })),
@@ -133,7 +133,7 @@ export default async function MembersPage({
                     {m.name.charAt(0).toUpperCase()}
                   </span>
                   <div className="min-w-0 flex-1">
-                    {/* truncate belongs on the text itself — on the flex row it
+                    {/* truncate belongs on the text itself  on the flex row it
                         does nothing, and the name then refuses to shrink. */}
                     <p className="flex min-w-0 items-center gap-1.5 font-bold text-navy">
                       <span className="min-w-0 truncate">{m.name}</span>

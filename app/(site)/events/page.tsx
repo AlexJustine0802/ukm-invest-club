@@ -454,9 +454,6 @@ export default async function EventsPage() {
 
         <div className="container-page relative grid min-h-[470px] items-center gap-10 py-14 lg:grid-cols-[0.88fr_1.12fr]">
           <div className="max-w-xl">
-            <p className="text-sm font-extrabold uppercase tracking-wide text-primary">
-              Events & Activities
-            </p>
             <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl">
               Learn, Connect,
               <br />

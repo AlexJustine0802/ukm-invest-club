@@ -23,7 +23,7 @@ export async function gradeSubmission(formData: FormData) {
   const rawScore = ((formData.get("score") as string) ?? "").trim();
   const feedback = ((formData.get("feedback") as string) ?? "").trim() || null;
 
-  // Blank score is allowed — feedback-only marking is still marking.
+  // Blank score is allowed  feedback-only marking is still marking.
   let score: number | null = null;
   if (rawScore) {
     const parsed = Number(rawScore);

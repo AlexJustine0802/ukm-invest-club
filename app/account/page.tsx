@@ -37,7 +37,7 @@ function weekOf(today: Date) {
 
 /**
  * Every list card keeps this body height whether it has rows or not, so an
- * empty database renders the same layout as a full one — no collapsing, no
+ * empty database renders the same layout as a full one  no collapsing, no
  * shifting.
  */
 const LIST_BODY = "mt-4 min-h-[180px] space-y-4";
@@ -197,7 +197,7 @@ export default async function AccountPage() {
   ).slice(0, 4);
 
   // Mobile-only summary bar. Reuses the data already fetched above for the
-  // side rails — no extra queries, no second copy of the widgets.
+  // side rails  no extra queries, no second copy of the widgets.
   const latestUpdates = [
     {
       id: "announcements",
@@ -249,7 +249,7 @@ export default async function AccountPage() {
             min-width:auto, which sizes the track to the widest card's
             min-content and pushes the whole column past the viewport. */}
         <div className="min-w-0 space-y-6">
-          {/* Highlight — managed in /admin/highlights. Always rendered at a
+          {/* Highlight  managed in /admin/highlights. Always rendered at a
               fixed height; with no active highlight it shows a placeholder. */}
           <Reveal className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-6 text-white sm:p-8">
             {highlight ? (
@@ -304,7 +304,7 @@ export default async function AccountPage() {
             )}
           </Reveal>
 
-          {/* Overview — the stat row is always present, showing 0 when empty. */}
+          {/* Overview  the stat row is always present, showing 0 when empty. */}
           <Reveal as="section">
             <h3 className="text-lg font-bold text-navy">Overview</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -339,7 +339,7 @@ export default async function AccountPage() {
             </div>
           </Reveal>
 
-          {/* Detail area — both columns always exist. */}
+          {/* Detail area  both columns always exist. */}
           <Reveal className="grid gap-6 lg:grid-cols-2">
             {/* Left: resources + discussions */}
             <div className="min-w-0 space-y-6">
@@ -564,7 +564,7 @@ export default async function AccountPage() {
           </p>
         </div>
 
-        {/* Right rail. Hidden on mobile — the Latest Updates bar at the top of
+        {/* Right rail. Hidden on mobile  the Latest Updates bar at the top of
             the page surfaces these same three widgets there, so showing them
             again at the bottom was a duplicate. Tablet and desktop unchanged. */}
         <Reveal className="hidden min-w-0 space-y-6 md:block">
@@ -612,7 +612,7 @@ export default async function AccountPage() {
             </div>
           </section>
 
-          {/* Real assignments — the same rows the Assignments page reads. */}
+          {/* Real assignments  the same rows the Assignments page reads. */}
           <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-navy">Assignment Deadlines</h3>
@@ -668,7 +668,7 @@ export default async function AccountPage() {
             </div>
           </section>
 
-          {/* Straight from the Career Alerts admin — no second list to keep in sync. */}
+          {/* Straight from the Career Alerts admin  no second list to keep in sync. */}
           <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-navy">Career Alert Highlights</h3>

@@ -2,7 +2,7 @@
 // options offered are always derived from here, so the admin cannot invent a
 // position that does not exist.
 //
-// The board is the only division without a "Head of …" — its positions already
+// The board is the only division without a "Head of …"  its positions already
 // are the leadership.
 //
 // `slug` is the stored identity (User.division holds it) while `name` is only
@@ -24,7 +24,7 @@ export interface DivisionRoles {
   icon: string;
 }
 
-// The org chart is fixed in source on purpose — it is not admin-editable. A new
+// The org chart is fixed in source on purpose  it is not admin-editable. A new
 // division means a new entry here plus a deploy, so member roles, the About
 // page and the recruitment page can never drift apart.
 export const DIVISIONS: DivisionRoles[] = [
@@ -58,7 +58,7 @@ export const DIVISIONS: DivisionRoles[] = [
     ],
     hasHead: true,
     description:
-      "Recruits new members and looks after the people already here — onboarding, internal culture and growth through the year.",
+      "Recruits new members and looks after the people already here  onboarding, internal culture and growth through the year.",
     icon: "Users",
   },
   {
@@ -74,7 +74,7 @@ export const DIVISIONS: DivisionRoles[] = [
     ],
     hasHead: true,
     description:
-      "Owns everything outside the club — media, partners, campuses and the wider investment community — plus the ventures and market research behind where the club places its effort.",
+      "Owns everything outside the club  media, partners, campuses and the wider investment community  plus the ventures and market research behind where the club places its effort.",
     icon: "Handshake",
   },
   {
@@ -94,7 +94,7 @@ export const DIVISIONS: DivisionRoles[] = [
     positions: ["Project & Event"],
     hasHead: true,
     description:
-      "Plans and runs the club's events end to end — seminars, workshops, competitions and everything on the day itself.",
+      "Plans and runs the club's events end to end  seminars, workshops, competitions and everything on the day itself.",
     icon: "CalendarDays",
   },
   {

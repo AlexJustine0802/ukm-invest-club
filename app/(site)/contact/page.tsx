@@ -95,9 +95,6 @@ export default function ContactPage() {
         <div className="absolute bottom-10 left-0 h-28 w-36 bg-[radial-gradient(circle_at_center,#93b4ff_1.4px,transparent_1.4px)] opacity-55 [background-size:24px_24px]" />
 
         <div className="container-page relative flex min-h-[460px] flex-col items-center justify-center py-16 text-center">
-          <p className="text-sm font-bold uppercase text-primary">
-            Let&apos;s Connect
-          </p>
           <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-tight text-navy sm:text-5xl lg:text-6xl">
             We&apos;d Love to
             <br />

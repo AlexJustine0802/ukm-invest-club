@@ -37,7 +37,7 @@ export default function ForgotPasswordForm() {
         <MailCheck className="h-16 w-16 text-emerald-500" />
         <p className="text-center text-sm text-slate-500">
           If an account exists for that email, we have sent a password reset
-          link. Check your inbox — the link expires in 1 hour.
+          link. Check your inbox  the link expires in 1 hour.
         </p>
         <Link href="/login" className="btn-primary w-full py-3 text-center">
           Back to Log In

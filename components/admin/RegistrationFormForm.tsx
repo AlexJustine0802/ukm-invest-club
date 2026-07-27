@@ -81,7 +81,7 @@ export default function RegistrationFormForm({
             className="input"
           />
           <p className="mt-1 text-xs text-slate-500">
-            The form lives at <code>/register/&lt;slug&gt;</code> — share that
+            The form lives at <code>/register/&lt;slug&gt;</code>  share that
             link.
           </p>
         </div>
@@ -150,7 +150,7 @@ export default function RegistrationFormForm({
           >
             {AUDIENCES.map((a) => (
               <option key={a.id} value={a.id}>
-                {a.label} — {a.hint}
+                {a.label}  {a.hint}
               </option>
             ))}
           </select>
@@ -237,7 +237,7 @@ export default function RegistrationFormForm({
         <div>
           <p className="font-bold text-navy">Event details</p>
           <p className="mt-1 text-sm text-slate-500">
-            Fill in a start date and this form also becomes a public event —
+            Fill in a start date and this form also becomes a public event 
             listed on the website, in the member dashboard, and registering
             through this form. Leave the start date blank for a plain sign-up
             (recruitment, standalone) with no event.
@@ -397,7 +397,7 @@ export default function RegistrationFormForm({
             className="h-4 w-4"
           />
           <span className="text-sm font-medium text-navy">
-            Published — the link works and members can see it
+            Published  the link works and members can see it
             <span className="mt-0.5 block text-xs font-normal text-slate-500">
               Also controls the event: unpublishing hides it from the public
               events page and the member dashboard.

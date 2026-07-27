@@ -276,9 +276,6 @@ export default function ResearchPageContent({
 
         <div className="container-page relative grid min-h-[460px] items-center gap-10 py-14 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase text-primary">
-              Research & Insights
-            </p>
             <h1 className="mt-5 text-4xl font-bold leading-tight text-navy sm:text-5xl">
               Insight Today,
               <br />
@@ -608,7 +605,7 @@ export default function ResearchPageContent({
           </StaggerGrid>
         ) : (
           <p className="text-sm text-slate-500">
-            No publications yet — check back soon.
+            No publications yet  check back soon.
           </p>
         )}
       </Reveal>

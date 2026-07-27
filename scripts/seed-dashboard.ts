@@ -53,7 +53,7 @@ const items = [
 async function main() {
   const existing = await prisma.dashboardItem.count();
   if (existing > 0) {
-    console.log(`dashboard_item already has ${existing} rows — skipping seed`);
+    console.log(`dashboard_item already has ${existing} rows  skipping seed`);
   } else {
     await prisma.dashboardItem.createMany({ data: items });
     console.log(`seeded ${items.length} dashboard items`);

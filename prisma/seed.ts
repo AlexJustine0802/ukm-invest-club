@@ -256,9 +256,9 @@ async function main() {
         title: "Understanding Compound Interest: The Eighth Wonder",
         slug: "understanding-compound-interest",
         excerpt:
-          "Why starting early matters more than starting big — a beginner-friendly look at how compounding builds wealth over time.",
+          "Why starting early matters more than starting big  a beginner-friendly look at how compounding builds wealth over time.",
         content:
-          "## The Power of Compounding\n\nCompound interest is often called the eighth wonder of the world. Unlike simple interest, compounding means you earn returns not only on your principal but also on the returns you've already accumulated.\n\n### A Simple Example\n\nInvesting **Rp 1,000,000** at 10% annually:\n\n- Year 1: Rp 1,100,000\n- Year 5: Rp 1,610,510\n- Year 20: Rp 6,727,500\n\nThe longer your money stays invested, the more dramatic the effect. This is why time in the market beats timing the market.\n\n### Key Takeaways\n\n1. Start as early as you can.\n2. Reinvest your dividends and returns.\n3. Stay consistent — small, regular contributions add up.",
+          "## The Power of Compounding\n\nCompound interest is often called the eighth wonder of the world. Unlike simple interest, compounding means you earn returns not only on your principal but also on the returns you've already accumulated.\n\n### A Simple Example\n\nInvesting **Rp 1,000,000** at 10% annually:\n\n- Year 1: Rp 1,100,000\n- Year 5: Rp 1,610,510\n- Year 20: Rp 6,727,500\n\nThe longer your money stays invested, the more dramatic the effect. This is why time in the market beats timing the market.\n\n### Key Takeaways\n\n1. Start as early as you can.\n2. Reinvest your dividends and returns.\n3. Stay consistent  small, regular contributions add up.",
         author: "ICUnpar Research Team",
         coverImage:
           "https://images.unsplash.com/photo-1434626881859-194d67b2b86f?auto=format&fit=crop&w=1200&q=80",
@@ -273,7 +273,7 @@ async function main() {
         excerpt:
           "A practical guide to the three sections every investor should understand before buying a stock.",
         content:
-          "## Balance Sheet Basics\n\nA balance sheet is a snapshot of what a company owns and owes at a point in time. It follows one simple equation:\n\n> **Assets = Liabilities + Equity**\n\n### Assets\n\nWhat the company owns — cash, inventory, property, and receivables.\n\n### Liabilities\n\nWhat the company owes — loans, accounts payable, and bonds.\n\n### Equity\n\nThe residual value belonging to shareholders. A healthy, growing equity base is often a good sign.\n\nUnderstanding these three sections helps you judge whether a company is financially sound before you invest.",
+          "## Balance Sheet Basics\n\nA balance sheet is a snapshot of what a company owns and owes at a point in time. It follows one simple equation:\n\n> **Assets = Liabilities + Equity**\n\n### Assets\n\nWhat the company owns  cash, inventory, property, and receivables.\n\n### Liabilities\n\nWhat the company owes  loans, accounts payable, and bonds.\n\n### Equity\n\nThe residual value belonging to shareholders. A healthy, growing equity base is often a good sign.\n\nUnderstanding these three sections helps you judge whether a company is financially sound before you invest.",
         author: "ICUnpar Research Team",
         coverImage:
           "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=80",

@@ -9,7 +9,7 @@ type Child = { label: string; href: string };
 type Group = { label: string; icon: string; href: string; children?: Child[] };
 type WorkspaceId = "public" | "dashboard";
 
-// Public website — mirrors the public navbar (Home, About, Research, Events, Contact).
+// Public website  mirrors the public navbar (Home, About, Research, Events, Contact).
 const publicGroups: Group[] = [
   {
     label: "Home",
@@ -58,7 +58,7 @@ const publicGroups: Group[] = [
   },
 ];
 
-// Member dashboard — everything behind the member login at /account.
+// Member dashboard  everything behind the member login at /account.
 const dashboardGroups: Group[] = [
   {
     label: "Banner",

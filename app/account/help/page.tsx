@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 const faqs = [
   {
     q: "How do I access learning materials?",
-    a: "Open Resources from the sidebar. Materials are grouped into folders by topic — use the category filters or the search bar to find something specific.",
+    a: "Open Resources from the sidebar. Materials are grouped into folders by topic  use the category filters or the search bar to find something specific.",
   },
   {
     q: "How do I register for an event?",
@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     q: "I did not receive my verification email.",
-    a: "Try logging in again — we send a fresh verification link automatically each time an unverified account attempts to log in. Also check your spam folder.",
+    a: "Try logging in again  we send a fresh verification link automatically each time an unverified account attempts to log in. Also check your spam folder.",
   },
   {
     q: "How do I reset my password?",

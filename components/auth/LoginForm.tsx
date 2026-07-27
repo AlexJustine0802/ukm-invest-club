@@ -36,7 +36,7 @@ export default function LoginForm() {
     <form action={formAction} className="space-y-5">
       {reset && !state.error && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
-          Password updated — please log in.
+          Password updated  please log in.
         </p>
       )}
       {state.error && (

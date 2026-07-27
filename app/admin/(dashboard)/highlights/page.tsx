@@ -19,7 +19,7 @@ export default async function AdminHighlightsPage() {
         <div>
           <h1 className="text-2xl font-bold text-navy">Highlights</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Promo banner at the top of the member dashboard — use it for staff
+            Promo banner at the top of the member dashboard  use it for staff
             recruitment, competitions, or any announcement worth featuring.
           </p>
         </div>

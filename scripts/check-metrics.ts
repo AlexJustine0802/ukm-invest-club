@@ -3,7 +3,7 @@
  * counts.
  *
  * getMetricValues names tables and columns as string literals, so renaming a
- * model or field in schema.prisma breaks it silently — the query still runs,
+ * model or field in schema.prisma breaks it silently  the query still runs,
  * it just counts the wrong thing or throws at runtime. Run this after any
  * schema change:
  *

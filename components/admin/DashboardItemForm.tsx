@@ -73,7 +73,7 @@ export default function DashboardItemForm({
             defaultValue={item?.metric ?? ""}
             className="input"
           >
-            <option value="">Off — use the typed value below</option>
+            <option value="">Off  use the typed value below</option>
             {METRICS.map((m) => (
               <option key={m.id} value={m.id}>
                 {m.label}
@@ -81,7 +81,7 @@ export default function DashboardItemForm({
             ))}
           </select>
           <p className="mt-1 text-xs text-slate-500">
-            Pick one and the card counts itself — publish a career alert or an
+            Pick one and the card counts itself  publish a career alert or an
             event and the number updates on its own.
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function DashboardItemForm({
           className="h-4 w-4"
         />
         <span className="text-sm font-medium text-navy">
-          Active — show this on the member dashboard
+          Active  show this on the member dashboard
         </span>
       </label>
 

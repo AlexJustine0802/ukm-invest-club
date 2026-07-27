@@ -1,6 +1,6 @@
 // Shape of a registration form's questions and answers. Both live in JSON
 // columns (RegistrationForm.questions, FormResponse.answers), so this module is
-// the single place that knows the format — admin editor, member form, CSV
+// the single place that knows the format  admin editor, member form, CSV
 // export and validation all read it from here.
 
 export const QUESTION_TYPES = [
@@ -71,7 +71,7 @@ export function allowsMembers(audience: string): boolean {
 
 /**
  * Read the questions JSON column back into typed questions, dropping anything
- * malformed rather than throwing — a half-broken form should still render.
+ * malformed rather than throwing  a half-broken form should still render.
  */
 export function parseQuestions(value: unknown): FormQuestion[] {
   if (!Array.isArray(value)) return [];
@@ -111,7 +111,7 @@ export function parseAnswers(value: unknown): FormAnswers {
   return out;
 }
 
-/** One answer as a single cell of text — used by the table and the CSV. */
+/** One answer as a single cell of text  used by the table and the CSV. */
 export function answerText(answer: string | string[] | undefined): string {
   if (answer === undefined) return "";
   return Array.isArray(answer) ? answer.join(", ") : answer;
@@ -138,7 +138,7 @@ export function formStatus(
 
 /**
  * Questions every event sign-up form starts with. The admin can edit, remove or
- * add to them under Registrations — this is just a sensible starting point so
+ * add to them under Registrations  this is just a sensible starting point so
  * "Register" always opens a real form.
  */
 export function defaultEventQuestions(): FormQuestion[] {

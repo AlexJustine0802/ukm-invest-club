@@ -57,7 +57,7 @@ export default function Sidebar({
   }, [open]);
 
   // The drawer and the desktop sidebar are both mounted at once, so each gets
-  // its own layoutId — one shared id across two live copies would make the
+  // its own layoutId  one shared id across two live copies would make the
   // indicator try to fly between them.
   // Takes both arguments rather than currying: a function that returns JSX
   // from one argument reads as a component to lint rules, and this is a render
@@ -85,7 +85,7 @@ export default function Sidebar({
       >
         {/* Was a 4px left border with the padding shaved to match, which
               nudged the label sideways on every navigation. Positioned
-              absolutely it costs no layout, so the text never moves — and
+              absolutely it costs no layout, so the text never moves  and
               layoutId slides it from the old item to the new one. */}
         {active && (
           <motion.span
@@ -122,7 +122,7 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile bar — the only way into the menu below lg. */}
+      {/* Mobile bar  the only way into the menu below lg. */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2 lg:hidden">
         <Link href="/account" className="flex items-center">
           <Image

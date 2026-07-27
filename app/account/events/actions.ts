@@ -33,7 +33,7 @@ export async function registerForEvent(formData: FormData) {
     await tx.eventRegistration
       .create({ data: { eventId, userId: session.userId } })
       .catch(() => {
-        // Unique constraint — already registered, nothing to do.
+        // Unique constraint  already registered, nothing to do.
       });
   });
 

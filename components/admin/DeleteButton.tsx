@@ -13,7 +13,7 @@ interface DeleteButtonProps {
 
 /**
  * Separate component because useFormStatus only reports the status of a form
- * above it in the tree — called in the same component that renders <form>, it
+ * above it in the tree  called in the same component that renders <form>, it
  * always returns false.
  */
 function Submit({ label, className }: { label: string; className: string }) {

@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 // Dates are relative to today so "Due in N days" and the Due Soon tab stay
-// meaningful — the mockup's fixed May-2025 dates would all read as overdue.
+// meaningful  the mockup's fixed May-2025 dates would all read as overdue.
 function inDays(days: number) {
   const d = new Date();
   d.setDate(d.getDate() + days);
@@ -40,7 +40,7 @@ const items = [
 async function main() {
   const existing = await prisma.assignment.count();
   if (existing > 0) {
-    console.log(`assignment table already has ${existing} rows — skipping seed`);
+    console.log(`assignment table already has ${existing} rows  skipping seed`);
   } else {
     await prisma.assignment.createMany({ data: items });
     console.log(`seeded ${items.length} assignments`);

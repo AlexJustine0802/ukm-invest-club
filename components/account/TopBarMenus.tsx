@@ -46,7 +46,7 @@ export default function TopBarMenus({
   initial: string;
   role: string;
   notifications: TopBarNotification[];
-  /** Off in the mobile nav bar — the profile lives inside the drawer there. */
+  /** Off in the mobile nav bar  the profile lives inside the drawer there. */
   showProfile?: boolean;
 }) {
   const [open, setOpen] = useState<OpenMenu>(null);

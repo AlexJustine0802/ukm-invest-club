@@ -67,7 +67,7 @@ export default async function AnnouncementsPage({
         role={user.role}
       />
 
-      {/* Always rendered — with an empty database this is just "All", so the
+      {/* Always rendered  with an empty database this is just "All", so the
           row below it never moves up the page. */}
       <div className="mt-8 flex flex-wrap items-center gap-3">
         {categories.map((c) => (

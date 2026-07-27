@@ -1,5 +1,5 @@
 /**
- * Self-check for the calendar month maths — the one bit of the new pages with
+ * Self-check for the calendar month maths  the one bit of the new pages with
  * real branching (param parsing, year wrap, leap years).
  *
  *   npx tsx scripts/check-calendar-math.ts

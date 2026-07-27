@@ -37,7 +37,7 @@ export default async function AccountTopBar({
             <TopBarSearch placeholder={searchPlaceholder} />
           </Suspense>
         )}
-        {/* Below lg these live in the nav bar instead — anchored to the left
+        {/* Below lg these live in the nav bar instead  anchored to the left
             of a mobile row, the dropdowns opened off the side of the screen. */}
         <div className="hidden lg:flex">
           <TopBarMenus

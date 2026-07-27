@@ -52,7 +52,7 @@ export default async function ResponsesPage({
 
       <p className="mt-4 rounded-xl bg-blue-50 p-3 text-xs text-slate-600">
         The CSV opens straight in Google Sheets (File → Import) or Excel. One row
-        per response, one column per question — re-download after new responses
+        per response, one column per question  re-download after new responses
         come in.
       </p>
 
@@ -83,7 +83,7 @@ export default async function ResponsesPage({
                       {formatDateTime(r.createdAt)}
                     </td>
                     <td className="px-4 py-3 font-medium text-navy">
-                      {r.user?.name ?? r.guestName ?? "—"}
+                      {r.user?.name ?? r.guestName ?? ""}
                       {!r.user && (
                         <span className="ml-1.5 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
                           Guest
@@ -91,7 +91,7 @@ export default async function ResponsesPage({
                       )}
                     </td>
                     <td className="px-4 py-3 text-slate-500">
-                      {r.user?.email ?? r.guestEmail ?? "—"}
+                      {r.user?.email ?? r.guestEmail ?? ""}
                     </td>
                     {questions.map((q) => {
                       const value = answers[q.id];
@@ -108,7 +108,7 @@ export default async function ResponsesPage({
                             </a>
                           ) : (
                             <span className="line-clamp-4 whitespace-pre-wrap">
-                              {answerText(value) || "—"}
+                              {answerText(value) || ""}
                             </span>
                           )}
                         </td>

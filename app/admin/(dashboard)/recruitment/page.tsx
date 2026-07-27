@@ -178,11 +178,11 @@ export default async function AdminRecruitmentPage() {
               <div className="mt-4 space-y-3">
                 {applicants.map((a) => {
                   const answers = parseAnswers(a.answers);
-                  const name = a.user?.name ?? a.guestName ?? "—";
+                  const name = a.user?.name ?? a.guestName ?? "";
                   const preview = questions
                     .slice(0, 2)
                     .map(
-                      (q) => `${q.label}: ${answerText(answers[q.id]) || "—"}`,
+                      (q) => `${q.label}: ${answerText(answers[q.id]) || ""}`,
                     )
                     .join(" · ");
                   return (
@@ -203,7 +203,7 @@ export default async function AdminRecruitmentPage() {
                           )}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {a.user?.email ?? a.guestEmail ?? "—"} ·{" "}
+                          {a.user?.email ?? a.guestEmail ?? ""} ·{" "}
                           {formatDateTime(a.createdAt)}
                         </p>
                         {preview && (

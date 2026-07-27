@@ -175,7 +175,7 @@ export default async function AssignmentDetailPage({
             {graded ? (
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                Marked — your submission is locked.
+                Marked  your submission is locked.
               </p>
             ) : (
               <div className="mt-5">

@@ -6,7 +6,7 @@ import { Users, AtSign, Link2, X } from "lucide-react";
 import { getUiIcon } from "@/lib/uiIcons";
 
 /**
- * A person on the public page is a member account (see /admin/members) — email
+ * A person on the public page is a member account (see /admin/members)  email
  * is deliberately left out so a public page never lists member addresses.
  */
 export interface DivisionMemberView {
@@ -108,7 +108,7 @@ function MemberCard({
   );
 }
 
-/** Columns in the grid below — must track the sm/lg breakpoints in the JSX. */
+/** Columns in the grid below  must track the sm/lg breakpoints in the JSX. */
 function useColumnCount() {
   const [columns, setColumns] = useState(3);
 
@@ -166,7 +166,7 @@ export default function DivisionsSection({
       </p>
 
       {/* The open panel is a full-width grid item placed straight after its
-          card, so the browser drops it under that card's row on its own —
+          card, so the browser drops it under that card's row on its own 
           correct at 1, 2 or 3 columns without measuring anything. */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {divisions.map((d, index) => {

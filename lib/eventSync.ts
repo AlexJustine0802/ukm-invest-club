@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 /**
  * A registration form and its public event are one record split across two
  * tables: the form holds the sign-up side, the event holds the public listing.
- * The form is the source of truth — every write goes through here, so the two
+ * The form is the source of truth  every write goes through here, so the two
  * can never drift.
  *
  * Shared fields (title, slug, description, cover, capacity, published) are
@@ -32,7 +32,7 @@ type Db = Prisma.TransactionClient;
 
 /**
  * Pull the event fields off a submitted form. Returns null when the admin left
- * the start date blank — that form is a plain sign-up (recruitment, standalone)
+ * the start date blank  that form is a plain sign-up (recruitment, standalone)
  * and gets no public event.
  */
 export function readEventDetails(formData: FormData): EventDetails | null {
@@ -66,7 +66,7 @@ async function uniqueEventSlug(db: Db, base: string, ignoreId?: string) {
 
 /**
  * Bring the form's event in line: create it, update it, or delete it when the
- * form stops being an event. Deleting the form itself needs no call here — the
+ * form stops being an event. Deleting the form itself needs no call here  the
  * foreign key cascades.
  */
 export async function syncEventForForm(

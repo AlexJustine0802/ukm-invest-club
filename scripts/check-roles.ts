@@ -1,5 +1,5 @@
 /**
- * Self-check for the org chart — the role/division pairing an admin POST is
+ * Self-check for the org chart  the role/division pairing an admin POST is
  * validated against.
  *
  *   npx tsx scripts/check-roles.ts
@@ -17,7 +17,7 @@ import {
 
 assert.equal(DIVISIONS.length, 7);
 
-// Slugs are the stored identity — a rename must never change them, or every
+// Slugs are the stored identity  a rename must never change them, or every
 // member assigned to the old value is orphaned.
 assert.deepEqual(
   DIVISIONS.map((d) => d.slug),

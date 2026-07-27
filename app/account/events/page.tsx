@@ -325,7 +325,7 @@ export default async function EventsPage({
                     </span>
                   ) : formSlug ? (
                     // Events with a sign-up form go through it, same as the
-                    // public site — the answers land in the admin responses.
+                    // public site  the answers land in the admin responses.
                     <Link
                       href={`/register/${formSlug}`}
                       className="block w-full rounded-lg bg-primary px-6 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary-dark"

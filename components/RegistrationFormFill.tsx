@@ -31,7 +31,7 @@ export default function RegistrationFormFill({
 }: {
   formId: string;
   questions: FormQuestion[];
-  /** True when nobody is signed in — we need a name and email on the row. */
+  /** True when nobody is signed in  we need a name and email on the row. */
   askGuestDetails: boolean;
 }) {
   const [state, action] = useActionState<SubmitState, FormData>(

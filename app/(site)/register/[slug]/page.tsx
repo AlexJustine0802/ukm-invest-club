@@ -53,7 +53,7 @@ export default async function RegisterPage({
   const status = form ? formStatus(form) : "hidden";
 
   // A deleted or unpublished form keeps the page shell rather than dropping to
-  // a 404 — the link is often already shared, and a bare 404 reads as broken.
+  // a 404  the link is often already shared, and a bare 404 reads as broken.
   if (!form || status === "hidden") {
     return (
       <div className="bg-slate-50">
@@ -180,7 +180,7 @@ export default async function RegisterPage({
                     View uploaded file
                   </a>
                 ) : (
-                  answerText(answers[q.id]) || "—"
+                  answerText(answers[q.id]) || ""
                 )}
               </dd>
             </div>

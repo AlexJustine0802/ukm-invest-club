@@ -12,7 +12,7 @@ import {
 
 /**
  * Hand in an assignment. Re-submitting replaces the previous file, but only
- * until the admin has marked it — after that the submission is frozen.
+ * until the admin has marked it  after that the submission is frozen.
  */
 export async function submitAssignment(
   _prev: SubmitState,

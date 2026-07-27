@@ -37,7 +37,7 @@ async function main() {
   assert.equal(second, null, "second delete should be a no-op");
   console.log("  ok  double delete -> row, then null");
 
-  // 3. Errors that are NOT P2025 must still propagate — swallowing a genuine
+  // 3. Errors that are NOT P2025 must still propagate  swallowing a genuine
   //    failure would be far worse than the bug this fixes.
   await assert.rejects(
     () =>

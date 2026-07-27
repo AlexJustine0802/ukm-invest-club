@@ -10,7 +10,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Defense in depth — middleware already guards /admin, but re-check here.
+  // Defense in depth  middleware already guards /admin, but re-check here.
   const session = await getSession();
   if (!session) redirect("/admin/login");
 

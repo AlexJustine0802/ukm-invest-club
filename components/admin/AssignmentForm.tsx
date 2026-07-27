@@ -199,7 +199,7 @@ export default function AssignmentForm({
           className="h-4 w-4"
         />
         <span className="text-sm font-medium text-navy">
-          Published — visible to members
+          Published  visible to members
         </span>
       </label>
 

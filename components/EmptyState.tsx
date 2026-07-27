@@ -4,7 +4,7 @@ import { Inbox } from "lucide-react";
  * Placeholder shown inside a section that has no rows yet.
  *
  * Sections keep their container, heading and reserved height whether the
- * database holds zero records or thousands — this fills the space instead of
+ * database holds zero records or thousands  this fills the space instead of
  * the section collapsing, which is what caused layout shift before.
  *
  * Same markup the Overview page already used; it lives here so every page

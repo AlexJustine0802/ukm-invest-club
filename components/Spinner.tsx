@@ -3,7 +3,7 @@
  *
  * A swapped label alone is easy to miss on a fast connection; a spinner reads
  * as "working" for however long the request actually takes. Decorative, so it
- * is hidden from assistive tech — the disabled button and the changed label
+ * is hidden from assistive tech  the disabled button and the changed label
  * already carry that meaning.
  *
  * Coloured for the filled buttons it sits in. Pass border classes to override.

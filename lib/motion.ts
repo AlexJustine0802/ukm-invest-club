@@ -3,7 +3,7 @@
  *
  * Framer Motion components import these; app/globals.css mirrors the same
  * numbers as CSS variables for the hover and press transitions. Change a value
- * here and in globals.css together — that pairing is what keeps a CSS hover
+ * here and in globals.css together  that pairing is what keeps a CSS hover
  * and a JS reveal reading as the same product.
  */
 
@@ -30,7 +30,7 @@ export const DUR = {
   /** Page enter. */
   page: 0.6,
   /**
-   * Page exit — deliberately quicker than the enter. Waiting on an outgoing
+   * Page exit  deliberately quicker than the enter. Waiting on an outgoing
    * page is dead time; the incoming one is what should feel generous.
    */
   pageExit: 0.3,

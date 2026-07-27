@@ -55,14 +55,14 @@ export function resolveMetric(
  * Count every metric in a single round trip.
  *
  * This was seven parallel `count()` calls. Each one holds its own connection,
- * so a single dashboard render opened seven at once — and with the six other
+ * so a single dashboard render opened seven at once  and with the six other
  * queries on that page, fourteen simultaneously, against a Supavisor ceiling
  * of fifteen. One visitor could exhaust the pool on their own and the next
  * request got `EMAXCONNSESSION`.
  *
  * The subqueries are the same indexed counts as before; the win is entirely in
  * connection use. Table and column names are literal here, so
- * scripts/check-metrics.ts asserts this agrees with Prisma's own counts —
+ * scripts/check-metrics.ts asserts this agrees with Prisma's own counts 
  * run it after renaming any model or field.
  */
 export async function getMetricValues(

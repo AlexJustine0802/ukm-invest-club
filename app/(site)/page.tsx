@@ -122,7 +122,7 @@ export default async function HomePage() {
             </h2>
             <p className="mt-4 text-slate-600">
               {site.fullName} ({site.name}) is a student-run investment club
-              focused on financial literacy, market analysis, and self-growth —
+              focused on financial literacy, market analysis, and self-growth 
               creating smart, competitive investors.
             </p>
             <Link

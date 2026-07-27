@@ -1,5 +1,5 @@
 /**
- * Self-check for the registration form model — question parsing, audience
+ * Self-check for the registration form model  question parsing, audience
  * rules, open/closed windows and CSV quoting.
  *
  *   npx tsx scripts/check-forms.ts

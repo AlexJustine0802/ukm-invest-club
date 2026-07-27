@@ -7,8 +7,8 @@ import { DUR, EASE } from "@/lib/motion";
 /**
  * Reveals a grid's cards one after another instead of as a single block.
  *
- * Each child gets wrapped in its own animated box, so the wrapper — not the
- * card — becomes the grid item. `h-full` on the wrapper plus `[&>*]:h-full` on
+ * Each child gets wrapped in its own animated box, so the wrapper  not the
+ * card  becomes the grid item. `h-full` on the wrapper plus `[&>*]:h-full` on
  * the card inside preserves the equal-height rows that grid stretching used to
  * give for free; without both, a row of cards ends up ragged.
  */

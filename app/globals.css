@@ -6,7 +6,7 @@
   --background: #f8fafc;
   --foreground: #1e293b;
 
-  /* One motion system. Every transition in the app — CSS or Framer Motion —
+  /* One motion system. Every transition in the app  CSS or Framer Motion 
      picks from these. The same numbers live in lib/motion.ts for the Framer
      side; keep the two in step or a CSS hover and a JS reveal stop matching.
 
@@ -42,7 +42,7 @@ iframe {
   max-width: 100%;
 }
 
-/* Long unbroken strings — emails, URLs, slugs — wrap instead of widening
+/* Long unbroken strings  emails, URLs, slugs  wrap instead of widening
    their container. Applied narrowly so ordinary prose keeps normal wrapping. */
 code,
 .break-anywhere {
@@ -205,7 +205,7 @@ code,
 
 /* Honour the OS setting everywhere at once. Framer Motion components read it
    through useReducedMotion; this covers the CSS half. Nothing is hidden or
-   disabled — transitions simply resolve immediately. */
+   disabled  transitions simply resolve immediately. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -98,7 +98,7 @@ export default function Navbar({
       </nav>
 
       {/* Mobile menu. Animating grid-template-rows between 0fr and 1fr is what
-          lets the panel slide open to its natural height — no measuring, no
+          lets the panel slide open to its natural height  no measuring, no
           hardcoded max-height that clips longer menus. */}
       <AnimatePresence initial={false}>
         {open && (

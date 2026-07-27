@@ -125,7 +125,7 @@ export default function HighlightForm({ action, highlight }: HighlightFormProps)
           className="h-4 w-4"
         />
         <span className="text-sm font-medium text-navy">
-          Active — show this on the member dashboard
+          Active  show this on the member dashboard
         </span>
       </label>
       <p className="text-xs text-slate-500">

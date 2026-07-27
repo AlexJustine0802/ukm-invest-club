@@ -4,7 +4,7 @@ import { slugify } from "@/lib/utils";
  * A slug that is free to use, suffixing `-2`, `-3`… until it is.
  *
  * Every slug column in the schema is `@unique`, so a second "Tes" would throw
- * P2002 straight out of the admin form — and none of the content forms have an
+ * P2002 straight out of the admin form  and none of the content forms have an
  * error channel to show it in, so the admin just gets a crash. Picking the next
  * free slug is what the publications, event-category and research-category
  * actions already did; this is that logic in one place.

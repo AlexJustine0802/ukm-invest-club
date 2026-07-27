@@ -59,7 +59,7 @@ export default async function AdminPublicationsPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
-                    {pub.category?.title ?? "—"}
+                    {pub.category?.title ?? ""}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {formatDate(pub.publishedAt)}

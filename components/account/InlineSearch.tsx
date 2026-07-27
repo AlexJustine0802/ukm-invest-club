@@ -27,14 +27,14 @@ export default function InlineSearch({
 
   // Keep the box in step when the URL changes (back button, reset links).
   // Adjusted during render rather than in an effect, which would cause a
-  // second render pass — see react.dev "You Might Not Need an Effect".
+  // second render pass  see react.dev "You Might Not Need an Effect".
   const [lastQuery, setLastQuery] = useState(query);
   if (query !== lastQuery) {
     setLastQuery(query);
     setValue(query);
   }
 
-  // Close on outside click or Escape. Any active filter stays applied — the
+  // Close on outside click or Escape. Any active filter stays applied  the
   // button shows as active so it is clear the list is still filtered.
   useEffect(() => {
     if (!open) return;

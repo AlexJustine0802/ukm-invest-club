@@ -41,7 +41,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "About",
-  description: `Learn about ${site.fullName} — our mission, values, and committee.`,
+  description: `Learn about ${site.fullName}  our mission, values, and committee.`,
 };
 
 const missions = [
@@ -130,7 +130,7 @@ function MomentCard({
 export default async function AboutPage() {
   const [divisionPeople, stats, partners, communityMoments, settings] =
     await Promise.all([
-      // The people are member accounts — edited once in /admin/members and shown
+      // The people are member accounts  edited once in /admin/members and shown
       // here and in the member area both.
       prisma.user.findMany({
         where: { division: { not: null } },
@@ -210,9 +210,6 @@ export default async function AboutPage() {
           </>
         )}
         <div className="container-page relative py-16 text-center lg:py-20">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary">
-            About Us
-          </span>
           <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
             About <span className="text-primary">{site.name}</span>
           </h1>

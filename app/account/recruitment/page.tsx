@@ -94,7 +94,7 @@ export default async function RecruitmentPage() {
       title="Recruitment"
       subtitle={
         isOpen
-          ? "Open recruitment is running — pick a division and apply."
+          ? "Open recruitment is running  pick a division and apply."
           : "Join the committee behind Invest Club."
       }
       showSearch={false}

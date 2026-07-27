@@ -9,7 +9,7 @@ import { DUR, EASE } from "@/lib/motion";
 /**
  * The App Router swaps a layout's `children` the moment navigation commits, so
  * by the time AnimatePresence plays an exit the subtree already holds the NEXT
- * page — you'd watch the incoming content fade out and straight back in.
+ * page  you'd watch the incoming content fade out and straight back in.
  * Pinning the router context to the value it had when this instance first
  * rendered keeps the outgoing page on screen for the length of its exit.
  *

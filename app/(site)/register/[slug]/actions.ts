@@ -22,7 +22,7 @@ export interface SubmitState {
 
 /**
  * Handle one registration submission. Everything the page checked before
- * rendering is re-checked here — the page is UI, this is the trust boundary.
+ * rendering is re-checked here  the page is UI, this is the trust boundary.
  */
 export async function submitRegistration(
   _prev: SubmitState,
@@ -138,7 +138,7 @@ export async function submitRegistration(
   });
 
   // A signed-in member filling an event's form is registering for that event,
-  // so record it too — that is what the seat counter and the "Registration"
+  // so record it too  that is what the seat counter and the "Registration"
   // tab on /account/events read.
   if (session) {
     const events = await prisma.event.findMany({
@@ -149,7 +149,7 @@ export async function submitRegistration(
       await prisma.eventRegistration
         .create({ data: { eventId: event.id, userId: session.userId } })
         .catch(() => {
-          // Unique constraint — already registered, nothing to do.
+          // Unique constraint  already registered, nothing to do.
         });
     }
     if (events.length) revalidatePath("/account/events");

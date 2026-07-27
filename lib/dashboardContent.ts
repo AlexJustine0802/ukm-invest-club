@@ -8,7 +8,7 @@ import type { DashboardItem } from "@prisma/client";
  * The layout and the page both want dashboard content, and keying the cache on
  * the section list would miss (they ask for different sections). Fetching the
  * whole active set instead means one query per request however many callers
- * there are — which matters because the connection pool is small.
+ * there are  which matters because the connection pool is small.
  */
 const getActiveItems = cache(
   async (): Promise<DashboardItem[]> =>

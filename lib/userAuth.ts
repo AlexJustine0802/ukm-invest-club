@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
 
-// Public visitor auth — separate from the admin session in lib/auth.ts.
+// Public visitor auth  separate from the admin session in lib/auth.ts.
 const COOKIE_NAME = "icunpar_user_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
 

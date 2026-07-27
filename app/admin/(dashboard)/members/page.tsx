@@ -19,7 +19,7 @@ export default async function AdminMembersPage({
       ? divisionParam
       : "all";
 
-  // Explicit select — never pull passwordHash into a page.
+  // Explicit select  never pull passwordHash into a page.
   const members = await prisma.user.findMany({
     select: {
       id: true,
@@ -64,7 +64,7 @@ export default async function AdminMembersPage({
       <div>
         <h1 className="text-2xl font-bold text-navy">Members &amp; roles</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Every registered account. Set a division and a role — the role list
+          Every registered account. Set a division and a role  the role list
           follows the division, and each division except PVPC has a Head.
           Members see this on <code>/account/members</code>.
         </p>
