@@ -36,6 +36,17 @@ export function dueLabel(due: Date, now: Date = new Date()): string {
 export type MemberState = "UPCOMING" | "ACTIVE" | "COMPLETED";
 
 /**
+ * NotificationRead key for an assignment.
+ *
+ * The bell row and the tab badge share it on purpose: reading the notification
+ * and opening the tab are both "I have seen this assignment", so either one
+ * clears both counts.
+ */
+export function assignmentKey(id: string): string {
+  return `assignment-${id}`;
+}
+
+/**
  * The state to show one member.
  *
  * Handing work in completes it — marking is feedback that arrives afterwards

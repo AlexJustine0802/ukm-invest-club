@@ -12,6 +12,8 @@ import Reveal from "@/components/Reveal";
 import { getSections } from "@/lib/dashboardContent";
 import { getUiIcon } from "@/lib/uiIcons";
 import { getMetricValues, resolveMetric } from "@/lib/metrics";
+import { greetingFor } from "@/lib/greeting";
+import Greeting from "@/components/account/Greeting";
 import { eventPalette } from "@/lib/eventStyles";
 import { dueLabel, isDueSoon } from "@/lib/assignments";
 import { isNewAlert } from "@/lib/career";
@@ -117,8 +119,9 @@ export default async function AccountPage() {
         location: true,
       },
     }),
-    // Live counts for any Overview card wired to a metric.
-    getMetricValues(now),
+    // Live counts for any Overview card wired to a metric. "Pending
+    // assignments" is this member's own outstanding work.
+    getMetricValues(now, user.id),
     // The dashboard rails below read the real tables, not a second hand-typed
     // copy in Dashboard Content.
     prisma.careerAlert.findMany({
@@ -161,9 +164,8 @@ export default async function AccountPage() {
   const firstName = displayName.split(" ")[0];
   const initial = displayName.charAt(0).toUpperCase();
 
-  const hour = now.getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  // Starting value only; Greeting switches to the reader's own clock.
+  const greeting = greetingFor(now);
 
   const week = weekOf(now);
   const weekDays = new Set(week.map((w) => w.iso));
@@ -230,7 +232,7 @@ export default async function AccountPage() {
       <LatestUpdates items={latestUpdates} />
 
       <AccountTopBar
-        title={`${greeting}, ${firstName}! 👋`}
+        title={<Greeting name={firstName} initial={greeting} />}
         subtitle={
           <span className="italic">
             &ldquo;The best investment you can make is in yourself.&rdquo; –

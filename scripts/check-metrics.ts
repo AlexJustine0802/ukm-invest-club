@@ -20,7 +20,12 @@ async function main() {
   // the two reads would look like a mismatch.
   const now = new Date();
 
-  const fromSql = await getMetricValues(now);
+  // Checked against a real member: "pending" is per person, so comparing the
+  // signed-out fallback would not exercise the NOT EXISTS join at all.
+  const someone = await prisma.user.findFirst({ select: { id: true } });
+  const userId = someone?.id ?? null;
+
+  const fromSql = await getMetricValues(now, userId);
 
   const [
     upcomingEvents,
@@ -32,7 +37,13 @@ async function main() {
     members,
   ] = await Promise.all([
     prisma.event.count({ where: { published: true, eventDate: { gte: now } } }),
-    prisma.assignment.count({ where: { published: true, status: "ACTIVE" } }),
+    prisma.assignment.count({
+      where: {
+        published: true,
+        OR: [{ opensAt: null }, { opensAt: { lte: now } }],
+        submissions: userId ? { none: { userId } } : undefined,
+      },
+    }),
     prisma.careerAlert.count({
       where: {
         published: true,

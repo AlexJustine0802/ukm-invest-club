@@ -496,7 +496,18 @@ model SiteSettings {
   id             Int      @id @default(1) // singleton row
   homeAboutImage String? // home "About Us" strip picture
   aboutHeroImage String? // about page hero image
-  updatedAt      DateTime @updatedAt
+
+  // Which automatic bell notifications members receive. Announcements are not
+  // listed: those are written by hand and are the whole point of the bell.
+  // Default on, so turning the feature off is a deliberate act.
+  notifyAssignments  Boolean @default(true)
+  notifyMaterials    Boolean @default(true)
+  notifyEvents       Boolean @default(true)
+  notifyDiscussions  Boolean @default(true)
+  notifyRecruitment  Boolean @default(true)
+  notifyCareer       Boolean @default(true)
+
+  updatedAt DateTime @updatedAt
 }
 
 model HeroSlide {

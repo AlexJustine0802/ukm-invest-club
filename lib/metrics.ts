@@ -67,13 +67,25 @@ export function resolveMetric(
  */
 export async function getMetricValues(
   now: Date = new Date(),
+  /**
+   * Whose dashboard this is. "Pending" is personal: it counts what this member
+   * still owes, so handing work in takes the card down by one. Without a user
+   * (or for a signed-out render) it falls back to every open assignment.
+   */
+  userId?: string | null,
 ): Promise<Record<MetricId, number>> {
   const [row] = await prisma.$queryRaw<Record<MetricId, bigint>[]>`
     SELECT
       (SELECT count(*) FROM "Event"
         WHERE published = true AND "eventDate" >= ${now})           AS "upcoming-events",
-      (SELECT count(*) FROM "Assignment"
-        WHERE published = true AND status = 'ACTIVE')               AS "pending-assignments",
+      (SELECT count(*) FROM "Assignment" a
+        WHERE a.published = true
+          AND (a."opensAt" IS NULL OR a."opensAt" <= ${now})
+          AND NOT EXISTS (
+            SELECT 1 FROM "AssignmentSubmission" s
+            WHERE s."assignmentId" = a.id
+              AND s."userId" = ${userId ?? null}
+          ))                                                        AS "pending-assignments",
       (SELECT count(*) FROM "CareerAlert"
         WHERE published = true
           AND (deadline IS NULL OR deadline >= ${now}))             AS "career-alerts",

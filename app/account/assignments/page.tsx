@@ -16,9 +16,11 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import TabBar from "@/components/account/TabBar";
+import MarkSeen from "@/components/account/MarkSeen";
 import { getUiIcon } from "@/lib/uiIcons";
 import {
   ASSIGNMENT_TABS,
+  assignmentKey,
   dueLabel,
   isDueSoon,
   isOpen,
@@ -45,7 +47,7 @@ export default async function AssignmentsPage({
   const tab: AssignmentTab = isValidTab(tabParam) ? tabParam : "all";
   const query = q.trim().toLowerCase();
 
-  const [all, submissions] = await Promise.all([
+  const [all, submissions, seenRows] = await Promise.all([
     prisma.assignment.findMany({
       where: { published: true },
       orderBy: [{ order: "asc" }, { dueDate: "asc" }],
@@ -54,7 +56,15 @@ export default async function AssignmentsPage({
       where: { userId: user.id },
       select: { assignmentId: true, gradedAt: true, score: true },
     }),
+    // Shared with the bell: the same key marks a notification read and an
+    // assignment seen, so clearing one clears the other.
+    prisma.notificationRead.findMany({
+      where: { userId: user.id },
+      select: { key: true },
+    }),
   ]);
+
+  const seen = new Set(seenRows.map((r) => r.key));
 
   const mySubmissions = new Map(submissions.map((s) => [s.assignmentId, s]));
 
@@ -71,8 +81,9 @@ export default async function AssignmentsPage({
     completed: all.filter((a) => stateOf(a) === "COMPLETED").length,
   };
 
-  const byTab = (a: (typeof all)[number]) => {
-    switch (tab) {
+  /** Which bucket an assignment belongs to, for both filtering and counting. */
+  const inBucket = (a: (typeof all)[number], id: AssignmentTab) => {
+    switch (id) {
       case "active":
         return stateOf(a) === "ACTIVE";
       case "due-soon":
@@ -86,6 +97,16 @@ export default async function AssignmentsPage({
     }
   };
 
+  const byTab = (a: (typeof all)[number]) => inBucket(a, tab);
+
+  /**
+   * Tab pills count what the member has not looked at yet, not the bucket size
+   * — so a number appearing means "something new in here", and it clears once
+   * they open that tab. The stat cards above still show the totals.
+   */
+  const unseenIn = (id: AssignmentTab) =>
+    all.filter((a) => inBucket(a, id) && !seen.has(assignmentKey(a.id))).length;
+
   const visible = all.filter(
     (a) =>
       byTab(a) &&
@@ -96,11 +117,22 @@ export default async function AssignmentsPage({
 
   const tabCount: Record<AssignmentTab, number | null> = {
     all: null,
-    active: counts.active,
-    "due-soon": counts.dueSoon,
-    "coming-soon": counts.comingSoon,
-    completed: counts.completed,
+    active: unseenIn("active"),
+    "due-soon": unseenIn("due-soon"),
+    "coming-soon": unseenIn("coming-soon"),
+    completed: unseenIn("completed"),
   };
+
+  /**
+   * Only a specific tab clears its own badge. Landing on "All Assignments"
+   * would otherwise wipe every count before the member had looked at anything.
+   */
+  const seenNow =
+    tab === "all"
+      ? []
+      : visible
+          .filter((a) => !seen.has(assignmentKey(a.id)))
+          .map((a) => assignmentKey(a.id));
 
   const tabHref = (id: AssignmentTab) => {
     const params = new URLSearchParams();
@@ -130,6 +162,9 @@ export default async function AssignmentsPage({
         initial={user.name.charAt(0).toUpperCase()}
         role={user.role}
       />
+
+      {/* Opening a tab counts as reading what is in it. */}
+      <MarkSeen keys={seenNow} />
 
       {/* Tabs  the underline slides between them, see TabBar. */}
       <div className="mt-8">

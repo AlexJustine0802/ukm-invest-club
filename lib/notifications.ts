@@ -3,6 +3,13 @@ import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/dashboardContent";
 import { NEW_ALERT_DAYS, postedLabel } from "@/lib/career";
 import { getUserSession } from "@/lib/userAuth";
+import {
+  assignmentKey,
+  dueLabel,
+  isDueSoon,
+  memberState,
+} from "@/lib/assignments";
+import { formatDateTime } from "@/lib/utils";
 import type { TopBarNotification } from "@/components/account/TopBarMenus";
 
 /**
@@ -18,22 +25,42 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
   const now = new Date();
   const session = await getUserSession();
 
-  const [announcements, careerAlerts, marked] = await Promise.all([
+  // Each source can be switched off in /admin/notifications. Missing row = all
+  // on, which is what a site that has never opened that page expects.
+  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const on = (key: keyof NonNullable<typeof settings>) =>
+    settings ? Boolean(settings[key]) : true;
+
+  const [
+    announcements,
+    careerAlerts,
+    marked,
+    assignments,
+    mySubmissions,
+    events,
+    materials,
+    posts,
+    recruitment,
+  ] = await Promise.all([
     getSection("announcement"),
-    prisma.careerAlert.findMany({
-      where: {
-        published: true,
-        createdAt: {
-          gte: new Date(now.getTime() - NEW_ALERT_DAYS * 24 * 60 * 60 * 1000),
-        },
-      },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-    }),
+    on("notifyCareer")
+      ? prisma.careerAlert.findMany({
+          where: {
+            published: true,
+            createdAt: {
+              gte: new Date(
+                now.getTime() - NEW_ALERT_DAYS * 24 * 60 * 60 * 1000,
+              ),
+            },
+          },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        })
+      : [],
     // Marking does not move an assignment out of Completed  the score arrives
     // here instead, so the member hears about it without the list changing
     // underneath them.
-    session
+    session && on("notifyAssignments")
       ? prisma.assignmentSubmission.findMany({
           where: { userId: session.userId, gradedAt: { not: null } },
           orderBy: { gradedAt: "desc" },
@@ -46,7 +73,75 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
           },
         })
       : [],
+    // Every published assignment, so one that has just opened or fallen due
+    // announces itself. Unread state is what keeps the list short, not a date
+    // window  a member who never looked still sees it waiting.
+    on("notifyAssignments")
+      ? prisma.assignment.findMany({
+          where: { published: true },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+          select: { id: true, title: true, opensAt: true, dueDate: true },
+        })
+      : [],
+    session
+      ? prisma.assignmentSubmission.findMany({
+          where: { userId: session.userId },
+          select: { assignmentId: true, gradedAt: true },
+        })
+      : [],
+    on("notifyEvents")
+      ? prisma.event.findMany({
+          where: { published: true, eventDate: { gte: now } },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: { id: true, slug: true, title: true, eventDate: true },
+        })
+      : [],
+    on("notifyMaterials")
+      ? prisma.resourceMaterial.findMany({
+          where: { active: true, folder: { active: true } },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: {
+            id: true,
+            title: true,
+            createdAt: true,
+            folder: { select: { id: true, title: true } },
+          },
+        })
+      : [],
+    on("notifyDiscussions")
+      ? prisma.discussionPost.findMany({
+          where: { channel: { published: true } },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: {
+            id: true,
+            createdAt: true,
+            user: { select: { name: true } },
+            channel: { select: { slug: true, name: true } },
+          },
+        })
+      : [],
+    // The open recruitment, if the window is running.
+    on("notifyRecruitment")
+      ? prisma.registrationForm.findFirst({
+          where: {
+            isRecruitment: true,
+            published: true,
+            OR: [{ opensAt: null }, { opensAt: { lte: now } }],
+            AND: [{ OR: [{ closesAt: null }, { closesAt: { gte: now } }] }],
+          },
+          orderBy: { createdAt: "desc" },
+          select: { id: true, title: true, closesAt: true },
+        })
+      : null,
   ]);
+
+  const submissionFor = new Map(
+    mySubmissions.map((s) => [s.assignmentId, s]),
+  );
 
   // No row = unread, so a new notification needs nothing written to appear.
   const readKeys = new Set(
@@ -61,6 +156,29 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
   );
 
   const list: Omit<TopBarNotification, "read">[] = [
+    ...assignments.map((a) => {
+      const state = memberState(a.opensAt, submissionFor.get(a.id), now);
+      return {
+        id: assignmentKey(a.id),
+        title:
+          state === "COMPLETED"
+            ? `Handed in: ${a.title}`
+            : `New assignment: ${a.title}`,
+        body:
+          state === "UPCOMING"
+            ? `Opens ${formatDateTime(a.opensAt!)}`
+            : state === "COMPLETED"
+              ? "Waiting to be marked"
+              : dueLabel(a.dueDate, now),
+        ago: isDueSoon(a.dueDate, state, now) ? "Due soon" : "",
+        icon: "ClipboardList",
+        color:
+          state === "UPCOMING"
+            ? "bg-violet-50 text-violet-600"
+            : "bg-blue-50 text-primary",
+        href: `/account/assignments/${a.id}`,
+      };
+    }),
     ...marked.map((m) => ({
       id: `graded-${m.id}`,
       title: `Marked: ${m.assignment.title}`,
@@ -69,6 +187,48 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: "GraduationCap",
       color: "bg-blue-50 text-primary",
       href: `/account/assignments/${m.assignment.id}`,
+    })),
+    ...(recruitment
+      ? [
+          {
+            id: `recruitment-${recruitment.id}`,
+            title: `Recruitment open: ${recruitment.title}`,
+            body: recruitment.closesAt
+              ? `Closes ${formatDateTime(recruitment.closesAt)}`
+              : "Applications are open",
+            ago: "",
+            icon: "ClipboardList",
+            color: "bg-amber-50 text-amber-600",
+            href: "/account/recruitment",
+          },
+        ]
+      : []),
+    ...events.map((e) => ({
+      id: `event-${e.id}`,
+      title: `New event: ${e.title}`,
+      body: formatDateTime(e.eventDate),
+      ago: postedLabel(e.eventDate, now).replace("Posted", "Happens"),
+      icon: "CalendarDays",
+      color: "bg-sky-50 text-sky-700",
+      href: `/account/events`,
+    })),
+    ...materials.map((m) => ({
+      id: `material-${m.id}`,
+      title: `New material: ${m.title}`,
+      body: `In ${m.folder.title}`,
+      ago: postedLabel(m.createdAt, now),
+      icon: "FolderClosed",
+      color: "bg-violet-50 text-violet-600",
+      href: `/account/resources/${m.folder.id}`,
+    })),
+    ...posts.map((p) => ({
+      id: `post-${p.id}`,
+      title: `New in ${p.channel.name}`,
+      body: `${p.user.name} posted`,
+      ago: postedLabel(p.createdAt, now),
+      icon: "MessageSquare",
+      color: "bg-emerald-50 text-emerald-700",
+      href: `/account/discussions/${p.channel.slug}`,
     })),
     ...careerAlerts.map((c) => ({
       id: c.id,

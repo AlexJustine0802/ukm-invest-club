@@ -31,9 +31,23 @@ async function markRead(keys: string[]) {
   revalidatePath("/account", "layout");
 }
 
+/**
+ * Mark specific notifications read — one clicked row, or everything a tab just
+ * showed the member.
+ *
+ * The keys are intersected with the member's own current notifications: a
+ * server action is a public endpoint, so what arrives from the client decides
+ * *which* of their notifications to mark, never what a notification is.
+ */
+export async function markNotificationsRead(keys: string[]) {
+  if (keys.length === 0) return;
+  const mine = new Set((await getTopBarNotifications()).map((n) => n.id));
+  await markRead(keys.filter((k) => mine.has(k)));
+}
+
 /** One row clicked. */
 export async function markNotificationRead(key: string) {
-  await markRead([key]);
+  await markNotificationsRead([key]);
 }
 
 /**

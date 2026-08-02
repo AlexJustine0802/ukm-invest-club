@@ -60,6 +60,20 @@ export default async function MemberDashboardHomePage() {
         </div>
       </div>
 
+      <h2 className="mt-10 text-lg font-bold text-navy">Notifications</h2>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Link
+          href="/admin/notifications"
+          className="card p-5 transition hover:shadow-md"
+        >
+          <p className="font-bold text-navy">Member notifications</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Switch the automatic bell alerts on or off — assignments,
+            materials, events, discussions, recruitment, career alerts.
+          </p>
+        </Link>
+      </div>
+
       {/* Section shortcuts */}
       <h2 className="mt-10 text-lg font-bold text-navy">Dashboard content</h2>
       <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
