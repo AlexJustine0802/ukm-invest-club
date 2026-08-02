@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import {
@@ -47,6 +48,21 @@ export default function SubmitAssignmentForm({
     submitAssignment,
     {},
   );
+  const router = useRouter();
+
+  /**
+   * Pull the page's server components again after a successful hand-in, so the
+   * "Your submission" panel, the file name and the Withdraw link appear without
+   * the member reloading by hand. `revalidatePath` in the action clears the
+   * cache but does not re-render a page whose action came from here.
+   *
+   * Keyed on `state` rather than `state.ok`: every successful submit returns a
+   * fresh object, so a second hand-in refreshes again  where `state.ok` would
+   * stay true and never fire.
+   */
+  useEffect(() => {
+    if (state.ok) router.refresh();
+  }, [state, router]);
 
   return (
     <form action={action} className="space-y-4">
