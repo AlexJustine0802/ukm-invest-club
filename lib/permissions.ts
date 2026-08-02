@@ -233,6 +233,19 @@ export const ADMIN_MODULES: AdminModule[] = [
     description: "Announcements, resources and dashboard stats.",
   },
   {
+    id: "resource-materials",
+    // Separate from dashboard-content on purpose: creating the folder is an
+    // editorial job, filling it with material is the day-to-day one, and a
+    // role can be trusted with the second without the first.
+    label: "Resource Materials",
+    href: "/admin/dashboard-content?section=folder",
+    icon: "FolderClosed",
+    workspace: "dashboard",
+    // No "edit": materials are added and removed, not rewritten in place.
+    actions: ["view", "create", "delete"],
+    description: "The files and links inside each resource folder.",
+  },
+  {
     id: "members",
     label: "Members",
     href: "/admin/members",

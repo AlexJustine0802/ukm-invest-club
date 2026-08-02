@@ -6,7 +6,11 @@
  */
 import assert from "node:assert/strict";
 import { PrismaClient } from "@prisma/client";
-import { syncEventForForm, type EventDetails } from "../lib/eventSync";
+import {
+  readEventDetails,
+  syncEventForForm,
+  type EventDetails,
+} from "../lib/eventSync";
 
 const prisma = new PrismaClient();
 const SLUG = `zz-sync-check-${Date.now()}`;
@@ -19,7 +23,26 @@ const details: EventDetails = {
   seatUnit: "seats",
 };
 
+/** The "show on the public Events page" tickbox is what creates an event. */
+function checkEventDetailsGate() {
+  const fd = (entries: Record<string, string>) => {
+    const f = new FormData();
+    for (const [k, v] of Object.entries(entries)) f.append(k, v);
+    return f;
+  };
+  const date = "2027-03-01T09:00";
+
+  assert.equal(readEventDetails(fd({ eventDate: date })), null, "date alone");
+  assert.equal(readEventDetails(fd({ showOnEvents: "on" })), null, "no date");
+  assert.ok(
+    readEventDetails(fd({ showOnEvents: "on", eventDate: date })),
+    "ticked with a date makes an event",
+  );
+}
+
 async function main() {
+  checkEventDetailsGate();
+
   // --- Create: a form with a start date also creates its event ---
   const form = await prisma.$transaction(async (tx) => {
     const created = await tx.registrationForm.create({

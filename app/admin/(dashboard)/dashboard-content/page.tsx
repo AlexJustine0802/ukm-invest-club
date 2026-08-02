@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
-import { DASHBOARD_SECTIONS, sectionConfig } from "@/lib/dashboardSections";
+import { sectionConfig } from "@/lib/dashboardSections";
 import { deleteDashboardItem } from "./actions";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
@@ -22,13 +22,23 @@ export default async function AdminDashboardContentPage({
   const items = await prisma.dashboardItem.findMany({
     where: { section },
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    include: { _count: { select: { materials: true } } },
   });
 
   const newHref = `/admin/dashboard-content/new?section=${section}`;
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      {/* The section tabs used to live here; the shortcut cards on the member
+          dashboard admin page are the way in, so this is the way back. */}
+      <Link
+        href="/admin/member-dashboard"
+        className="text-sm text-accent-dark hover:text-accent"
+      >
+        ← Back to admin menu
+      </Link>
+
+      <div className="mt-2 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy">{config.label}</h1>
           <p className="mt-1 text-sm text-slate-500">{config.description}</p>
@@ -38,23 +48,6 @@ export default async function AdminDashboardContentPage({
             + Add item
           </Link>
         </Can>
-      </div>
-
-      {/* Section tabs */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {DASHBOARD_SECTIONS.map((s) => (
-          <Link
-            key={s.id}
-            href={`/admin/dashboard-content?section=${s.id}`}
-            className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-              s.id === section
-                ? "bg-navy text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-            }`}
-          >
-            {s.label}
-          </Link>
-        ))}
       </div>
 
       {items.length === 0 ? (
@@ -88,8 +81,15 @@ export default async function AdminDashboardContentPage({
                 {item.subtitle && (
                   <p className="mt-0.5 text-sm text-slate-600">{item.subtitle}</p>
                 )}
-                {item.meta && (
-                  <p className="text-xs text-slate-400">{item.meta}</p>
+                {section === "folder" ? (
+                  <p className="text-xs text-slate-400">
+                    {item._count.materials} material
+                    {item._count.materials === 1 ? "" : "s"}
+                  </p>
+                ) : (
+                  item.meta && (
+                    <p className="text-xs text-slate-400">{item.meta}</p>
+                  )
                 )}
                 <p className="mt-1 text-xs text-slate-400">
                   Order: {item.order}
@@ -97,6 +97,16 @@ export default async function AdminDashboardContentPage({
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                {section === "folder" && (
+                  <Can module="resource-materials" action="view">
+                    <Link
+                      href={`/admin/dashboard-content/${item.id}/materials`}
+                      className="btn-secondary px-3 py-1.5 text-xs"
+                    >
+                      Materials
+                    </Link>
+                  </Can>
+                )}
                 <Can module="dashboard-content" action="edit">
                   <Link
                     href={`/admin/dashboard-content/${item.id}/edit`}

@@ -347,10 +347,35 @@ model DashboardItem {
   // counted live instead of being typed in by hand.
   metric String?
 
+  // "folder" section only: what members see after opening the folder.
+  materials ResourceMaterial[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([section, active, order])
+}
+
+// One entry inside a resource folder  a link or a file members can open.
+// Folders themselves are DashboardItem rows in the "folder" section; deleting
+// one takes its materials with it.
+model ResourceMaterial {
+  id          String  @id @default(cuid())
+  folderId    String
+  title       String
+  description String?
+  url         String
+  // Free text under the title, e.g. "PDF · 12 pages".
+  meta   String?
+  order  Int     @default(0)
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  folder DashboardItem @relation(fields: [folderId], references: [id], onDelete: Cascade)
+
+  @@index([folderId, active, order])
 }
 
 // "Our Divisions" on the About page: the division's own description and icon.
@@ -377,14 +402,23 @@ model Division {
 // "Due Soon" bucket stay correct without anyone re-typing them.
 model Assignment {
   id          String   @id @default(cuid())
-  title       String
-  category    String // e.g. "Financial Analysis"
-  workType    String   @default("Individual") // e.g. "Group (3–4 members)"
-  description String?  @db.Text
-  dueDate     DateTime
-  status      String   @default("ACTIVE") // ACTIVE | SUBMITTED | COMPLETED
-  icon        String?
-  color       String?
+  title String
+  // Nullable since the admin form stopped asking for these; existing rows keep
+  // whatever was typed in before.
+  category    String?
+  workType    String?
+  description String?   @db.Text
+  // Null means open from the moment it is published. Set, and members can see
+  // it but cannot submit until this passes  the nullable column is the
+  // "needs an open date" switch, there is no second flag to keep in step.
+  opensAt DateTime?
+  dueDate DateTime
+  // Not editable any more  a member's own submission decides what they see,
+  // see memberStatus in lib/assignments. Kept as the fallback for anyone who
+  // has not submitted.
+  status String  @default("ACTIVE") // ACTIVE | SUBMITTED | COMPLETED
+  icon   String?
+  color  String?
   href        String?
   order       Int      @default(0)
   published   Boolean  @default(true)

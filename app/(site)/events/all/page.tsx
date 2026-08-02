@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import EmptyState from "@/components/EmptyState";
+import SearchBar from "@/components/SearchBar";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -18,11 +19,17 @@ const PAGE_SIZE = 9;
 export default async function AllEventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; category?: string; page?: string }>;
+  searchParams: Promise<{
+    tab?: string;
+    category?: string;
+    page?: string;
+    q?: string;
+  }>;
 }) {
-  const { tab: tabParam, category, page: pageParam } = await searchParams;
+  const { tab: tabParam, category, page: pageParam, q } = await searchParams;
   const tab = tabParam === "latest" ? "latest" : "upcoming";
   const page = Math.max(1, Number(pageParam) || 1);
+  const query = q?.trim() ?? "";
   const now = new Date();
 
   const categories = await prisma.eventCategory.findMany({
@@ -34,6 +41,15 @@ export default async function AllEventsPage({
     published: true,
     eventDate: tab === "upcoming" ? { gte: now } : { lt: now },
     ...(category ? { category: { slug: category } } : {}),
+    ...(query
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" as const } },
+            { description: { contains: query, mode: "insensitive" as const } },
+            { location: { contains: query, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
   };
 
   const [events, total] = await Promise.all([
@@ -57,6 +73,7 @@ export default async function AllEventsPage({
     const usp = new URLSearchParams();
     if (params.tab && params.tab !== "upcoming") usp.set("tab", params.tab);
     if (params.category) usp.set("category", params.category);
+    if (query) usp.set("q", query);
     if (params.page && params.page > 1) usp.set("page", String(params.page));
     const qs = usp.toString();
     return qs ? `/events/all?${qs}` : "/events/all";
@@ -91,8 +108,15 @@ export default async function AllEventsPage({
       </section>
 
       <section className="container-page py-10">
+        <SearchBar
+          action="/events/all"
+          placeholder="Search events..."
+          defaultValue={query}
+          hidden={{ category, tab: tab === "latest" ? "latest" : undefined }}
+        />
+
         {/* Upcoming / Latest tabs */}
-        <div className="mx-auto flex w-fit gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+        <div className="mx-auto mt-6 flex w-fit gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
           <Link
             href={buildHref({ tab: "upcoming", category })}
             className={`rounded-full px-5 py-2 text-sm font-semibold transition-colors ${
@@ -146,7 +170,11 @@ export default async function AllEventsPage({
         {events.length === 0 ? (
           <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
             <EmptyState
-              message={`No ${tab === "upcoming" ? "upcoming" : "past"} events in this category yet.`}
+              message={
+                query
+                  ? `No ${tab === "upcoming" ? "upcoming" : "past"} events match “${query}”.`
+                  : `No ${tab === "upcoming" ? "upcoming" : "past"} events in this category yet.`
+              }
             />
           </div>
         ) : (

@@ -49,7 +49,7 @@ export default async function SubmissionsPage({
 
       <h1 className="mt-2 text-2xl font-bold text-navy">{assignment.title}</h1>
       <p className="mt-1 text-sm text-slate-500">
-        {assignment.category} · {assignment.workType} · due{" "}
+        due{" "}
         {formatDateTime(assignment.dueDate)}
       </p>
 

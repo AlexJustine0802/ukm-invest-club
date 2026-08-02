@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
-import { uploadFile } from "@/lib/upload";
+import { isBlobConfigured, uploadFile } from "@/lib/upload";
+import { isOpen } from "@/lib/assignments";
+import { formatDateTime } from "@/lib/utils";
 import {
   MAX_SUBMISSION_MB,
   ALLOWED_SUBMISSION_EXTENSIONS,
@@ -26,10 +28,17 @@ export async function submitAssignment(
 
   const assignment = await prisma.assignment.findUnique({
     where: { id: assignmentId },
-    select: { id: true, published: true },
+    select: { id: true, published: true, opensAt: true },
   });
   if (!assignment || !assignment.published) {
     return { error: "This assignment is not available." };
+  }
+  // Checked here and not only in the page: hiding the upload box does not stop
+  // a form post arriving early.
+  if (!isOpen(assignment.opensAt)) {
+    return {
+      error: `This assignment opens on ${formatDateTime(assignment.opensAt!)}.`,
+    };
   }
 
   const existing = await prisma.assignmentSubmission.findUnique({
@@ -56,11 +65,22 @@ export async function submitAssignment(
         error: `That file type is not accepted. Allowed: ${ALLOWED_SUBMISSION_EXTENSIONS.join(", ")}.`,
       };
     }
+    // Two different problems used to share one message, which sent people
+    // chasing a config error when the upload had simply failed.
+    if (!isBlobConfigured()) {
+      return {
+        error:
+          "Error.",
+      };
+    }
     try {
       fileUrl = await uploadFile(file, "submissions");
       fileName = file.name;
-    } catch {
-      return { error: "Upload is not configured. Contact the admin." };
+    } catch (e) {
+      console.error("[submitAssignment] upload failed", e);
+      return {
+        error: "The upload did not go through. Check your connection and try again.",
+      };
     }
   }
 

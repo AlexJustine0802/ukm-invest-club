@@ -1,23 +1,13 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  ArrowRight,
-  BarChart3,
-  CalendarDays,
-  Clock,
-  FileText,
-  MapPin,
-} from "lucide-react";
+import { ArrowRight, BarChart3, CalendarDays, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { getResearchIcon } from "@/lib/researchIcons";
-import { getUiIcon } from "@/lib/uiIcons";
-import { withDefaultStats } from "@/lib/impactStats";
 import EmptyState from "@/components/EmptyState";
 import Reveal from "@/components/Reveal";
-import StaggerGrid from "@/components/StaggerGrid";
 
 export type PublicationSummary = {
   id: string;
@@ -40,28 +30,10 @@ export type ResearchCategoryWithPreview = {
   publications: PublicationSummary[];
 };
 
-export type UpcomingEventSummary = {
-  id: string;
-  slug: string;
-  title: string;
-  eventDate: Date;
-  location: string | null;
-  coverImage: string | null;
-};
-
-export type ResearchStatView = {
-  id: string;
-  label: string;
-  value: string;
-  icon: string;
-};
-
 interface ResearchPageContentProps {
   heroSlides: PublicationSummary[];
   categories: ResearchCategoryWithPreview[];
   latestPublications: PublicationSummary[];
-  upcomingEvents: UpcomingEventSummary[];
-  researchStats: ResearchStatView[];
 }
 
 const marketCards = [
@@ -207,17 +179,30 @@ function CategoryPanel({
             <Link
               key={pub.id}
               href={`/publications/${pub.slug}`}
-              className="rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-primary"
+              className="overflow-hidden rounded-lg border border-slate-200 bg-white transition-colors hover:border-primary"
             >
-              <span className="text-xs font-bold uppercase text-primary">
-                {formatDate(pub.publishedAt)}
-              </span>
-              <h4 className="mt-2 text-base font-bold text-navy">
-                {pub.title}
-              </h4>
-              <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
-                {pub.excerpt}
-              </p>
+              {/* Cover set per publication in the admin; falls back so cards
+                  in a row keep the same height. */}
+              <div className="relative aspect-[16/9] bg-primary-light">
+                <Image
+                  src={pub.coverImage || "/images/research-building.png"}
+                  alt={pub.title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 320px"
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <span className="text-xs font-bold uppercase text-primary">
+                  {formatDate(pub.publishedAt)}
+                </span>
+                <h4 className="mt-2 text-base font-bold text-navy">
+                  {pub.title}
+                </h4>
+                <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">
+                  {pub.excerpt}
+                </p>
+              </div>
             </Link>
           ))
         ) : (
@@ -234,8 +219,6 @@ export default function ResearchPageContent({
   heroSlides,
   categories,
   latestPublications,
-  upcomingEvents,
-  researchStats,
 }: ResearchPageContentProps) {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [activeSlide, setActiveSlide] = useState(0);
@@ -263,7 +246,6 @@ export default function ResearchPageContent({
   const slide = heroCards[activeSlide];
   const spotlight = latestPublications[0];
   const featuredList = latestPublications.slice(1, 4);
-  const publicationCards = latestPublications.slice(0, 3);
 
   return (
     <div className="bg-white text-navy">
@@ -426,7 +408,7 @@ export default function ResearchPageContent({
                   <div
                     className={`overflow-hidden transition-all duration-300 ease-in-out sm:hidden ${
                       active
-                        ? "mt-4 max-h-[640px] opacity-100"
+                        ? "mt-4 max-h-[1600px] opacity-100"
                         : "max-h-0 opacity-0"
                     }`}
                   >
@@ -555,155 +537,6 @@ export default function ResearchPageContent({
         <p className="mt-5 text-xs font-semibold text-slate-500">
           Source: IDX, Bank Indonesia, BPS
         </p>
-      </Reveal>
-
-      <Reveal
-        as="section"
-        className="container-page border-t border-slate-100 py-8"
-      >
-        <SectionHeader
-          title="Research Publications"
-          action="View All Publications"
-        />
-        {publicationCards.length > 0 ? (
-          <StaggerGrid className="grid gap-6 lg:grid-cols-3">
-            {publicationCards.map((publication) => (
-              <Link
-                key={publication.id}
-                href={`/publications/${publication.slug}`}
-                className="grid min-h-[170px] grid-cols-[100px_1fr] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md"
-              >
-                <div className="relative bg-primary-light">
-                  <Image
-                    src={
-                      publication.coverImage || "/images/research-modeling.png"
-                    }
-                    alt={publication.title}
-                    fill
-                    sizes="100px"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex min-w-0 flex-col p-5">
-                  {publication.category && (
-                    <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
-                      {publication.category.title}
-                    </span>
-                  )}
-                  <h3 className="mt-3 text-base font-bold text-navy">
-                    {publication.title}
-                  </h3>
-                  <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">
-                    {publication.excerpt}
-                  </p>
-                  <span className="mt-auto pt-4 text-xs font-semibold uppercase text-slate-500">
-                    {formatDate(publication.publishedAt)}
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </StaggerGrid>
-        ) : (
-          <p className="text-sm text-slate-500">
-            No publications yet  check back soon.
-          </p>
-        )}
-      </Reveal>
-
-      <Reveal
-        as="section"
-        className="container-page grid gap-8 py-8 lg:grid-cols-[1fr_0.95fr]"
-      >
-        <div className="relative overflow-hidden rounded-lg bg-blue-50 p-8">
-          <div className="absolute right-0 top-0 h-44 w-36 bg-[radial-gradient(circle_at_center,#93b4ff_1.5px,transparent_1.5px)] opacity-90 [background-size:18px_18px]" />
-          <SectionHeader title="Research By The Numbers" />
-          <div className="relative mt-14 grid grid-cols-2 gap-6 sm:grid-cols-5">
-            {withDefaultStats(researchStats, "research").map((stat) => {
-              const Icon = getUiIcon(stat.icon);
-              return (
-                <div key={stat.id} className="text-center">
-                  <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-primary shadow-sm">
-                    <Icon className="h-7 w-7" />
-                  </span>
-                  <p className="mt-4 text-2xl font-bold text-navy">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
-                    {stat.label}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div>
-          <SectionHeader
-            title="Upcoming Events"
-            action="View All Events"
-            href="/events"
-          />
-          {upcomingEvents.length > 0 ? (
-            <div className="space-y-5">
-              {upcomingEvents.map((event) => {
-                const day = event.eventDate.getDate();
-                const month = event.eventDate.toLocaleDateString("en-US", {
-                  month: "short",
-                });
-                const time = event.eventDate.toLocaleTimeString("en-US", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                });
-                return (
-                  <Link
-                    key={event.id}
-                    href={`/events/${event.slug}`}
-                    className="grid overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[1fr_170px]"
-                  >
-                    <div className="flex gap-5 p-5">
-                      <div className="flex h-20 w-16 shrink-0 flex-col items-center justify-center rounded-lg bg-primary text-white">
-                        <span className="text-3xl font-bold leading-none">
-                          {day}
-                        </span>
-                        <span className="mt-1 text-xs font-bold uppercase">
-                          {month}
-                        </span>
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-base font-bold leading-6 text-navy">
-                          {event.title}
-                        </h3>
-                        {event.location && (
-                          <p className="mt-3 flex items-center gap-2 text-xs font-semibold text-slate-500">
-                            <MapPin className="h-3.5 w-3.5" />
-                            {event.location}
-                          </p>
-                        )}
-                        <p className="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-500">
-                          <Clock className="h-3.5 w-3.5" />
-                          {time} WIB
-                        </p>
-                      </div>
-                    </div>
-                    <div className="relative min-h-[130px] bg-slate-100">
-                      <Image
-                        src={event.coverImage || "/images/research-seminar.png"}
-                        alt=""
-                        fill
-                        sizes="170px"
-                        className="object-cover"
-                      />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-sm text-slate-500">
-              No upcoming events scheduled right now.
-            </p>
-          )}
-        </div>
       </Reveal>
     </div>
   );

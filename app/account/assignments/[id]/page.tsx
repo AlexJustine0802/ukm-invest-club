@@ -5,20 +5,19 @@ import {
   ArrowLeft,
   CalendarClock,
   CheckCircle2,
+  ClipboardList,
   Clock,
   Download,
   ExternalLink,
   FileText,
   GraduationCap,
-  Users,
 } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import SubmitAssignmentForm from "@/components/account/SubmitAssignmentForm";
-import { getUiIcon } from "@/lib/uiIcons";
-import { dueLabel, isDueSoon } from "@/lib/assignments";
+import { dueLabel, isDueSoon, isOpen, memberStatus } from "@/lib/assignments";
 import { formatDateTime } from "@/lib/utils";
 import { withdrawSubmission } from "./actions";
 
@@ -44,10 +43,14 @@ export default async function AssignmentDetailPage({
     where: { assignmentId_userId: { assignmentId: id, userId: user.id } },
   });
 
-  const Icon = getUiIcon(assignment.icon);
   const now = new Date();
+  const open = isOpen(assignment.opensAt, now);
   const overdue = assignment.dueDate < now;
-  const soon = isDueSoon(assignment.dueDate, assignment.status, now);
+  const soon = isDueSoon(
+    assignment.dueDate,
+    memberStatus(assignment.status, submission),
+    now,
+  );
   const graded = Boolean(submission?.gradedAt);
 
   return (
@@ -62,7 +65,7 @@ export default async function AssignmentDetailPage({
 
       <AccountTopBar
         title={assignment.title}
-        subtitle={`${assignment.category} · ${assignment.workType}`}
+        subtitle={dueLabel(assignment.dueDate, now)}
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}
@@ -74,12 +77,9 @@ export default async function AssignmentDetailPage({
         <div className="space-y-6 lg:col-span-2">
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
             <div className="flex items-start gap-4">
-              <span
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
-                  assignment.color ?? "bg-blue-50 text-primary"
-                }`}
-              >
-                <Icon className="h-6 w-6" />
+              {/* One icon for every assignment  there is nothing to pick. */}
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-primary">
+                <ClipboardList className="h-6 w-6" />
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
@@ -96,14 +96,6 @@ export default async function AssignmentDetailPage({
                   )}
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-500">
-                  <span className="flex items-center gap-1.5">
-                    <FileText className="h-3.5 w-3.5 text-slate-400" />
-                    {assignment.category}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Users className="h-3.5 w-3.5 text-slate-400" />
-                    {assignment.workType}
-                  </span>
                   <span
                     className={`flex items-center gap-1.5 font-semibold ${
                       overdue ? "text-rose-600" : soon ? "text-amber-600" : "text-slate-500"
@@ -172,7 +164,13 @@ export default async function AssignmentDetailPage({
               </p>
             )}
 
-            {graded ? (
+            {!open ? (
+              <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                <Clock className="h-4 w-4 text-amber-600" />
+                Opens {formatDateTime(assignment.opensAt!)} — you can read the
+                brief now and submit once it opens.
+              </p>
+            ) : graded ? (
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 Marked  your submission is locked.

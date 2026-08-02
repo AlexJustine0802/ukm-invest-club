@@ -63,9 +63,10 @@ export const DASHBOARD_SECTIONS: SectionConfig[] = [
     id: "folder",
     label: "Resource Folders",
     description: "Folder cards on the member Resources page.",
+    // No `meta` here on purpose: the item count is counted from the materials
+    // actually in the folder, not typed in by hand.
     fields: {
       title: "Folder name",
-      meta: "Item count (e.g. 24 materials)",
       badge: "Category",
       icon: "Icon",
       color: "Header colour",

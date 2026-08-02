@@ -6,7 +6,7 @@ import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
-import { getSection } from "@/lib/dashboardContent";
+import { prisma } from "@/lib/prisma";
 import { getUiIcon } from "@/lib/uiIcons";
 
 export const metadata: Metadata = { title: "Resources" };
@@ -23,7 +23,13 @@ export default async function ResourcesPage({
   const user = await getCurrentMember();
   if (!user) redirect("/login");
 
-  const folders = await getSection("folder");
+  // Straight from Prisma rather than getSection: the card shows how many
+  // materials are really in each folder, so it needs the relation count.
+  const folders = await prisma.dashboardItem.findMany({
+    where: { section: "folder", active: true },
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    include: { _count: { select: { materials: true } } },
+  });
   const { q = "", category = "All" } = await searchParams;
   const query = q.trim().toLowerCase();
 
@@ -117,9 +123,11 @@ export default async function ResourcesPage({
           {visible.map((f) => {
             const Icon = getUiIcon(f.icon);
             return (
+              // A folder with a Link set still jumps straight there; the rest
+              // open their own page listing the materials inside.
               <Link
                 key={f.id}
-                href={f.href || "/publications"}
+                href={f.href || `/account/resources/${f.id}`}
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:shadow-md"
               >
                 <div
@@ -131,7 +139,11 @@ export default async function ResourcesPage({
                   </p>
                 </div>
                 <div className="flex items-center justify-between px-5 py-4">
-                  <p className="text-sm text-slate-500">{f.meta}</p>
+                  <p className="text-sm text-slate-500">
+                    {f.href
+                      ? "Opens an external link"
+                      : `${f._count.materials} material${f._count.materials === 1 ? "" : "s"}`}
+                  </p>
                   <FolderClosed className="h-5 w-5 text-slate-400" />
                 </div>
               </Link>

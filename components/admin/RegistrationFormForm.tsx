@@ -237,12 +237,33 @@ export default function RegistrationFormForm({
         <div>
           <p className="font-bold text-navy">Event details</p>
           <p className="mt-1 text-sm text-slate-500">
-            Fill in a start date and this form also becomes a public event 
-            listed on the website, in the member dashboard, and registering
-            through this form. Leave the start date blank for a plain sign-up
-            (recruitment, standalone) with no event.
+            A form can also appear as a public event  listed on the website
+            Events page, in the member dashboard, and registering through this
+            form.
           </p>
         </div>
+
+        {/* Gates the whole card: without this ticked the fields below are
+            ignored and no public event is created, so a recruitment can keep
+            its own open/close dates without going on the website. */}
+        <label className="flex items-start gap-3 rounded-lg border border-slate-200 p-4">
+          <input
+            type="checkbox"
+            name="showOnEvents"
+            defaultChecked={Boolean(event)}
+            className="mt-0.5 h-4 w-4"
+          />
+          <span>
+            <span className="font-semibold text-navy">
+              Show this on the public Events page
+            </span>
+            <span className="mt-0.5 block text-xs text-slate-500">
+              Needs a start date below. Leave unticked for a sign-up that is
+              shared by link only  a recruitment, for example. Unticking it
+              later removes the public event; the form and its responses stay.
+            </span>
+          </span>
+        </label>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>

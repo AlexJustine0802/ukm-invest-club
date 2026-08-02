@@ -31,11 +31,17 @@ export interface FormSource {
 type Db = Prisma.TransactionClient;
 
 /**
- * Pull the event fields off a submitted form. Returns null when the admin left
- * the start date blank  that form is a plain sign-up (recruitment, standalone)
- * and gets no public event.
+ * Pull the event fields off a submitted form. Returns null when the admin did
+ * not tick "show on the public Events page", or ticked it but left the start
+ * date blank  either way the form is a plain sign-up (recruitment,
+ * standalone) and gets no public event.
+ *
+ * The tickbox is what decides. A recruitment form can carry dates for its own
+ * open/close window without that putting it on the public site.
  */
 export function readEventDetails(formData: FormData): EventDetails | null {
+  if (!formData.get("showOnEvents")) return null;
+
   const start = (formData.get("eventDate") as string)?.trim();
   if (!start) return null;
 

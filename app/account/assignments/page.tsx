@@ -20,7 +20,9 @@ import {
   ASSIGNMENT_TABS,
   dueLabel,
   isDueSoon,
+  isOpen,
   isValidTab,
+  memberStatus,
   type AssignmentTab,
 } from "@/lib/assignments";
 
@@ -57,23 +59,27 @@ export default async function AssignmentsPage({
 
   const now = new Date();
 
+  // Per member, not the shared column  see memberStatus in lib/assignments.
+  const statusOf = (a: (typeof all)[number]) =>
+    memberStatus(a.status, mySubmissions.get(a.id));
+
   const counts = {
-    active: all.filter((a) => a.status === "ACTIVE").length,
-    dueSoon: all.filter((a) => isDueSoon(a.dueDate, a.status, now)).length,
-    submitted: all.filter((a) => a.status === "SUBMITTED").length,
-    completed: all.filter((a) => a.status === "COMPLETED").length,
+    active: all.filter((a) => statusOf(a) === "ACTIVE").length,
+    dueSoon: all.filter((a) => isDueSoon(a.dueDate, statusOf(a), now)).length,
+    submitted: all.filter((a) => statusOf(a) === "SUBMITTED").length,
+    completed: all.filter((a) => statusOf(a) === "COMPLETED").length,
   };
 
   const byTab = (a: (typeof all)[number]) => {
     switch (tab) {
       case "active":
-        return a.status === "ACTIVE";
+        return statusOf(a) === "ACTIVE";
       case "due-soon":
-        return isDueSoon(a.dueDate, a.status, now);
+        return isDueSoon(a.dueDate, statusOf(a), now);
       case "submitted":
-        return a.status === "SUBMITTED";
+        return statusOf(a) === "SUBMITTED";
       case "completed":
-        return a.status === "COMPLETED";
+        return statusOf(a) === "COMPLETED";
       default:
         return true;
     }
@@ -84,7 +90,6 @@ export default async function AssignmentsPage({
       byTab(a) &&
       (!query ||
         a.title.toLowerCase().includes(query) ||
-        a.category.toLowerCase().includes(query) ||
         (a.description ?? "").toLowerCase().includes(query)),
   );
 
@@ -92,8 +97,8 @@ export default async function AssignmentsPage({
     all: null,
     active: counts.active,
     "due-soon": counts.dueSoon,
-    submitted: null,
-    completed: null,
+    submitted: counts.submitted,
+    completed: counts.completed,
   };
 
   const tabHref = (id: AssignmentTab) => {
@@ -196,8 +201,7 @@ export default async function AssignmentsPage({
       ) : (
         <div className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {visible.map((a) => {
-            const Icon = getUiIcon(a.icon);
-            const soon = isDueSoon(a.dueDate, a.status, now);
+            const soon = isDueSoon(a.dueDate, statusOf(a), now);
             const mine = mySubmissions.get(a.id);
             // What this member did with it beats the assignment's own status.
             const badge = mine?.gradedAt
@@ -207,11 +211,13 @@ export default async function AssignmentsPage({
                 }
               : mine
                 ? { text: "Submitted", cls: "bg-violet-50 text-violet-600" }
-                : a.status === "COMPLETED"
-                  ? { text: "Completed", cls: "bg-emerald-50 text-emerald-600" }
-                  : soon
-                    ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
-                    : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
+                : !isOpen(a.opensAt, now)
+                  ? { text: "Not open yet", cls: "bg-slate-100 text-slate-500" }
+                  : a.status === "COMPLETED"
+                    ? { text: "Completed", cls: "bg-emerald-50 text-emerald-600" }
+                    : soon
+                      ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
+                      : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
 
             return (
               <Link
@@ -219,15 +225,13 @@ export default async function AssignmentsPage({
                 href={`/account/assignments/${a.id}`}
                 className="flex flex-col gap-4 p-5 hover:bg-slate-50 lg:flex-row lg:items-center"
               >
-                <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${a.color ?? "bg-blue-50 text-primary"}`}>
-                  <Icon className="h-6 w-6" />
+                {/* One icon for every assignment  there is nothing to pick. */}
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-primary">
+                  <ClipboardList className="h-6 w-6" />
                 </span>
 
                 <div className="min-w-0 flex-1">
                   <p className="font-bold text-navy">{a.title}</p>
-                  <p className="text-sm text-slate-500">
-                    {a.category} • {a.workType}
-                  </p>
                   {a.description && (
                     <p className="mt-1 text-sm text-slate-500">{a.description}</p>
                   )}

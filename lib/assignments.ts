@@ -32,6 +32,37 @@ export function dueLabel(due: Date, now: Date = new Date()): string {
   return `Due in ${days} days`;
 }
 
+/**
+ * The status to show one member.
+ *
+ * `Assignment.status` is a single column shared by everyone, so it stays
+ * "ACTIVE" after a member hands their work in. What the member actually did
+ * wins: their own submission decides, and the column is only the fallback for
+ * an assignment they have not touched. Everything the member sees  the stat
+ * cards, the tab counts, the badges, "due soon"  must go through here, or the
+ * numbers disagree with the list.
+ */
+export function memberStatus(
+  assignmentStatus: string,
+  submission?: { gradedAt: Date | null } | null,
+): AssignmentStatus {
+  if (submission?.gradedAt) return "COMPLETED";
+  if (submission) return "SUBMITTED";
+  return (ASSIGNMENT_STATUSES as readonly string[]).includes(assignmentStatus)
+    ? (assignmentStatus as AssignmentStatus)
+    : "ACTIVE";
+}
+
+/**
+ * Whether an assignment accepts work yet. `opensAt` null = open immediately.
+ *
+ * The single source of truth for the gate: the form hides the upload, the list
+ * badges it, and the submit action refuses  all three ask here.
+ */
+export function isOpen(opensAt: Date | null, now: Date = new Date()): boolean {
+  return !opensAt || opensAt <= now;
+}
+
 export function isDueSoon(
   due: Date,
   status: string,

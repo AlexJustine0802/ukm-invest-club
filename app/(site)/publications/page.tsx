@@ -23,51 +23,31 @@ const publicationSummarySelect = {
 } as const;
 
 export default async function PublicationsPage() {
-  const now = new Date();
-
-  const [featured, categories, latestPublications, upcomingEvents, researchStats] =
-    await Promise.all([
-      prisma.publication.findMany({
-        where: { published: true, featured: true },
-        orderBy: [{ featuredOrder: "asc" }, { publishedAt: "desc" }],
-        take: 6,
-        select: publicationSummarySelect,
-      }),
-      prisma.researchCategory.findMany({
-        orderBy: { order: "asc" },
-        include: {
-          publications: {
-            where: { published: true },
-            orderBy: { publishedAt: "desc" },
-            take: 3,
-            select: publicationSummarySelect,
-          },
+  const [featured, categories, latestPublications] = await Promise.all([
+    prisma.publication.findMany({
+      where: { published: true, featured: true },
+      orderBy: [{ featuredOrder: "asc" }, { publishedAt: "desc" }],
+      take: 6,
+      select: publicationSummarySelect,
+    }),
+    prisma.researchCategory.findMany({
+      orderBy: { order: "asc" },
+      include: {
+        publications: {
+          where: { published: true },
+          orderBy: { publishedAt: "desc" },
+          take: 3,
+          select: publicationSummarySelect,
         },
-      }),
-      prisma.publication.findMany({
-        where: { published: true },
-        orderBy: { publishedAt: "desc" },
-        take: 4,
-        select: publicationSummarySelect,
-      }),
-      prisma.event.findMany({
-        where: { published: true, eventDate: { gte: now } },
-        orderBy: { eventDate: "asc" },
-        take: 3,
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          eventDate: true,
-          location: true,
-          coverImage: true,
-        },
-      }),
-      prisma.impactStat.findMany({
-        where: { section: "research" },
-        orderBy: { order: "asc" },
-      }),
-    ]);
+      },
+    }),
+    prisma.publication.findMany({
+      where: { published: true },
+      orderBy: { publishedAt: "desc" },
+      take: 4,
+      select: publicationSummarySelect,
+    }),
+  ]);
 
   // Hero shows the ticked ("featured") publications; falls back to the latest.
   const heroSlides =
@@ -78,8 +58,6 @@ export default async function PublicationsPage() {
       heroSlides={heroSlides}
       categories={categories}
       latestPublications={latestPublications}
-      upcomingEvents={upcomingEvents}
-      researchStats={researchStats}
     />
   );
 }

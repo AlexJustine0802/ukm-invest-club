@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { site } from "@/lib/site";
 
@@ -27,12 +26,7 @@ export default function RootLayout({
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
         </noscript>
       </head>
-      <body className="antialiased">
-        {children}
-        {/* Page views and visitors. Injects nothing outside Vercel, so local
-            dev and any other host stay untouched. */}
-        <Analytics />
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

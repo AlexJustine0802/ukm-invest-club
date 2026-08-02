@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import EmptyState from "@/components/EmptyState";
+import SearchBar from "@/components/SearchBar";
 import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -18,10 +19,11 @@ const PAGE_SIZE = 9;
 export default async function AllPublicationsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; q?: string }>;
 }) {
-  const { category, page: pageParam } = await searchParams;
+  const { category, page: pageParam, q } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
+  const query = q?.trim() ?? "";
 
   const categories = await prisma.researchCategory.findMany({
     orderBy: { order: "asc" },
@@ -31,6 +33,14 @@ export default async function AllPublicationsPage({
   const where = {
     published: true,
     ...(category ? { category: { slug: category } } : {}),
+    ...(query
+      ? {
+          OR: [
+            { title: { contains: query, mode: "insensitive" as const } },
+            { excerpt: { contains: query, mode: "insensitive" as const } },
+          ],
+        }
+      : {}),
   };
 
   const [publications, total] = await Promise.all([
@@ -49,6 +59,7 @@ export default async function AllPublicationsPage({
   const buildHref = (params: { category?: string; page?: number }) => {
     const usp = new URLSearchParams();
     if (params.category) usp.set("category", params.category);
+    if (query) usp.set("q", query);
     if (params.page && params.page > 1) usp.set("page", String(params.page));
     const qs = usp.toString();
     return qs ? `/publications/all?${qs}` : "/publications/all";
@@ -84,9 +95,16 @@ export default async function AllPublicationsPage({
 
       {/* Filters */}
       <section className="container-page py-10">
-        <div className="flex flex-wrap items-center justify-center gap-2">
+        <SearchBar
+          action="/publications/all"
+          placeholder="Search publications..."
+          defaultValue={query}
+          hidden={{ category }}
+        />
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           <Link
-            href="/publications/all"
+            href={buildHref({})}
             className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
               !category
                 ? "bg-primary text-white"
@@ -113,7 +131,13 @@ export default async function AllPublicationsPage({
         {/* Grid */}
         {publications.length === 0 ? (
           <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-white">
-            <EmptyState message="No publications in this category yet." />
+            <EmptyState
+              message={
+                query
+                  ? `No publications match “${query}”.`
+                  : "No publications in this category yet."
+              }
+            />
           </div>
         ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

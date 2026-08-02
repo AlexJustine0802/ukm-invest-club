@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
-import { getUiIcon } from "@/lib/uiIcons";
-import { dueLabel, isDueSoon } from "@/lib/assignments";
+import { ClipboardList } from "lucide-react";
+import { dueLabel, isDueSoon, isOpen } from "@/lib/assignments";
+import { formatDateTime } from "@/lib/utils";
 import { deleteAssignment } from "./actions";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
@@ -34,22 +35,44 @@ export default async function AdminAssignmentsPage({
     : "all";
   const query = q.trim().toLowerCase();
 
-  const all = await prisma.assignment.findMany({
-    orderBy: [{ order: "asc" }, { dueDate: "asc" }],
-    include: { _count: { select: { submissions: true } } },
-  });
+  const [all, gradedGroups] = await Promise.all([
+    prisma.assignment.findMany({
+      orderBy: [{ order: "asc" }, { dueDate: "asc" }],
+      include: { _count: { select: { submissions: true } } },
+    }),
+    // Marked submissions per assignment: the tabs below need "how many are
+    // still waiting" as well as "how many came in".
+    prisma.assignmentSubmission.groupBy({
+      by: ["assignmentId"],
+      where: { gradedAt: { not: null } },
+      _count: { _all: true },
+    }),
+  ]);
   const now = new Date();
 
+  const gradedCount = new Map(
+    gradedGroups.map((g) => [g.assignmentId, g._count._all]),
+  );
+
+  /**
+   * Tabs read the submissions, not `Assignment.status`. That column is no
+   * longer editable  a member's own submission decides what they see  so
+   * keying the admin tabs off it would leave Submitted and Completed
+   * permanently empty.
+   */
   const matchesTab = (a: (typeof all)[number], id: TabId) => {
+    const total = a._count.submissions;
+    const graded = gradedCount.get(a.id) ?? 0;
+
     switch (id) {
       case "active":
-        return a.published && a.status === "ACTIVE";
+        return a.published && total === 0;
       case "due-soon":
-        return a.published && isDueSoon(a.dueDate, a.status, now);
+        return a.published && isDueSoon(a.dueDate, "ACTIVE", now);
       case "submitted":
-        return a.status === "SUBMITTED";
+        return total > graded; // something is waiting to be marked
       case "completed":
-        return a.status === "COMPLETED";
+        return total > 0 && graded === total;
       case "hidden":
         return !a.published;
       default:
@@ -60,8 +83,7 @@ export default async function AdminAssignmentsPage({
   const matchesQuery = (a: (typeof all)[number]) =>
     !query ||
     a.title.toLowerCase().includes(query) ||
-    a.category.toLowerCase().includes(query) ||
-    a.workType.toLowerCase().includes(query);
+    (a.description ?? "").toLowerCase().includes(query);
 
   const assignments = all.filter((a) => matchesTab(a, tab) && matchesQuery(a));
 
@@ -147,19 +169,24 @@ export default async function AdminAssignmentsPage({
       ) : (
         <div className="mt-6 space-y-3">
           {assignments.map((a) => {
-            const Icon = getUiIcon(a.icon);
             const soon = isDueSoon(a.dueDate, a.status, now);
             return (
               <div key={a.id} className="card flex flex-wrap items-start gap-4 p-4">
-                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${a.color ?? "bg-blue-50 text-primary"}`}>
-                  <Icon className="h-5 w-5" />
+                {/* One icon for every assignment  there is nothing to pick. */}
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-primary">
+                  <ClipboardList className="h-5 w-5" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-bold text-navy">{a.title}</p>
                     <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
-                      {a.status.charAt(0) + a.status.slice(1).toLowerCase()}
+                      {a._count.submissions} submitted
                     </span>
+                    {!isOpen(a.opensAt, now) && (
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
+                        Opens {formatDateTime(a.opensAt!)}
+                      </span>
+                    )}
                     {soon && (
                       <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-600">
                         Due soon
@@ -171,9 +198,6 @@ export default async function AdminAssignmentsPage({
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-500">
-                    {a.category} • {a.workType}
-                  </p>
                   <p className="mt-1 text-xs text-slate-400">
                     {dueLabel(a.dueDate, now)} ·{" "}
                     {a.dueDate.toLocaleString("en-GB", {
@@ -182,8 +206,7 @@ export default async function AdminAssignmentsPage({
                       year: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
-                    })}{" "}
-                    · Order: {a.order}
+                    })}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
