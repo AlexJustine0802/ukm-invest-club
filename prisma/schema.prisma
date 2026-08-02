@@ -155,6 +155,26 @@ model User {
   discussionPosts    DiscussionPost[]
   formResponses      FormResponse[]
   submissions        AssignmentSubmission[]
+  notificationReads  NotificationRead[]
+}
+
+// Bell notifications are derived from other tables (announcements, career
+// alerts, marked submissions) rather than stored, so "read" cannot live on the
+// notification itself. One row per member per notification key marks it read;
+// no row means unread, which is why nothing has to be written when a new
+// notification appears.
+model NotificationRead {
+  id     String   @id @default(cuid())
+  userId String
+  // The notification's own id, e.g. "graded-<submissionId>" or an announcement
+  // row id  whatever getTopBarNotifications used.
+  key    String
+  readAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([userId])
 }
 
 // A discussion channel members opt into. Only admins create channels; members

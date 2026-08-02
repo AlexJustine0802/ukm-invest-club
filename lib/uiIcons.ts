@@ -25,6 +25,7 @@ import {
   FileSpreadsheet,
   Wrench,
   Star,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -56,6 +57,8 @@ export const UI_ICONS: Record<string, LucideIcon> = {
   FileSpreadsheet,
   Wrench,
   Star,
+  // Used by the "marked" bell notification, and pickable like the rest.
+  GraduationCap,
 };
 
 export const UI_ICON_KEYS = Object.keys(UI_ICONS);

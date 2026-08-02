@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import {
   ClipboardList,
   Clock,
-  Send,
+  CalendarClock,
   CheckCircle2,
   CalendarDays,
   ChevronRight,
@@ -15,6 +15,7 @@ import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
+import TabBar from "@/components/account/TabBar";
 import { getUiIcon } from "@/lib/uiIcons";
 import {
   ASSIGNMENT_TABS,
@@ -22,7 +23,7 @@ import {
   isDueSoon,
   isOpen,
   isValidTab,
-  memberStatus,
+  memberState,
   type AssignmentTab,
 } from "@/lib/assignments";
 
@@ -59,27 +60,27 @@ export default async function AssignmentsPage({
 
   const now = new Date();
 
-  // Per member, not the shared column  see memberStatus in lib/assignments.
-  const statusOf = (a: (typeof all)[number]) =>
-    memberStatus(a.status, mySubmissions.get(a.id));
+  // Per member, not the shared column  see memberState in lib/assignments.
+  const stateOf = (a: (typeof all)[number]) =>
+    memberState(a.opensAt, mySubmissions.get(a.id), now);
 
   const counts = {
-    active: all.filter((a) => statusOf(a) === "ACTIVE").length,
-    dueSoon: all.filter((a) => isDueSoon(a.dueDate, statusOf(a), now)).length,
-    submitted: all.filter((a) => statusOf(a) === "SUBMITTED").length,
-    completed: all.filter((a) => statusOf(a) === "COMPLETED").length,
+    active: all.filter((a) => stateOf(a) === "ACTIVE").length,
+    dueSoon: all.filter((a) => isDueSoon(a.dueDate, stateOf(a), now)).length,
+    comingSoon: all.filter((a) => stateOf(a) === "UPCOMING").length,
+    completed: all.filter((a) => stateOf(a) === "COMPLETED").length,
   };
 
   const byTab = (a: (typeof all)[number]) => {
     switch (tab) {
       case "active":
-        return statusOf(a) === "ACTIVE";
+        return stateOf(a) === "ACTIVE";
       case "due-soon":
-        return isDueSoon(a.dueDate, statusOf(a), now);
-      case "submitted":
-        return statusOf(a) === "SUBMITTED";
+        return isDueSoon(a.dueDate, stateOf(a), now);
+      case "coming-soon":
+        return stateOf(a) === "UPCOMING";
       case "completed":
-        return statusOf(a) === "COMPLETED";
+        return stateOf(a) === "COMPLETED";
       default:
         return true;
     }
@@ -97,7 +98,7 @@ export default async function AssignmentsPage({
     all: null,
     active: counts.active,
     "due-soon": counts.dueSoon,
-    submitted: counts.submitted,
+    "coming-soon": counts.comingSoon,
     completed: counts.completed,
   };
 
@@ -112,7 +113,7 @@ export default async function AssignmentsPage({
   const stats = [
     { value: counts.active, label: "Active Assignments", note: "Currently ongoing", icon: ClipboardList, color: "bg-blue-50 text-primary" },
     { value: counts.dueSoon, label: "Due Soon", note: "Next 3 days", icon: Clock, color: "bg-amber-50 text-amber-600" },
-    { value: counts.submitted, label: "Submitted", note: "Awaiting review", icon: Send, color: "bg-violet-50 text-violet-600" },
+    { value: counts.comingSoon, label: "Coming Soon", note: "Not open yet", icon: CalendarClock, color: "bg-violet-50 text-violet-600" },
     { value: counts.completed, label: "Completed", note: "Great job!", icon: CheckCircle2, color: "bg-emerald-50 text-emerald-600" },
   ];
 
@@ -130,36 +131,19 @@ export default async function AssignmentsPage({
         role={user.role}
       />
 
-      {/* Tabs */}
-      <div className="mt-8 flex flex-wrap items-center gap-6 border-b border-slate-200">
-        {ASSIGNMENT_TABS.map((t) => {
-          const isActive = t.id === tab;
-          const count = tabCount[t.id];
-          return (
-            <Link
-              key={t.id}
-              href={tabHref(t.id)}
-              className={`-mb-px flex items-center gap-2 border-b-2 pb-3 text-sm font-semibold ${
-                isActive
-                  ? "border-primary text-primary"
-                  : "border-transparent text-slate-500 hover:text-navy"
-              }`}
-            >
-              {t.label}
-              {count !== null && count > 0 && (
-                <span
-                  className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[11px] font-bold ${
-                    t.id === "due-soon"
-                      ? "bg-amber-500 text-white"
-                      : "bg-primary text-white"
-                  }`}
-                >
-                  {count}
-                </span>
-              )}
-            </Link>
-          );
-        })}
+      {/* Tabs  the underline slides between them, see TabBar. */}
+      <div className="mt-8">
+        <TabBar
+          layoutId="assignment-tabs"
+          active={tab}
+          accent={["due-soon"]}
+          tabs={ASSIGNMENT_TABS.map((t) => ({
+            id: t.id,
+            label: t.label,
+            href: tabHref(t.id),
+            count: tabCount[t.id],
+          }))}
+        />
       </div>
 
       {/* Stat cards */}
@@ -201,23 +185,26 @@ export default async function AssignmentsPage({
       ) : (
         <div className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white">
           {visible.map((a) => {
-            const soon = isDueSoon(a.dueDate, statusOf(a), now);
+            const soon = isDueSoon(a.dueDate, stateOf(a), now);
             const mine = mySubmissions.get(a.id);
             // What this member did with it beats the assignment's own status.
+            // Marking is feedback on a completed assignment, not a state of its
+            // own  it only changes what the badge says.
             const badge = mine?.gradedAt
               ? {
-                  text: mine.score !== null ? `Marked · ${mine.score}` : "Marked",
+                  text:
+                    mine.score !== null
+                      ? `Completed · ${mine.score}`
+                      : "Completed · marked",
                   cls: "bg-blue-50 text-primary",
                 }
               : mine
-                ? { text: "Submitted", cls: "bg-violet-50 text-violet-600" }
+                ? { text: "Completed", cls: "bg-emerald-50 text-emerald-600" }
                 : !isOpen(a.opensAt, now)
-                  ? { text: "Not open yet", cls: "bg-slate-100 text-slate-500" }
-                  : a.status === "COMPLETED"
-                    ? { text: "Completed", cls: "bg-emerald-50 text-emerald-600" }
-                    : soon
-                      ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
-                      : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
+                  ? { text: "Coming soon", cls: "bg-violet-50 text-violet-600" }
+                  : soon
+                    ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
+                    : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
 
             return (
               <Link

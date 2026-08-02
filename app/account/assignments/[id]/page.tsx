@@ -17,7 +17,7 @@ import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import SubmitAssignmentForm from "@/components/account/SubmitAssignmentForm";
-import { dueLabel, isDueSoon, isOpen, memberStatus } from "@/lib/assignments";
+import { dueLabel, isDueSoon, isOpen, memberState } from "@/lib/assignments";
 import { formatDateTime } from "@/lib/utils";
 import { withdrawSubmission } from "./actions";
 
@@ -48,7 +48,7 @@ export default async function AssignmentDetailPage({
   const overdue = assignment.dueDate < now;
   const soon = isDueSoon(
     assignment.dueDate,
-    memberStatus(assignment.status, submission),
+    memberState(assignment.opensAt, submission, now),
     now,
   );
   const graded = Boolean(submission?.gradedAt);

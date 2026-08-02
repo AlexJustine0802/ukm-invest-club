@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useContext, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useContext, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   AnimatePresence,
   motion,
@@ -54,38 +54,19 @@ function FrozenRouter({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * `useSearchParams` makes a route client-rendered unless it sits under a
- * Suspense boundary, and this wraps statically built pages too. The fallback is
- * the children themselves, so those pages still ship their content in the HTML
- * and only lose the animation on first paint.
+ * Keyed on the pathname only, deliberately.
+ *
+ * Tabs and filters navigate to the same path with a different `?tab=`, and
+ * replaying the whole page fade there reads as a reload rather than a filter.
+ * They still update, because FrozenRouter above only freezes while exiting.
  */
 export default function PageTransition({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <Suspense fallback={<>{children}</>}>
-      <Transition>{children}</Transition>
-    </Suspense>
-  );
-}
-
-function Transition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const reduced = useReducedMotion();
-
-  /**
-   * The query string belongs in the key, not just the path.
-   *
-   * Tabs and filters navigate to the same pathname with a different `?tab=` or
-   * `?category=`. Keyed on pathname alone, AnimatePresence kept the same
-   * instance alive, so FrozenRouter below went on serving the router context it
-   * captured on first render  the URL changed and the content did not, until a
-   * hard reload remounted everything.
-   */
-  const key = `${pathname}?${searchParams}`;
 
   // Reduced motion collapses the timing instead of changing the tree, so the
   // page never remounts when the preference resolves after hydration.
@@ -99,7 +80,7 @@ function Transition({ children }: { children: React.ReactNode }) {
     // navigations still get the full enter and exit.
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
-        key={key}
+        key={pathname}
         data-page-transition
         // The outgoing page lifts slightly as it fades and the incoming one
         // rises into its place, so a navigation reads as one movement in a

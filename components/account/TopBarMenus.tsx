@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -12,7 +13,11 @@ import {
   LogOut,
   type LucideIcon,
 } from "lucide-react";
-import { logoutUser } from "@/app/account/actions";
+import {
+  logoutUser,
+  markAllNotificationsRead,
+  markNotificationRead,
+} from "@/app/account/actions";
 import { getUiIcon } from "@/lib/uiIcons";
 import { DUR, EASE } from "@/lib/motion";
 
@@ -25,6 +30,8 @@ export interface TopBarNotification {
   color: string;
   /** Where clicking the row goes. */
   href: string;
+  /** Read rows stay in the list but stop counting towards the bell. */
+  read: boolean;
 }
 
 const profileMenu: { label: string; icon: LucideIcon; href: string }[] = [
@@ -52,6 +59,29 @@ export default function TopBarMenus({
   const [open, setOpen] = useState<OpenMenu>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const router = useRouter();
+
+  /**
+   * Read state is optimistic: the badge drops the moment a row is clicked, so
+   * the count is right while the navigation and the server write are still in
+   * flight. The next server render replaces it with the stored truth.
+   */
+  const [readNow, setReadNow] = useState<string[]>([]);
+  const isRead = (n: TopBarNotification) => n.read || readNow.includes(n.id);
+  const unread = notifications.filter((n) => !isRead(n));
+
+  async function onNotificationClick(id: string) {
+    setOpen(null);
+    setReadNow((current) => [...current, id]);
+    await markNotificationRead(id);
+    router.refresh();
+  }
+
+  async function onMarkAllRead() {
+    setReadNow(notifications.map((n) => n.id));
+    await markAllNotificationsRead();
+    router.refresh();
+  }
 
   // Panels scale from their own corner so they read as unfolding out of the
   // button that opened them rather than appearing over it.
@@ -97,7 +127,7 @@ export default function TopBarMenus({
           className="relative rounded-lg p-2 hover:bg-slate-100"
         >
           <Bell className="h-5 w-5 text-slate-500" />
-          {notifications.length > 0 && (
+          {unread.length > 0 && (
             // Springs in once on mount, so a newly arrived count draws the eye
             // without pulsing forever afterwards.
             <motion.span
@@ -110,7 +140,7 @@ export default function TopBarMenus({
               }
               className="absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white"
             >
-              {notifications.length}
+              {unread.length}
             </motion.span>
           )}
         </button>
@@ -125,11 +155,26 @@ export default function TopBarMenus({
               style={{ transformOrigin: "top right" }}
               className="fixed inset-x-3 top-16 z-50 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg lg:absolute lg:inset-x-auto lg:right-0 lg:top-auto lg:mt-2 lg:w-80"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-3">
                 <p className="text-sm font-bold text-navy">Notifications</p>
-                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                  {notifications.length} new
-                </span>
+                {unread.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      {unread.length} new
+                    </span>
+                    <button
+                      type="button"
+                      onClick={onMarkAllRead}
+                      className="text-[11px] font-semibold text-slate-500 hover:text-primary"
+                    >
+                      Mark all read
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-[10px] font-semibold text-slate-400">
+                    All read
+                  </span>
+                )}
               </div>
               <div className="max-h-96 overflow-y-auto overscroll-contain">
                 {notifications.length === 0 ? (
@@ -139,12 +184,15 @@ export default function TopBarMenus({
                 ) : (
                   notifications.map((n) => {
                     const Icon = getUiIcon(n.icon);
+                    const read = isRead(n);
                     return (
                       <Link
                         key={n.id}
                         href={n.href}
-                        onClick={() => setOpen(null)}
-                        className="flex gap-3 border-b border-slate-50 px-4 py-3 last:border-0 hover:bg-slate-50"
+                        onClick={() => onNotificationClick(n.id)}
+                        className={`flex gap-3 border-b border-slate-50 px-4 py-3 last:border-0 hover:bg-slate-50 ${
+                          read ? "opacity-60" : ""
+                        }`}
                       >
                         <span
                           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${n.color}`}
@@ -152,7 +200,11 @@ export default function TopBarMenus({
                           <Icon className="h-4 w-4" />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-navy">
+                          <p
+                            className={`text-sm text-navy ${
+                              read ? "font-medium" : "font-semibold"
+                            }`}
+                          >
                             {n.title}
                           </p>
                           {n.body && (
@@ -164,6 +216,11 @@ export default function TopBarMenus({
                             </p>
                           )}
                         </div>
+                        {/* Unread marker, so a read row is still distinguishable
+                            once the panel is reopened. */}
+                        {!read && (
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                        )}
                       </Link>
                     );
                   })

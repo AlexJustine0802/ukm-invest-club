@@ -32,25 +32,29 @@ export function dueLabel(due: Date, now: Date = new Date()): string {
   return `Due in ${days} days`;
 }
 
+/** What one member sees an assignment as. */
+export type MemberState = "UPCOMING" | "ACTIVE" | "COMPLETED";
+
 /**
- * The status to show one member.
+ * The state to show one member.
  *
- * `Assignment.status` is a single column shared by everyone, so it stays
- * "ACTIVE" after a member hands their work in. What the member actually did
- * wins: their own submission decides, and the column is only the fallback for
- * an assignment they have not touched. Everything the member sees  the stat
- * cards, the tab counts, the badges, "due soon"  must go through here, or the
- * numbers disagree with the list.
+ * Handing work in completes it — marking is feedback that arrives afterwards
+ * (a bell notification), not another step in the list, so a graded and an
+ * ungraded submission both read COMPLETED.
+ *
+ * `Assignment.status` is deliberately ignored: it is one column shared by
+ * everyone, so it cannot describe what any individual did. Everything the
+ * member sees — stat cards, tab counts, badges, "due soon" — goes through here,
+ * or the numbers disagree with the list.
  */
-export function memberStatus(
-  assignmentStatus: string,
+export function memberState(
+  opensAt: Date | null,
   submission?: { gradedAt: Date | null } | null,
-): AssignmentStatus {
-  if (submission?.gradedAt) return "COMPLETED";
-  if (submission) return "SUBMITTED";
-  return (ASSIGNMENT_STATUSES as readonly string[]).includes(assignmentStatus)
-    ? (assignmentStatus as AssignmentStatus)
-    : "ACTIVE";
+  now: Date = new Date(),
+): MemberState {
+  if (submission) return "COMPLETED";
+  if (!isOpen(opensAt, now)) return "UPCOMING";
+  return "ACTIVE";
 }
 
 /**
@@ -63,12 +67,13 @@ export function isOpen(opensAt: Date | null, now: Date = new Date()): boolean {
   return !opensAt || opensAt <= now;
 }
 
+/** Only an open, unsubmitted assignment can be "due soon". */
 export function isDueSoon(
   due: Date,
-  status: string,
+  state: string,
   now: Date = new Date(),
 ): boolean {
-  if (status !== "ACTIVE") return false;
+  if (state !== "ACTIVE") return false;
   const days = daysUntil(due, now);
   return days <= DUE_SOON_DAYS;
 }
@@ -77,7 +82,7 @@ export const ASSIGNMENT_TABS = [
   { id: "all", label: "All Assignments" },
   { id: "active", label: "Active" },
   { id: "due-soon", label: "Due Soon" },
-  { id: "submitted", label: "Submitted" },
+  { id: "coming-soon", label: "Coming Soon" },
   { id: "completed", label: "Completed" },
 ] as const;
 
