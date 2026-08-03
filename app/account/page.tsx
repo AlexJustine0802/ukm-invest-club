@@ -13,7 +13,7 @@ import { getSections } from "@/lib/dashboardContent";
 import { getAnnouncements } from "@/lib/announcements";
 import { getBanner } from "@/lib/highlights";
 import { getUiIcon } from "@/lib/uiIcons";
-import { getMetricValues, resolveMetric } from "@/lib/metrics";
+import { getMetricValues } from "@/lib/metrics";
 import { greetingFor } from "@/lib/greeting";
 import Greeting from "@/components/account/Greeting";
 import { eventPalette } from "@/lib/eventStyles";
@@ -47,24 +47,21 @@ function weekOf(today: Date) {
 const LIST_BODY = "mt-4 min-h-[180px] space-y-4";
 const RAIL_BODY = "mt-4 min-h-[150px] space-y-4";
 
-/**
- * Shown when nobody has configured Overview cards yet. The values still come
- * from the live counters, so an empty database simply reads 0.
- */
+/** The Overview row. Every value is a live counter, so an empty database reads 0. */
 const DEFAULT_OVERVIEW = [
-  {
-    id: "default-resources",
-    title: "Resources Available",
-    icon: "BookOpen",
-    color: "bg-blue-50 text-primary",
-    metric: "resources" as const,
-  },
   {
     id: "default-events",
     title: "Upcoming Events",
     icon: "CalendarDays",
     color: "bg-emerald-50 text-emerald-600",
     metric: "upcoming-events" as const,
+  },
+  {
+    id: "default-resources",
+    title: "Resources Available",
+    icon: "BookOpen",
+    color: "bg-blue-50 text-primary",
+    metric: "resources" as const,
   },
   {
     id: "default-assignments",
@@ -105,7 +102,7 @@ export default async function AccountPage() {
     // /admin/highlights (an event, recruitment round or career alert).
     getBanner(),
     // Editable blocks, managed from /admin/dashboard-content.
-    getSections(["overview", "resource"]),
+    getSections(["resource"]),
     // Upcoming events reuse the existing public Event model.
     prisma.event.findMany({
       where: { published: true, eventDate: { gte: now } },
@@ -174,32 +171,14 @@ export default async function AccountPage() {
 
   const railAnnouncements = announcements.slice(0, 3);
 
-  // Admin-configured cards lead; the defaults fill the rest of the row, so
-  // adding one card in the admin no longer replaces the other three. A default
-  // whose counter an admin card already shows is dropped, not duplicated.
-  const configured = content.overview.map((o) => {
-    const metric = resolveMetric(o.metric, o.title);
-    return {
-      id: o.id,
-      title: o.title,
-      icon: o.icon,
-      color: o.color,
-      metric,
-      value: metric ? String(metrics[metric]) : (o.subtitle ?? "0"),
-      // A typed "↑ 3 this week" cannot be trusted next to a live count.
-      note: metric ? null : o.note,
-    };
-  });
-  const usedMetrics = new Set(configured.map((c) => c.metric).filter(Boolean));
-
-  const overviewCards = [
-    ...configured,
-    ...DEFAULT_OVERVIEW.filter((d) => !usedMetrics.has(d.metric)).map((d) => ({
-      ...d,
-      value: String(metrics[d.metric]),
-      note: null,
-    })),
-  ].slice(0, 4);
+  // The four live counters, always the same four. They are counted here, not
+  // typed in the admin, so the row cannot end up with a stale hand-written card
+  // sitting next to them.
+  const overviewCards = DEFAULT_OVERVIEW.map((d) => ({
+    ...d,
+    value: String(metrics[d.metric]),
+    note: null,
+  }));
 
   // Mobile-only summary bar. Reuses the data already fetched above for the
   // side rails  no extra queries, no second copy of the widgets.
@@ -312,29 +291,30 @@ export default async function AccountPage() {
           {/* Overview  the stat row is always present, showing 0 when empty. */}
           <Reveal as="section">
             <h3 className="text-lg font-bold text-navy">Overview</h3>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            {/* One row on anything wider than a phone; four across the rail. */}
+            <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {overviewCards.map((o) => {
                 const Icon = getUiIcon(o.icon);
                 return (
                   <div
                     key={o.id}
-                    className="flex min-h-[104px] flex-col justify-center rounded-2xl border border-slate-200 bg-white p-5"
+                    className="flex min-h-[104px] flex-col justify-center gap-2 rounded-2xl border border-slate-200 bg-white p-4"
                   >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${o.color ?? "bg-blue-50 text-primary"}`}
-                      >
-                        <Icon className="h-5 w-5" />
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-2xl font-extrabold leading-tight text-navy">
-                          {o.value}
-                        </p>
-                        <p className="text-sm text-slate-500">{o.title}</p>
-                      </div>
+                    <span
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${o.color ?? "bg-blue-50 text-primary"}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-xl font-extrabold leading-tight text-navy">
+                        {o.value}
+                      </p>
+                      <p className="text-xs leading-snug text-slate-500">
+                        {o.title}
+                      </p>
                     </div>
                     {o.note && (
-                      <p className="mt-3 text-xs font-semibold text-emerald-600">
+                      <p className="text-xs font-semibold text-emerald-600">
                         {o.note}
                       </p>
                     )}
