@@ -101,7 +101,6 @@ export default async function AdminRecruitmentPage() {
                   </p>
                 )}
                 <p className="mt-2 text-xs text-slate-400">
-                  /register/{current.slug} · {questions.length} question
                   {questions.length === 1 ? "" : "s"} ·{" "}
                   {current.opensAt
                     ? `opens ${formatDateTime(current.opensAt)}`
