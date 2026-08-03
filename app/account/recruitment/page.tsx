@@ -154,7 +154,9 @@ export default async function RecruitmentPage() {
   const questionCount = flattenQuestions(
     parseQuestions(recruitment!.questions),
   ).length;
-  const applyHref = `/register/${recruitment!.slug}`;
+  // Members stay in the member area; the public /register page is for
+  // guests following a shared link.
+  const applyHref = `/account/register/${recruitment!.slug}?from=recruitment`;
 
   return (
     <>

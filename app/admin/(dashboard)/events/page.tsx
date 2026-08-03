@@ -23,7 +23,7 @@ export default async function AdminEventsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-navy">Events</h1>
         <Can module="registrations" action="create">
-          <Link href="/admin/registrations/new" className="btn-primary">
+          <Link href="/admin/registrations/new?event=1" className="btn-primary">
             + New event
           </Link>
         </Can>
@@ -37,7 +37,10 @@ export default async function AdminEventsPage() {
         <p className="mt-8 text-slate-500">
           No events yet.{" "}
           <Can module="registrations" action="create">
-            <Link href="/admin/registrations/new" className="text-accent-dark underline">
+            <Link
+              href="/admin/registrations/new?event=1"
+              className="text-accent-dark underline"
+            >
               Create your first event
             </Link>
           </Can>

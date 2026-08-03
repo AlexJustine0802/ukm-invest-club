@@ -2,6 +2,7 @@ import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import FormQuestionsEditor from "@/components/admin/FormQuestionsEditor";
 import CategorySelect from "@/components/admin/CategorySelect";
+import EventDatesFields from "@/components/admin/EventDatesFields";
 import { AUDIENCES, parseQuestions } from "@/lib/forms";
 import { toDateTimeLocalValue } from "@/lib/utils";
 
@@ -41,6 +42,8 @@ interface RegistrationFormFormProps {
     categoryId: string | null;
     seatUnit: string;
   } | null;
+  /** New forms only: start with "show on the Events page" already ticked. */
+  startAsEvent?: boolean;
   /** Omitted when the role may not add an event category. */
   createCategory?: (
     title: string,
@@ -52,6 +55,7 @@ export default function RegistrationFormForm({
   form,
   categories = [],
   event,
+  startAsEvent = false,
   createCategory,
 }: RegistrationFormFormProps) {
   return (
@@ -247,10 +251,6 @@ export default function RegistrationFormForm({
           />
           <span className="text-sm font-medium text-navy">
             Highlight this
-            <span className="mt-0.5 block text-xs font-normal text-slate-500">
-              Runs as the banner at the top of the member dashboard. Only one
-              banner fits, so the newest thing highlighted is the one shown.
-            </span>
           </span>
         </label>
       </div>
@@ -268,56 +268,15 @@ export default function RegistrationFormForm({
         {/* Gates the whole card: without this ticked the fields below are
             ignored and no public event is created, so a recruitment can keep
             its own open/close dates without going on the website. */}
-        <label className="flex items-start gap-3 rounded-lg border border-slate-200 p-4">
-          <input
-            type="checkbox"
-            name="showOnEvents"
-            defaultChecked={Boolean(event)}
-            className="mt-0.5 h-4 w-4"
-          />
-          <span>
-            <span className="font-semibold text-navy">
-              Show this on the public Events page
-            </span>
-            <span className="mt-0.5 block text-xs text-slate-500">
-              Needs a start date below. Leave unticked for a sign-up that is
-              shared by link only  a recruitment, for example. Unticking it
-              later removes the public event; the form and its responses stay.
-            </span>
-          </span>
-        </label>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="eventDate" className="label">
-              Start date &amp; time
-            </label>
-            <input
-              id="eventDate"
-              name="eventDate"
-              type="datetime-local"
-              defaultValue={
-                event ? toDateTimeLocalValue(event.eventDate) : undefined
-              }
-              className="input"
-            />
-          </div>
-          <div>
-            <label htmlFor="endDate" className="label">
-              End date &amp; time{" "}
-              <span className="text-slate-400">(optional)</span>
-            </label>
-            <input
-              id="endDate"
-              name="endDate"
-              type="datetime-local"
-              defaultValue={
-                event?.endDate ? toDateTimeLocalValue(event.endDate) : undefined
-              }
-              className="input"
-            />
-          </div>
-        </div>
+        <EventDatesFields
+          defaultChecked={Boolean(event) || startAsEvent}
+          defaultEventDate={
+            event ? toDateTimeLocalValue(event.eventDate) : undefined
+          }
+          defaultEndDate={
+            event?.endDate ? toDateTimeLocalValue(event.endDate) : undefined
+          }
+        />
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>

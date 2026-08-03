@@ -177,7 +177,16 @@ export async function submitRegistration(
     if (events.length) revalidatePath("/account/events");
   }
 
+  // Members fill the form inside the member area; sending them back to the
+  // public page afterwards would drop them out of it. Only the two known
+  // areas are accepted, so the field cannot redirect anywhere else.
+  const basePath =
+    formData.get("basePath") === "/account/register"
+      ? "/account/register"
+      : "/register";
+
   revalidatePath(`/register/${form.slug}`);
+  revalidatePath(`/account/register/${form.slug}`);
   revalidatePath(`/admin/registrations/${form.id}/responses`);
-  redirect(`/register/${form.slug}?done=1`);
+  redirect(`${basePath}/${form.slug}?done=1`);
 }

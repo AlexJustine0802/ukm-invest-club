@@ -8,6 +8,8 @@ import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { eventPalette, timeRange, eventDateLabel } from "@/lib/eventStyles";
+import { formStatus } from "@/lib/forms";
+import { formatDateTime } from "@/lib/utils";
 import { registerForEvent } from "../actions";
 
 export const metadata: Metadata = { title: "Event" };
@@ -38,7 +40,13 @@ export default async function MemberEventPage({
       category: true,
       _count: { select: { registrations: true } },
       registrationForm: {
-        select: { slug: true, published: true, registrationEnabled: true },
+        select: {
+          slug: true,
+          published: true,
+          registrationEnabled: true,
+          opensAt: true,
+          closesAt: true,
+        },
       },
     },
   });
@@ -61,6 +69,11 @@ export default async function MemberEventPage({
     needsRegistration && event.registrationForm?.published
       ? event.registrationForm.slug
       : null;
+  // A form with a future open date takes no answers yet. Saying so here beats
+  // sending someone to the form to be turned away by it.
+  const formState = event.registrationForm
+    ? formStatus(event.registrationForm, now)
+    : null;
   const palette = eventPalette(
     event.category?.color,
     event.category?.title ?? event.title,
@@ -139,6 +152,30 @@ export default async function MemberEventPage({
           <p className="font-semibold text-slate-600">
             No registration needed — just come along.
           </p>
+        ) : formState === "not-yet" ? (
+          <>
+            <p className="font-bold text-navy">Registration opens soon</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {event.registrationForm?.opensAt
+                ? `Opens ${formatDateTime(event.registrationForm.opensAt)}.`
+                : "Check back shortly."}
+            </p>
+            <button
+              type="button"
+              disabled
+              className="mt-4 cursor-not-allowed rounded-lg bg-slate-100 px-6 py-2.5 text-sm font-semibold text-slate-400"
+            >
+              Register
+            </button>
+          </>
+        ) : formState === "closed" ? (
+          <p className="font-semibold text-slate-500">
+            Registration has closed
+            {event.registrationForm?.closesAt
+              ? ` (${formatDateTime(event.registrationForm.closesAt)})`
+              : ""}
+            .
+          </p>
         ) : registration ? (
           <p className="flex items-center gap-2 font-semibold text-primary">
             <Check className="h-4 w-4" />
@@ -160,7 +197,7 @@ export default async function MemberEventPage({
               // Events with a sign-up form go through it; the answers land in
               // the admin responses, same as the public site.
               <Link
-                href={`/register/${formSlug}`}
+                href={`/account/register/${formSlug}`}
                 className="mt-4 inline-block rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
               >
                 Register

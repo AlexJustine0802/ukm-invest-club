@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, isUpcoming } from "@/lib/utils";
+import { formStatus } from "@/lib/forms";
 import Markdown from "@/components/Markdown";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,13 @@ async function getEvent(slug: string) {
     where: { slug, published: true },
     include: {
       registrationForm: {
-        select: { slug: true, published: true, registrationEnabled: true },
+        select: {
+          slug: true,
+          published: true,
+          registrationEnabled: true,
+          opensAt: true,
+          closesAt: true,
+        },
       },
       _count: { select: { registrations: true } },
     },
@@ -46,6 +53,9 @@ export default async function EventDetailPage({ params }: Props) {
   const form = event.registrationForm;
   const formSlug =
     form?.published && form.registrationEnabled ? form.slug : null;
+  // Not open yet / already closed is worth saying here, rather than letting
+  // the button lead to a form that refuses the answer.
+  const formState = form ? formStatus(form) : null;
   const left =
     event.capacity === null
       ? null
@@ -105,6 +115,27 @@ export default async function EventDetailPage({ params }: Props) {
           ) : !formSlug ? (
             <p className="font-semibold text-slate-600">
               No registration needed — just come along.
+            </p>
+          ) : formState === "not-yet" ? (
+            <>
+              <p className="font-bold text-navy">Registration opens soon</p>
+              <p className="mt-1 text-sm text-slate-500">
+                {form?.opensAt
+                  ? `Opens ${formatDateTime(form.opensAt)}.`
+                  : "Check back shortly."}
+              </p>
+              <button
+                type="button"
+                disabled
+                className="btn-primary mt-4 cursor-not-allowed px-6 py-2.5 opacity-50"
+              >
+                Register
+              </button>
+            </>
+          ) : formState === "closed" ? (
+            <p className="font-semibold text-slate-500">
+              Registration has closed
+              {form?.closesAt ? ` (${formatDateTime(form.closesAt)})` : ""}.
             </p>
           ) : left === 0 ? (
             <p className="font-semibold text-slate-500">

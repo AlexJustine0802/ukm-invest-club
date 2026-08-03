@@ -19,6 +19,7 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import { eventPalette, timeRange, eventDateLabel } from "@/lib/eventStyles";
+import { formStatus } from "@/lib/forms";
 
 export const metadata: Metadata = { title: "Events" };
 export const dynamic = "force-dynamic";
@@ -79,7 +80,13 @@ export default async function EventsPage({
         category: true,
         _count: { select: { registrations: true } },
         registrationForm: {
-          select: { slug: true, published: true, registrationEnabled: true },
+          select: {
+            slug: true,
+            published: true,
+            registrationEnabled: true,
+            opensAt: true,
+            closesAt: true,
+          },
         },
       },
     }),
@@ -239,6 +246,9 @@ export default async function EventsPage({
             // takes no sign-ups at all.
             const needsRegistration =
               e.registrationForm?.registrationEnabled ?? false;
+            const formState = e.registrationForm
+              ? formStatus(e.registrationForm, now)
+              : null;
 
             return (
               <article
@@ -318,6 +328,16 @@ export default async function EventsPage({
                     <p className="flex items-center justify-center gap-1 text-xs font-semibold text-primary">
                       <Check className="h-3.5 w-3.5" />
                       Registered
+                    </p>
+                  ) : formState === "not-yet" ? (
+                    <p className="text-center text-xs font-semibold text-amber-600">
+                      {e.registrationForm?.opensAt
+                        ? `Opens ${eventDateLabel(e.registrationForm.opensAt)}`
+                        : "Opens soon"}
+                    </p>
+                  ) : formState === "closed" ? (
+                    <p className="text-center text-xs font-semibold text-slate-400">
+                      Registration closed
                     </p>
                   ) : isFull ? (
                     <p className="text-center text-xs font-semibold text-slate-400">

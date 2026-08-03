@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import CareerAlertForm from "@/components/admin/CareerAlertForm";
 import { updateCareerAlert } from "../../actions";
 import { requirePage } from "@/lib/adminAccess";
+import { isBlobConfigured } from "@/lib/upload";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,11 @@ export default async function EditCareerAlertPage({
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-navy">Edit job posting</h1>
       <div className="mt-6 max-w-2xl">
-        <CareerAlertForm action={updateCareerAlert} alert={alert} />
+        <CareerAlertForm
+          action={updateCareerAlert}
+          alert={alert}
+          uploadEnabled={isBlobConfigured()}
+        />
       </div>
     </div>
   );

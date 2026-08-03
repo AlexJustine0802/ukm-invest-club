@@ -1,11 +1,12 @@
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
-import { UI_ICON_KEYS } from "@/lib/uiIcons";
-import { EVENT_COLOR_KEYS } from "@/lib/eventStyles";
+import ImageField from "@/components/admin/ImageField";
 import { toDateTimeLocalValue } from "@/lib/utils";
 
 interface CareerAlertFormProps {
   action: (formData: FormData) => void;
+  /** Whether file uploads are configured (Vercel Blob). */
+  uploadEnabled?: boolean;
   alert?: {
     id: string;
     company: string;
@@ -15,15 +16,42 @@ interface CareerAlertFormProps {
     description: string | null;
     applyUrl: string | null;
     deadline: Date | null;
-    icon: string | null;
-    color: string | null;
+    logo: string | null;
+    companyIndustry: string | null;
+    companySize: string | null;
+    companyWebsite: string | null;
+    companyProfile: string | null;
     published: boolean;
     announced: boolean;
     highlighted: boolean;
   };
 }
 
-export default function CareerAlertForm({ action, alert }: CareerAlertFormProps) {
+// Headings and bullets survive to the member page, which renders Markdown.
+const PLACEHOLDER = [
+  "What the role involves, who it suits, requirements.",
+  "",
+  "## What would you do?",
+  "- Task one",
+  "- Task two",
+  "",
+  "## Qualifications",
+  "- Requirement one",
+].join("\n");
+
+const COMPANY_PLACEHOLDER = [
+  "What the company does, and what it is like to work there.",
+  "",
+  "## Benefits",
+  "- Medical",
+  "- Transport & meal allowance",
+].join("\n");
+
+export default function CareerAlertForm({
+  action,
+  alert,
+  uploadEnabled = false,
+}: CareerAlertFormProps) {
   return (
     <form action={action} className="space-y-5">
       {alert && <input type="hidden" name="id" value={alert.id} />}
@@ -91,9 +119,9 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
         <textarea
           id="description"
           name="description"
-          rows={4}
+          rows={10}
           defaultValue={alert?.description ?? ""}
-          placeholder="What the role involves, who it suits, requirements."
+          placeholder={PLACEHOLDER}
           className="input"
         />
       </div>
@@ -128,40 +156,71 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* Company profile — shown as its own block under the posting. */}
+      <div className="space-y-4 rounded-lg border border-slate-200 p-4">
         <div>
-          <label htmlFor="icon" className="label">
-            Icon
-          </label>
-          <select
-            id="icon"
-            name="icon"
-            defaultValue={alert?.icon ?? "Briefcase"}
-            className="input"
-          >
-            {UI_ICON_KEYS.map((key) => (
-              <option key={key} value={key}>
-                {key}
-              </option>
-            ))}
-          </select>
+          <p className="font-bold text-navy">Company profile</p>
         </div>
+
+        <ImageField
+          label="Company logo"
+          defaultUrl={alert?.logo}
+          uploadEnabled={uploadEnabled}
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="companyIndustry" className="label">
+              Industry
+            </label>
+            <input
+              id="companyIndustry"
+              name="companyIndustry"
+              defaultValue={alert?.companyIndustry ?? ""}
+              placeholder="e.g. Education & Training"
+              className="input"
+            />
+          </div>
+          <div>
+            <label htmlFor="companySize" className="label">
+              Size
+            </label>
+            <input
+              id="companySize"
+              name="companySize"
+              defaultValue={alert?.companySize ?? ""}
+              placeholder="e.g. 51-100 employees"
+              className="input"
+            />
+          </div>
+        </div>
+
         <div>
-          <label htmlFor="color" className="label">
-            Colour
+          <label htmlFor="companyWebsite" className="label">
+            Website
           </label>
-          <select
-            id="color"
-            name="color"
-            defaultValue={alert?.color ?? EVENT_COLOR_KEYS[0]}
+          <input
+            id="companyWebsite"
+            name="companyWebsite"
+            type="url"
+            defaultValue={alert?.companyWebsite ?? ""}
+            placeholder="https://..."
             className="input"
-          >
-            {EVENT_COLOR_KEYS.map((key) => (
-              <option key={key} value={key}>
-                {key}
-              </option>
-            ))}
-          </select>
+          />
+        </div>
+
+        <div>
+          <label htmlFor="companyProfile" className="label">
+            About the company
+          </label>
+          <textarea
+            id="companyProfile"
+            name="companyProfile"
+            rows={6}
+            defaultValue={alert?.companyProfile ?? ""}
+            placeholder={COMPANY_PLACEHOLDER}
+            className="input"
+          />
         </div>
       </div>
 
@@ -173,8 +232,7 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
           className="h-4 w-4"
         />
         <span className="text-sm font-medium text-navy">
-          Published  visible on /account/career and pushed to the member
-          notification bell for 14 days
+          Published
         </span>
       </label>
 
@@ -187,10 +245,6 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
         />
         <span className="text-sm font-medium text-navy">
           Announce this
-          <span className="mt-0.5 block text-xs font-normal text-slate-500">
-            Also lists it on the member Announcements page and dashboard rail.
-            Can be switched on later from Announcements.
-          </span>
         </span>
       </label>
 
@@ -203,10 +257,6 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
         />
         <span className="text-sm font-medium text-navy">
           Highlight this
-          <span className="mt-0.5 block text-xs font-normal text-slate-500">
-            Runs as the banner at the top of the member dashboard. Only one
-            banner fits, so the newest thing highlighted is the one shown.
-          </span>
         </span>
       </label>
 

@@ -74,7 +74,7 @@ export async function getBanners(): Promise<Banner[]> {
         ? "/account/events"
         : f.isRecruitment
           ? "/account/recruitment"
-          : `/register/${f.slug}`,
+          : `/account/register/${f.slug}`,
       noteTitle: f.event ? "When" : f.closesAt ? "Closes" : null,
       noteBody: f.event
         ? `${formatDate(f.event.eventDate)}${f.event.location ? ` · ${f.event.location}` : ""}`

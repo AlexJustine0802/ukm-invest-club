@@ -74,7 +74,7 @@ export async function getAnnouncements(): Promise<Announcement[]> {
         ? "/account/events"
         : f.isRecruitment
           ? "/account/recruitment"
-          : `/register/${f.slug}`,
+          : `/account/register/${f.slug}`,
       createdAt: f.createdAt,
     });
   }

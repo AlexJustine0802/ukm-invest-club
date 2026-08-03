@@ -28,26 +28,30 @@ function Submit() {
 }
 
 /**
- * One question, plus whatever its answer unlocks.
+ * One question.
  *
  * `live` is false for a section that is not on screen. Those stay mounted so
  * their answers are still submitted, but nothing in them is `required` — the
  * browser refuses to submit a form with a required field it cannot show.
+ *
+ * Dropdown answers are held by the form above, because they decide which
+ * questions come next and therefore where the sections fall.
  */
 function Question({
   question: q,
   live,
+  value,
+  onValue,
 }: {
   question: FormQuestion;
   live: boolean;
+  value: string;
+  onValue: (next: string) => void;
 }) {
   const key = `q_${q.id}`;
   const required = q.required && live;
-  const [value, setValue] = useState("");
-  const branch = q.branches?.[value];
 
   return (
-    <>
       <div className="rounded-2xl border border-slate-200 bg-white p-5">
         <label htmlFor={key} className="font-semibold text-navy">
           {q.label}
@@ -88,7 +92,7 @@ function Question({
               name={key}
               required={required}
               value={value}
-              onChange={(e) => setValue(e.target.value)}
+              onChange={(e) => onValue(e.target.value)}
               className={fieldClass}
             >
               <option value="" disabled>
@@ -158,63 +162,97 @@ function Question({
           )}
         </div>
       </div>
-
-      {/* Follow-ups for the answer just picked. Unmounted when the answer
-          changes, so a branch nobody is on submits nothing. */}
-      {branch?.map((child) => (
-        <div key={child.id} className="ml-4 border-l-2 border-blue-100 pl-4">
-          <Question question={child} live={live} />
-        </div>
-      ))}
-    </>
   );
+}
+
+interface FlowItem {
+  question: FormQuestion;
+  /** How deep in a branch it is — drives the indent, nothing else. */
+  depth: number;
+}
+
+/**
+ * Flatten the questions into the sequence being asked right now.
+ *
+ * Only the branch matching the answer given is included, so changing a
+ * dropdown rewrites everything after it — including where the sections fall.
+ */
+function expand(
+  list: FormQuestion[],
+  values: Record<string, string>,
+  depth: number,
+): FlowItem[] {
+  const out: FlowItem[] = [];
+  for (const question of list) {
+    out.push({ question, depth });
+    const branch = question.branches?.[values[question.id] ?? ""];
+    if (branch) out.push(...expand(branch, values, depth + 1));
+  }
+  return out;
 }
 
 export default function RegistrationFormFill({
   formId,
   questions,
   askGuestDetails,
+  basePath,
 }: {
   formId: string;
   questions: FormQuestion[];
   /** True when nobody is signed in — we need a name and email on the row. */
   askGuestDetails: boolean;
+  /** Which area is showing the form; the submit returns to the same one. */
+  basePath: "/register" | "/account/register";
 }) {
   const [state, action] = useActionState<SubmitState, FormData>(
     submitRegistration,
     {},
   );
 
-  const sections = sectionsOf(questions);
+  // Dropdown answers live here because they decide which questions come next,
+  // and therefore where the section breaks fall.
+  const [values, setValues] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
-  const last = step === sections.length - 1;
+
+  // The questions actually being asked, in order: a branch's follow-ups are
+  // spliced in right after the dropdown that opened them. A section break
+  // inside a branch is therefore a break in this flow like any other, which is
+  // what lets a branch carry its own sections.
+  const flow = expand(questions, values, 0);
+  const sections = sectionsOf(flow.map((f) => f.question)).map((section) =>
+    section.map((q) => flow.find((f) => f.question.id === q.id)!),
+  );
+  const stepIndex = Math.min(step, sections.length - 1);
+  const last = stepIndex === sections.length - 1;
 
   // Next only moves on if this section is filled in. Only the visible section
   // carries `required`, so the browser's own check is the whole validation.
-  const next = () => {
-    if (!formRef.current?.reportValidity()) return;
-    setStep((s) => Math.min(s + 1, sections.length - 1));
+  const goTo = (index: number) => {
+    setStep(Math.max(0, Math.min(index, sections.length - 1)));
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const back = () => {
-    setStep((s) => Math.max(s - 1, 0));
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const next = () => {
+    if (!formRef.current?.reportValidity()) return;
+    goTo(stepIndex + 1);
   };
+
+  const back = () => goTo(stepIndex - 1);
 
   return (
     <form ref={formRef} action={action} className="space-y-4">
       <input type="hidden" name="formId" value={formId} />
+      <input type="hidden" name="basePath" value={basePath} />
 
       {sections.length > 1 && (
         <p className="text-sm font-semibold text-slate-500">
-          Section {step + 1} of {sections.length}
+          Section {stepIndex + 1} of {sections.length}
         </p>
       )}
 
       {askGuestDetails && (
-        <div className={step === 0 ? undefined : "hidden"}>
+        <div className={stepIndex === 0 ? undefined : "hidden"}>
           <div className="rounded-2xl border border-slate-200 bg-white p-5">
             <p className="font-semibold text-navy">Your details</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -228,7 +266,7 @@ export default function RegistrationFormFill({
                 <input
                   id="guestName"
                   name="guestName"
-                  required={step === 0}
+                  required={stepIndex === 0}
                   className={`mt-1 ${fieldClass}`}
                 />
               </div>
@@ -243,7 +281,7 @@ export default function RegistrationFormFill({
                   id="guestEmail"
                   name="guestEmail"
                   type="email"
-                  required={step === 0}
+                  required={stepIndex === 0}
                   className={`mt-1 ${fieldClass}`}
                 />
               </div>
@@ -253,11 +291,34 @@ export default function RegistrationFormFill({
       )}
 
       {/* Every section stays mounted: leaving one must not throw away what was
-          typed into it, and the whole form posts in one submit. */}
+          typed into it, and the whole form posts in one submit. Changing a
+          dropdown does drop the sections after it, which is the point — those
+          questions belong to a branch nobody is on any more. */}
       {sections.map((section, i) => (
-        <div key={i} className={i === step ? "space-y-4" : "hidden"}>
-          {section.map((q) => (
-            <Question key={q.id} question={q} live={i === step} />
+        <div key={i} className={i === stepIndex ? "space-y-4" : "hidden"}>
+          {section.map(({ question, depth }) => (
+            <div
+              key={question.id}
+              className={
+                depth > 0 ? "ml-4 border-l-2 border-blue-100 pl-4" : undefined
+              }
+            >
+              <Question
+                question={question}
+                live={i === stepIndex}
+                value={values[question.id] ?? ""}
+                onValue={(answer) => {
+                  setValues((current) => ({
+                    ...current,
+                    [question.id]: answer,
+                  }));
+                  // A new answer can lengthen or shorten the form. Pin the
+                  // reader where they are instead of letting a clamped step
+                  // spring forward when the flow grows again.
+                  setStep(stepIndex);
+                }}
+              />
+            </div>
           ))}
         </div>
       ))}
@@ -270,7 +331,7 @@ export default function RegistrationFormFill({
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        {step > 0 && (
+        {stepIndex > 0 && (
           <button
             type="button"
             onClick={back}

@@ -293,6 +293,16 @@ model CareerAlert {
   description String?   @db.Text
   applyUrl    String?
   deadline    DateTime?
+  // The company's logo, uploaded or pasted in the admin. `icon`/`color` are
+  // what postings used before there was one; kept for rows that still have
+  // them, no longer offered in the form.
+  logo        String?
+  // Company profile, shown under the posting. Every field optional: a posting
+  // is still worth publishing when all anyone has is the company's name.
+  companyIndustry String?
+  companySize     String? // free text, e.g. "51-100 employees"
+  companyWebsite  String?
+  companyProfile  String? @db.Text // Markdown
   icon        String? // key from lib/uiIcons
   color       String? // palette key from lib/eventStyles
   published   Boolean   @default(true)

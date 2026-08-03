@@ -53,9 +53,7 @@ export default function ImageField({
 
       {!uploadEnabled && (
         <p className="mt-1 text-xs text-slate-400">
-          Tip: image uploads aren&apos;t configured  paste a public image URL
-          (e.g. from Unsplash or your storage). Set BLOB_READ_WRITE_TOKEN to
-          enable direct uploads.
+           
         </p>
       )}
 
