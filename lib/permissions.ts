@@ -224,6 +224,17 @@ export const ADMIN_MODULES: AdminModule[] = [
     description: "Job and internship postings for members.",
   },
   {
+    id: "announcements",
+    label: "Announcements",
+    href: "/admin/announcements",
+    icon: "Megaphone",
+    workspace: "dashboard",
+    // "manage" is the announce switches on events, recruitment and career
+    // alerts  flipping one announces something you did not write.
+    actions: [...CRUD, "manage"],
+    description: "Member announcements and what gets announced.",
+  },
+  {
     id: "dashboard-content",
     label: "Dashboard Content",
     href: "/admin/dashboard-content",

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
+import { uploadFile } from "@/lib/upload";
 
 function revalidateAssignments() {
   revalidatePath("/account/assignments");
@@ -17,7 +18,7 @@ function revalidateAssignments() {
  * colour and order are left to the column defaults on create and untouched on
  * update  see the note in components/admin/AssignmentForm.
  */
-function dataFrom(formData: FormData) {
+async function dataFrom(formData: FormData) {
   const str = (key: string) => (formData.get(key) as string)?.trim() || null;
 
   // The tickbox decides; a date left in the field without it is ignored, so an
@@ -26,7 +27,18 @@ function dataFrom(formData: FormData) {
   const opensAt =
     formData.get("hasOpenDate") && opensAtRaw ? new Date(opensAtRaw) : null;
 
+  // The question paper. No new file and no "remove" tick leaves whatever is
+  // already stored alone, so saving an edit does not wipe the attachment.
+  const file = formData.get("file");
+  const upload =
+    file instanceof File && file.size > 0
+      ? { fileUrl: await uploadFile(file, "assignments"), fileName: file.name }
+      : formData.get("removeFile") === "on"
+        ? { fileUrl: null, fileName: null }
+        : {};
+
   return {
+    ...upload,
     title: (formData.get("title") as string).trim(),
     description: str("description"),
     opensAt,
@@ -38,7 +50,7 @@ function dataFrom(formData: FormData) {
 
 export async function createAssignment(formData: FormData) {
   await requirePermission("assignments", "create");
-  await prisma.assignment.create({ data: dataFrom(formData) });
+  await prisma.assignment.create({ data: await dataFrom(formData) });
   revalidateAssignments();
   redirect("/admin/assignments");
 }
@@ -46,7 +58,7 @@ export async function createAssignment(formData: FormData) {
 export async function updateAssignment(formData: FormData) {
   await requirePermission("assignments", "edit");
   const id = formData.get("id") as string;
-  await prisma.assignment.update({ where: { id }, data: dataFrom(formData) });
+  await prisma.assignment.update({ where: { id }, data: await dataFrom(formData) });
   revalidateAssignments();
   redirect("/admin/assignments");
 }

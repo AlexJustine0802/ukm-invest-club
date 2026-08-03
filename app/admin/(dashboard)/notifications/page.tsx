@@ -28,7 +28,7 @@ export default async function AdminNotificationsPage() {
       </h1>
       <p className="mt-1 max-w-2xl text-sm text-slate-500">
         What the bell in the member area announces on its own. Announcements are
-        not listed — those you write by hand in Dashboard Content, and they are
+        not listed  those you write by hand in Dashboard Content, and they are
         always sent.
       </p>
 

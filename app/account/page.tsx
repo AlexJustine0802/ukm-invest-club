@@ -10,6 +10,7 @@ import EmptyState from "@/components/EmptyState";
 import LatestUpdates from "@/components/account/LatestUpdates";
 import Reveal from "@/components/Reveal";
 import { getSections } from "@/lib/dashboardContent";
+import { getAnnouncements } from "@/lib/announcements";
 import { getUiIcon } from "@/lib/uiIcons";
 import { getMetricValues, resolveMetric } from "@/lib/metrics";
 import { greetingFor } from "@/lib/greeting";
@@ -97,7 +98,7 @@ export default async function AccountPage() {
     careerAlerts,
     deadlines,
     channels,
-    mySubmissions,
+    announcements,
   ] = await Promise.all([
     // Newest active highlight, managed from /admin/highlights.
     prisma.highlight.findFirst({
@@ -105,7 +106,7 @@ export default async function AccountPage() {
       orderBy: { createdAt: "desc" },
     }),
     // Editable blocks, managed from /admin/dashboard-content.
-    getSections(["overview", "announcement", "resource"]),
+    getSections(["overview", "resource"]),
     // Upcoming events reuse the existing public Event model.
     prisma.event.findMany({
       where: { published: true, eventDate: { gte: now } },
@@ -133,7 +134,12 @@ export default async function AccountPage() {
       take: 3,
     }),
     prisma.assignment.findMany({
-      where: { published: true, status: "ACTIVE" },
+      // Already handed in = no longer a deadline for this member.
+      where: {
+        published: true,
+        status: "ACTIVE",
+        submissions: { none: { userId: session.userId } },
+      },
       orderBy: { dueDate: "asc" },
       take: 3,
     }),
@@ -150,15 +156,9 @@ export default async function AccountPage() {
         },
       },
     }),
-    prisma.assignmentSubmission.findMany({
-      where: { userId: session.userId },
-      select: { assignmentId: true },
-    }),
+    // Hand-written notices plus anything switched on in /admin/announcements.
+    getAnnouncements(),
   ]);
-
-  const submittedAssignmentIds = new Set(
-    mySubmissions.map((s) => s.assignmentId),
-  );
 
   const displayName = user.name;
   const firstName = displayName.split(" ")[0];
@@ -173,7 +173,7 @@ export default async function AccountPage() {
     weekDays.has(e.eventDate.toDateString()),
   );
 
-  const railAnnouncements = content.announcement.slice(0, 3);
+  const railAnnouncements = announcements.slice(0, 3);
 
   // Stat cards always render. Admin-configured rows win; with none configured
   // the defaults above stand in so the row of cards never disappears.
@@ -204,7 +204,7 @@ export default async function AccountPage() {
     {
       id: "announcements",
       label: "Announcements",
-      count: content.announcement.length,
+      count: announcements.length,
       href: "/account/announcements",
       icon: "Megaphone",
       color: "bg-blue-50 text-primary",
@@ -632,7 +632,6 @@ export default async function AccountPage() {
                 deadlines.map((d) => {
                   const Icon = getUiIcon(d.icon);
                   const soon = isDueSoon(d.dueDate, d.status, now);
-                  const submitted = submittedAssignmentIds.has(d.id);
                   return (
                     <Link
                       key={d.id}
@@ -653,14 +652,10 @@ export default async function AccountPage() {
                         </p>
                         <p
                           className={`text-xs font-semibold ${
-                            submitted
-                              ? "text-emerald-600"
-                              : soon
-                                ? "text-rose-600"
-                                : "text-slate-400"
+                            soon ? "text-rose-600" : "text-slate-400"
                           }`}
                         >
-                          {submitted ? "Submitted" : dueLabel(d.dueDate, now)}
+                          {dueLabel(d.dueDate, now)}
                         </p>
                       </div>
                     </Link>

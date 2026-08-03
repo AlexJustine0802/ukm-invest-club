@@ -5,7 +5,7 @@ import { Inbox, ArrowLeft } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
-import { getSection } from "@/lib/dashboardContent";
+import { getAnnouncements } from "@/lib/announcements";
 import { getUiIcon } from "@/lib/uiIcons";
 
 export const metadata: Metadata = { title: "Announcements" };
@@ -22,7 +22,7 @@ export default async function AnnouncementsPage({
   const user = await getCurrentMember();
   if (!user) redirect("/login");
 
-  const all = await getSection("announcement");
+  const all = await getAnnouncements();
   const { q = "", category = "All" } = await searchParams;
   const query = q.trim().toLowerCase();
 
@@ -107,10 +107,11 @@ export default async function AnnouncementsPage({
         <div className="mt-6 space-y-4">
           {visible.map((a) => {
             const Icon = getUiIcon(a.icon);
-            return (
+            const card = (
               <article
-                key={a.id}
-                className="flex gap-4 rounded-2xl border border-slate-200 bg-white p-5"
+                className={`flex gap-4 rounded-2xl border border-slate-200 bg-white p-5 ${
+                  a.href ? "transition-colors hover:border-primary/60" : ""
+                }`}
               >
                 <span
                   className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${a.color ?? "bg-blue-50 text-primary"}`}
@@ -137,6 +138,15 @@ export default async function AnnouncementsPage({
                   <span className="shrink-0 text-xs text-slate-400">{a.note}</span>
                 )}
               </article>
+            );
+            // Announced events / recruitment / career alerts link to the thing
+            // they announce; a hand-written notice has nowhere to go.
+            return a.href ? (
+              <Link key={a.id} href={a.href} className="block">
+                {card}
+              </Link>
+            ) : (
+              <div key={a.id}>{card}</div>
             );
           })}
         </div>

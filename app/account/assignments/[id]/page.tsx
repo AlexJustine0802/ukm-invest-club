@@ -114,6 +114,23 @@ export default async function AssignmentDetailPage({
               </p>
             )}
 
+            {assignment.fileUrl && (
+              <a
+                href={assignment.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 hover:border-primary/60"
+              >
+                <FileText className="h-5 w-5 shrink-0 text-slate-400" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-navy">
+                    {assignment.fileName ?? "Question file"}
+                  </p>
+                  <p className="text-xs text-slate-500">Tap to open</p>
+                </div>
+              </a>
+            )}
+
             {assignment.href && (
               <a
                 href={assignment.href}
@@ -167,7 +184,7 @@ export default async function AssignmentDetailPage({
             {!open ? (
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
                 <Clock className="h-4 w-4 text-amber-600" />
-                Opens {formatDateTime(assignment.opensAt!)} — you can read the
+                Opens {formatDateTime(assignment.opensAt!)}  you can read the
                 brief now and submit once it opens.
               </p>
             ) : graded ? (

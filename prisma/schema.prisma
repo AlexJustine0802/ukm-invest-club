@@ -234,6 +234,10 @@ model RegistrationForm {
   // stops accepting responses. Defaults on so existing events keep theirs.
   registrationEnabled Boolean @default(true)
 
+  // Announced on the member Announcements page and dashboard rail. Reads as
+  // the event, the recruitment round or the sign-up, depending on the form.
+  announced Boolean @default(false)
+
   opensAt   DateTime?
   closesAt  DateTime?
   capacity  Int? // null = unlimited
@@ -290,6 +294,9 @@ model CareerAlert {
   icon        String? // key from lib/uiIcons
   color       String? // palette key from lib/eventStyles
   published   Boolean   @default(true)
+  // Also listed on the member Announcements page and dashboard rail. One flag,
+  // no copied row to keep in step with the alert it describes.
+  announced   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -440,6 +447,10 @@ model Assignment {
   icon   String?
   color  String?
   href        String?
+  // The question paper, uploaded in the admin form. `href` stays the "link to
+  // it somewhere else" option; a file here is the copy members download.
+  fileUrl     String?
+  fileName    String?
   order       Int      @default(0)
   published   Boolean  @default(true)
 

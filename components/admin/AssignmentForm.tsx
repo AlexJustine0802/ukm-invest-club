@@ -15,8 +15,12 @@ interface AssignmentFormProps {
     opensAt: Date | null;
     dueDate: Date;
     href: string | null;
+    fileUrl: string | null;
+    fileName: string | null;
     published: boolean;
   };
+  /** Whether file uploads are configured (Vercel Blob). */
+  uploadEnabled?: boolean;
 }
 
 /** yyyy-MM-ddTHH:mm in local time, which is what datetime-local expects. */
@@ -28,6 +32,7 @@ function toLocalInput(date: Date): string {
 export default function AssignmentForm({
   action,
   assignment,
+  uploadEnabled = false,
 }: AssignmentFormProps) {
   return (
     <form action={action} className="space-y-5">
@@ -111,11 +116,42 @@ export default function AssignmentForm({
           }
           className="input"
         />
-        <p className="mt-1 text-xs text-slate-500">
-          “Due in N days” and the Due Soon tab are worked out from this. Whether
-          a member sees it as submitted follows their own submission — there is
-          nothing to set by hand.
-        </p>
+      </div>
+
+      {/* The question paper. Uploading a new one replaces the old; the tickbox
+          is the only way to end up with no file at all. */}
+      <div className="rounded-lg border border-slate-200 p-4">
+        <label htmlFor="file" className="label">
+          Question file <span className="text-slate-400">(optional)</span>
+        </label>
+        {assignment?.fileUrl && (
+          <p className="mb-2 text-xs text-slate-500">
+            Current:{" "}
+            <a
+              href={assignment.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-primary hover:underline"
+            >
+              {assignment.fileName ?? "Uploaded file"}
+            </a>
+          </p>
+        )}
+        <input
+          id="file"
+          name="file"
+          type="file"
+          disabled={!uploadEnabled}
+          className="input file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-semibold"
+        />
+        {assignment?.fileUrl && (
+          <label className="mt-3 flex items-center gap-3">
+            <input type="checkbox" name="removeFile" className="h-4 w-4" />
+            <span className="text-sm font-medium text-navy">
+              Remove the current file
+            </span>
+          </label>
+        )}
       </div>
 
       <div>

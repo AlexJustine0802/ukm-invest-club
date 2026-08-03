@@ -7,6 +7,8 @@ import { METRICS } from "@/lib/metrics";
 interface DashboardItemFormProps {
   action: (formData: FormData) => void;
   section: string;
+  /** Where Cancel goes. Defaults to the section's Dashboard Content list. */
+  backTo?: string;
   item?: {
     id: string;
     title: string;
@@ -27,11 +29,12 @@ export default function DashboardItemForm({
   action,
   section,
   item,
+  backTo,
 }: DashboardItemFormProps) {
   const config = sectionConfig(section);
   const fields = config.fields;
   const colors = colorOptions(section);
-  const backHref = `/admin/dashboard-content?section=${section}`;
+  const backHref = backTo ?? `/admin/dashboard-content?section=${section}`;
 
   const textField = (
     key: "title" | "subtitle" | "meta" | "note" | "badge" | "href",

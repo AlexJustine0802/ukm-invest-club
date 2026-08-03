@@ -32,7 +32,7 @@ async function markRead(keys: string[]) {
 }
 
 /**
- * Mark specific notifications read — one clicked row, or everything a tab just
+ * Mark specific notifications read  one clicked row, or everything a tab just
  * showed the member.
  *
  * The keys are intersected with the member's own current notifications: a

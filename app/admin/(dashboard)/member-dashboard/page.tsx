@@ -68,7 +68,7 @@ export default async function MemberDashboardHomePage() {
         >
           <p className="font-bold text-navy">Member notifications</p>
           <p className="mt-1 text-sm text-slate-500">
-            Switch the automatic bell alerts on or off — assignments,
+            Switch the automatic bell alerts on or off  assignments,
             materials, events, discussions, recruitment, career alerts.
           </p>
         </Link>

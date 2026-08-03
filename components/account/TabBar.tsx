@@ -16,7 +16,7 @@ export interface TabItem {
  *
  * The bar is one shared `layoutId`, so framer-motion animates the single
  * element between positions instead of fading one out and another in. It only
- * renders under the active tab — that is what gives it something to travel
+ * renders under the active tab  that is what gives it something to travel
  * from.
  */
 export default function TabBar({

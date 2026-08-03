@@ -3,7 +3,7 @@
  *
  * One list drives the admin form, the action that saves it and the guards in
  * lib/notifications, so a new source is added in one place. Each `id` is a
- * SiteSettings column name — renaming one means a database change.
+ * SiteSettings column name  renaming one means a database change.
  *
  * Announcements are deliberately absent: an admin writes those by hand, so
  * there is nothing to switch off.

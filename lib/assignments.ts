@@ -49,13 +49,13 @@ export function assignmentKey(id: string): string {
 /**
  * The state to show one member.
  *
- * Handing work in completes it — marking is feedback that arrives afterwards
+ * Handing work in completes it  marking is feedback that arrives afterwards
  * (a bell notification), not another step in the list, so a graded and an
  * ungraded submission both read COMPLETED.
  *
  * `Assignment.status` is deliberately ignored: it is one column shared by
  * everyone, so it cannot describe what any individual did. Everything the
- * member sees — stat cards, tab counts, badges, "due soon" — goes through here,
+ * member sees  stat cards, tab counts, badges, "due soon"  goes through here,
  * or the numbers disagree with the list.
  */
 export function memberState(

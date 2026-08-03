@@ -31,7 +31,7 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default async function CalendarPage({
   searchParams,
 }: {
-  searchParams: Promise<{ m?: string; d?: string }>;
+  searchParams: Promise<{ m?: string; d?: string; dir?: string }>;
 }) {
   const session = await getUserSession();
   if (!session) redirect("/login");
@@ -39,7 +39,7 @@ export default async function CalendarPage({
   const user = await getCurrentMember();
   if (!user) redirect("/login");
 
-  const { m, d } = await searchParams;
+  const { m, d, dir } = await searchParams;
   const { year, month, start, end } = monthRange(m);
 
   const [events, assignments, registrations] = await Promise.all([
@@ -49,7 +49,12 @@ export default async function CalendarPage({
       include: { category: true },
     }),
     prisma.assignment.findMany({
-      where: { published: true, dueDate: { gte: start, lt: end } },
+      // Handed in = off the calendar, both the grid chips and the day panel.
+      where: {
+        published: true,
+        dueDate: { gte: start, lt: end },
+        submissions: { none: { userId: user.id } },
+      },
       orderBy: { dueDate: "asc" },
     }),
     prisma.eventRegistration.findMany({
@@ -126,6 +131,15 @@ export default async function CalendarPage({
 
   const cardClass = "rounded-2xl border border-slate-200 bg-white p-5";
 
+  // ?dir set only by the prev/next arrows, so the grid slides in from the side
+  // you came from. Today / a direct link / a day click just render still.
+  const slideClass =
+    dir === "n"
+      ? "animate-slide-in-right"
+      : dir === "p"
+        ? "animate-slide-in-left"
+        : "";
+
   return (
     <>
       <AccountTopBar
@@ -148,7 +162,7 @@ export default async function CalendarPage({
             </h2>
             <div className="flex shrink-0 items-center gap-1">
               <Link
-                href={`/account/calendar?m=${monthParam(year, month, -1)}`}
+                href={`/account/calendar?m=${monthParam(year, month, -1)}&dir=p`}
                 aria-label="Previous month"
                 className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
               >
@@ -161,7 +175,7 @@ export default async function CalendarPage({
                 Today
               </Link>
               <Link
-                href={`/account/calendar?m=${monthParam(year, month, 1)}`}
+                href={`/account/calendar?m=${monthParam(year, month, 1)}&dir=n`}
                 aria-label="Next month"
                 className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
               >
@@ -170,6 +184,13 @@ export default async function CalendarPage({
             </div>
           </div>
 
+          {/* overflow-hidden so the slide never widens the page. The key remounts
+              the grid on a month change, which is what replays the animation. */}
+          <div className="overflow-hidden">
+          <div
+            key={thisMonthParam}
+            className={`${slideClass} motion-reduce:animate-none`}
+          >
           <div className="mt-5 grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400">
             {WEEKDAYS.map((d) => (
               <div key={d} className="pb-2">
@@ -238,6 +259,8 @@ export default async function CalendarPage({
                 </Link>
               );
             })}
+          </div>
+          </div>
           </div>
 
           {/* Expanded day */}

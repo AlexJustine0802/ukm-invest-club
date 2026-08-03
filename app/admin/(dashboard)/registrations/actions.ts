@@ -20,6 +20,8 @@ function revalidateForms(slug?: string) {
   revalidatePath("/events");
   revalidatePath("/admin/events");
   revalidatePath("/account/events");
+  revalidatePath("/account/announcements");
+  revalidatePath("/admin/announcements");
   if (slug) revalidatePath(`/register/${slug}`);
 }
 
@@ -47,6 +49,7 @@ function dataFrom(formData: FormData) {
     audience: isAudience(audience) ? audience : "MEMBERS",
     multipleResponses: formData.get("multipleResponses") === "on",
     isRecruitment: formData.get("isRecruitment") === "on",
+    announced: formData.get("announced") === "on",
     registrationEnabled: formData.get("registrationEnabled") === "on",
     // Prisma types Json columns structurally; our typed array needs the cast.
     questions: parseQuestions(questions).filter(

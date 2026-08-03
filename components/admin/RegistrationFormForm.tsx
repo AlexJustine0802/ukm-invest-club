@@ -17,6 +17,7 @@ interface RegistrationFormFormProps {
     audience: string;
     multipleResponses: boolean;
     isRecruitment: boolean;
+    announced: boolean;
     registrationEnabled: boolean;
     questions: unknown;
     opensAt: Date | null;
@@ -228,6 +229,23 @@ export default function RegistrationFormForm({
             <span className="mt-0.5 block text-xs font-normal text-slate-500">
               Drives the Recruitment page in the member area. Outside the open
               and close dates that page shows a “not open yet / closed” notice.
+            </span>
+          </span>
+        </label>
+
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="announced"
+            defaultChecked={form?.announced ?? false}
+            className="mt-1 h-4 w-4"
+          />
+          <span className="text-sm font-medium text-navy">
+            Announce this
+            <span className="mt-0.5 block text-xs font-normal text-slate-500">
+              Lists it on the member Announcements page and dashboard rail  as
+              the event if this form has one, otherwise as the recruitment round
+              or a sign-up. Can be switched on later from Announcements.
             </span>
           </span>
         </label>

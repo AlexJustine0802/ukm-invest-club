@@ -101,7 +101,7 @@ export default async function AssignmentsPage({
 
   /**
    * Tab pills count what the member has not looked at yet, not the bucket size
-   * — so a number appearing means "something new in here", and it clears once
+   *  so a number appearing means "something new in here", and it clears once
    * they open that tab. The stat cards above still show the totals.
    */
   const unseenIn = (id: AssignmentTab) =>

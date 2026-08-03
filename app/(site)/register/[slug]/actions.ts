@@ -98,7 +98,7 @@ export async function submitRegistration(
       try {
         answers[q.id] = await uploadFile(file, "form-uploads");
       } catch {
-        return { error: "File upload is not configured. Contact the admin." };
+        return { error: "ERROR" };
       }
       continue;
     }

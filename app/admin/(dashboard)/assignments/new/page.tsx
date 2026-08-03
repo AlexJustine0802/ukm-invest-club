@@ -2,6 +2,7 @@ import Link from "next/link";
 import AssignmentForm from "@/components/admin/AssignmentForm";
 import { createAssignment } from "../actions";
 import { requirePage } from "@/lib/adminAccess";
+import { isBlobConfigured } from "@/lib/upload";
 
 export default async function NewAssignmentPage() {
   await requirePage("assignments", "create");
@@ -13,7 +14,7 @@ export default async function NewAssignmentPage() {
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-navy">Add assignment</h1>
       <div className="mt-6 max-w-2xl">
-        <AssignmentForm action={createAssignment} />
+        <AssignmentForm action={createAssignment} uploadEnabled={isBlobConfigured()} />
       </div>
     </div>
   );

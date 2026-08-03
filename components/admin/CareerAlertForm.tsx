@@ -18,6 +18,7 @@ interface CareerAlertFormProps {
     icon: string | null;
     color: string | null;
     published: boolean;
+    announced: boolean;
   };
 }
 
@@ -173,6 +174,22 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
         <span className="text-sm font-medium text-navy">
           Published  visible on /account/career and pushed to the member
           notification bell for 14 days
+        </span>
+      </label>
+
+      <label className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          name="announced"
+          defaultChecked={alert?.announced ?? false}
+          className="mt-1 h-4 w-4"
+        />
+        <span className="text-sm font-medium text-navy">
+          Announce this
+          <span className="mt-0.5 block text-xs font-normal text-slate-500">
+            Also lists it on the member Announcements page and dashboard rail.
+            Can be switched on later from Announcements.
+          </span>
         </span>
       </label>
 

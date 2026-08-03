@@ -81,7 +81,7 @@ export default async function FolderMaterialsPage({
               className="input"
             />
             <p className="mt-1 text-xs text-slate-500">
-              Any URL — Drive file, slides, video, or a page on this site.
+              Any URL  Drive file, slides, video, or a page on this site.
             </p>
           </div>
 

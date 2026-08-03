@@ -7,7 +7,7 @@ import { markNotificationsRead } from "@/app/account/actions";
 /**
  * Marks notification keys read once the member has actually looked at them.
  *
- * Rendered by a page that has just shown the member a set of rows — opening the
+ * Rendered by a page that has just shown the member a set of rows  opening the
  * "Due Soon" tab is as good as reading the bell notification for what is in it,
  * so both counts clear from the one write.
  *
