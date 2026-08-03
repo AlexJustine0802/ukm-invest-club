@@ -5,7 +5,7 @@ import { CalendarClock, Users, ClipboardList, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
-import { formStatus, parseQuestions } from "@/lib/forms";
+import { formStatus, parseQuestions, flattenQuestions } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -71,7 +71,9 @@ export default async function PublicRegisterPage() {
               const notYet = formStatus(f, now) === "not-yet";
               const full =
                 f.capacity !== null && f._count.responses >= f.capacity;
-              const questionCount = parseQuestions(f.questions).length;
+              const questionCount = flattenQuestions(
+                parseQuestions(f.questions),
+              ).length;
 
               return (
                 <article

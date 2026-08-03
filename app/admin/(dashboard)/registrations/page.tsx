@@ -3,7 +3,12 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
-import { formStatus, parseQuestions, AUDIENCES } from "@/lib/forms";
+import {
+  formStatus,
+  parseQuestions,
+  flattenQuestions,
+  AUDIENCES,
+} from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 import { deleteRegistrationForm } from "./actions";
 import Can from "@/components/admin/Can";
@@ -167,7 +172,9 @@ export default async function AdminRegistrationsPage({
             const palette = eventPalette(f.color, f.title);
             const badge = STATUS_BADGE[formStatus(f, now)];
             const audience = AUDIENCES.find((a) => a.id === f.audience);
-            const questionCount = parseQuestions(f.questions).length;
+            const questionCount = flattenQuestions(
+              parseQuestions(f.questions),
+            ).length;
 
             return (
               <div key={f.id} className="card flex flex-wrap items-start gap-4 p-4">
@@ -199,8 +206,7 @@ export default async function AdminRegistrationsPage({
                     )}
                   </div>
                   <p className="mt-1 text-xs text-slate-400">
-                    /register/{f.slug} · {questionCount} question
-                    {questionCount === 1 ? "" : "s"} ·{" "}
+                    {" "}
                     {f._count.responses} response
                     {f._count.responses === 1 ? "" : "s"}
                     {f.capacity !== null ? ` / ${f.capacity}` : ""}

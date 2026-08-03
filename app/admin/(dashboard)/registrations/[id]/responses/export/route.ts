@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/adminAccess";
-import { parseQuestions, parseAnswers, answerText, toCsv } from "@/lib/forms";
+import {
+  parseQuestions,
+  parseAnswers,
+  answerText,
+  toCsv,
+  flattenQuestions,
+} from "@/lib/forms";
 import { slugify } from "@/lib/utils";
 
 /**
@@ -30,7 +36,7 @@ export async function GET(
   });
   if (!form) return new NextResponse("Not found", { status: 404 });
 
-  const questions = parseQuestions(form.questions);
+  const questions = flattenQuestions(parseQuestions(form.questions));
 
   const rows: string[][] = [
     ["Submitted at", "Name", "Email", "Account", ...questions.map((q) => q.label)],

@@ -18,7 +18,7 @@ import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { getUiIcon } from "@/lib/uiIcons";
-import { formStatus, parseQuestions } from "@/lib/forms";
+import { formStatus, parseQuestions, flattenQuestions } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 import { DIVISIONS } from "@/lib/roles";
 
@@ -151,7 +151,9 @@ export default async function RecruitmentPage() {
 
   // ---- Open ----
   const Icon = getUiIcon(recruitment!.icon ?? "Users");
-  const questionCount = parseQuestions(recruitment!.questions).length;
+  const questionCount = flattenQuestions(
+    parseQuestions(recruitment!.questions),
+  ).length;
   const applyHref = `/register/${recruitment!.slug}`;
 
   return (
@@ -193,10 +195,6 @@ export default async function RecruitmentPage() {
                 Closes {formatDateTime(recruitment!.closesAt)}
               </span>
             )}
-            <span className="flex items-center gap-2">
-              <ClipboardList className="h-4 w-4 text-primary-light" />
-              {questionCount} question{questionCount === 1 ? "" : "s"}
-            </span>
             {recruitment!.capacity !== null && (
               <span className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-primary-light" />
@@ -233,10 +231,6 @@ export default async function RecruitmentPage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             )}
-            <span className="flex items-center gap-2 text-xs text-slate-300">
-              <Icon className="h-4 w-4" />
-              Takes about 10 minutes
-            </span>
           </div>
         </div>
       </section>

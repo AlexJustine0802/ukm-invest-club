@@ -15,6 +15,9 @@ import {
   toCsv,
   csvCell,
   MAX_MB_LIMIT,
+  sectionsOf,
+  flattenQuestions,
+  parseQuestions as parse,
 } from "../lib/forms";
 
 // Good questions survive; junk is dropped rather than crashing the page.
@@ -68,5 +71,100 @@ const csv = toCsv([
 assert.ok(csv.startsWith("﻿"), "BOM present for Excel/Sheets");
 assert.ok(csv.includes('"line one\nline two"'));
 assert.equal(csv.split("\r\n").length, 2, "newline inside a cell stays inside it");
+
+// Sections: the form splits on breaks, and a form without one is still a form.
+const q = (id: string, type = "SHORT_TEXT") => ({
+  id,
+  type,
+  label: id,
+  required: false,
+});
+const sectioned = parse([q("a"), q("gap", "PAGE_BREAK"), q("b"), q("c")]);
+const sections = sectionsOf(sectioned);
+assert.equal(sections.length, 2);
+assert.deepEqual(
+  sections.map((s) => s.map((x) => x.id)),
+  [["a"], ["b", "c"]],
+);
+assert.equal(sectionsOf(parse([q("a")])).length, 1, "no break = one section");
+assert.equal(sectionsOf([]).length, 1, "empty form still has a page");
+assert.equal(
+  sectionsOf(parse([q("gap", "PAGE_BREAK"), q("gap2", "PAGE_BREAK"), q("a")]))
+    .length,
+  1,
+  "empty sections are dropped, not shown as a blank page",
+);
+
+// Branches: kept on a dropdown, dropped anywhere else, and flattened for CSV.
+const branching = parse([
+  {
+    id: "major",
+    type: "DROPDOWN",
+    label: "Major",
+    required: true,
+    options: ["Informatics", "Math"],
+    branches: {
+      Informatics: [q("lang")],
+      Math: [q("proof")],
+      Physics: [q("orphan")],
+    },
+  },
+  { ...q("note"), branches: { anything: [q("nope")] } },
+]);
+assert.deepEqual(Object.keys(branching[0].branches ?? {}), [
+  "Informatics",
+  "Math",
+  "Physics",
+]);
+assert.equal(branching[1].branches, undefined, "only a dropdown may branch");
+assert.deepEqual(
+  flattenQuestions(sectioned).map((x) => x.id),
+  ["a", "b", "c"],
+  "section breaks are not questions",
+);
+assert.deepEqual(
+  flattenQuestions(branching).map((x) => x.id),
+  ["major", "lang", "proof", "orphan", "note"],
+  "branch answers get their own column",
+);
+
+// Nesting is bounded, so a hand-edited JSON column cannot recurse forever.
+const deep = parse([
+  {
+    id: "l1",
+    type: "DROPDOWN",
+    label: "l1",
+    required: false,
+    options: ["x"],
+    branches: {
+      x: [
+        {
+          id: "l2",
+          type: "DROPDOWN",
+          label: "l2",
+          required: false,
+          options: ["y"],
+          branches: {
+            y: [
+              {
+                id: "l3",
+                type: "DROPDOWN",
+                label: "l3",
+                required: false,
+                options: ["z"],
+                branches: { z: [q("l4")] },
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+]);
+assert.deepEqual(
+  flattenQuestions(deep).map((x) => x.id),
+  ["l1", "l2", "l3"],
+  "past the depth limit branches are dropped",
+);
 
 console.log("forms OK");

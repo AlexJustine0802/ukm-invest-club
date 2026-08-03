@@ -11,6 +11,8 @@ export const QUESTION_TYPES = [
   { id: "DROPDOWN", label: "Dropdown" },
   { id: "DATE", label: "Date" },
   { id: "FILE", label: "File or picture upload" },
+  // Not a question: everything after it is the next section of the form.
+  { id: "PAGE_BREAK", label: "── Section break ──" },
 ] as const;
 
 export type QuestionType = (typeof QUESTION_TYPES)[number]["id"];
@@ -36,7 +38,20 @@ export interface FormQuestion {
   options?: string[];
   /** FILE only, in megabytes. */
   maxMb?: number;
+  /**
+   * DROPDOWN only: follow-up questions per answer, keyed by the option.
+   *
+   * Picking "Informatics" shows that option's questions and nothing else, so
+   * one form can ask each group what only that group needs to answer. They are
+   * nested rather than flagged flat so a branch moves, copies and deletes with
+   * the question it hangs off.
+   */
+  branches?: Record<string, FormQuestion[]>;
 }
+
+/** How deep branches may nest. A branch inside a branch inside a branch is a
+ * questionnaire nobody can fill in, and it bounds the recursion below. */
+export const MAX_BRANCH_DEPTH = 3;
 
 /** Answers keyed by question id. Arrays are checkbox answers. */
 export type FormAnswers = Record<string, string | string[]>;
@@ -73,7 +88,10 @@ export function allowsMembers(audience: string): boolean {
  * Read the questions JSON column back into typed questions, dropping anything
  * malformed rather than throwing  a half-broken form should still render.
  */
-export function parseQuestions(value: unknown): FormQuestion[] {
+export function parseQuestions(
+  value: unknown,
+  depth = 0,
+): FormQuestion[] {
   if (!Array.isArray(value)) return [];
   const out: FormQuestion[] = [];
   for (const raw of value) {
@@ -82,20 +100,84 @@ export function parseQuestions(value: unknown): FormQuestion[] {
     if (typeof q.id !== "string" || typeof q.label !== "string") continue;
     if (typeof q.type !== "string" || !isQuestionType(q.type)) continue;
 
+    // Branches are read back the same way, one level down. Past the depth
+    // limit they are simply dropped, which cannot loop however the JSON looks.
+    let branches: Record<string, FormQuestion[]> | undefined;
+    if (
+      q.type === "DROPDOWN" &&
+      // Same rule the editor enforces, so what it lets you build is exactly
+      // what reads back.
+      depth + 1 < MAX_BRANCH_DEPTH &&
+      q.branches &&
+      typeof q.branches === "object" &&
+      !Array.isArray(q.branches)
+    ) {
+      const parsed: Record<string, FormQuestion[]> = {};
+      for (const [option, list] of Object.entries(
+        q.branches as Record<string, unknown>,
+      )) {
+        const questions = parseQuestions(list, depth + 1);
+        if (questions.length) parsed[option] = questions;
+      }
+      if (Object.keys(parsed).length) branches = parsed;
+    }
+
     out.push({
       id: q.id,
       type: q.type,
       label: q.label,
       helpText: typeof q.helpText === "string" ? q.helpText : undefined,
       required: q.required !== false,
+      // A blank option is one the admin started and never named: it would
+      // render as an empty row nobody can meaningfully pick.
       options: Array.isArray(q.options)
-        ? q.options.filter((o): o is string => typeof o === "string")
+        ? q.options
+            .filter((o): o is string => typeof o === "string")
+            .map((o) => o.trim())
+            .filter(Boolean)
         : undefined,
       maxMb:
         typeof q.maxMb === "number" && q.maxMb > 0
           ? Math.min(q.maxMb, MAX_MB_LIMIT)
           : undefined,
+      branches,
     });
+  }
+  return out;
+}
+
+/**
+ * The form split into sections on its section breaks.
+ *
+ * Always at least one section, so a form with no breaks is simply one page and
+ * the fill component needs no special case for it.
+ */
+export function sectionsOf(questions: FormQuestion[]): FormQuestion[][] {
+  const sections: FormQuestion[][] = [[]];
+  for (const q of questions) {
+    if (q.type === "PAGE_BREAK") sections.push([]);
+    else sections[sections.length - 1].push(q);
+  }
+  // An empty section is a break with nothing after it (or two in a row): a
+  // blank page with a Next button on it, so it is dropped.
+  const filled = sections.filter((s) => s.length > 0);
+  return filled.length > 0 ? filled : [[]];
+}
+
+/**
+ * Every real question, branches included, in the order they are asked.
+ *
+ * The responses table and the CSV are flat, so they need one column per
+ * question wherever it lives  a branch answer is still an answer.
+ */
+export function flattenQuestions(questions: FormQuestion[]): FormQuestion[] {
+  const out: FormQuestion[] = [];
+  for (const q of questions) {
+    if (q.type === "PAGE_BREAK") continue;
+    out.push(q);
+    for (const list of Object.values(q.branches ?? {})) {
+      out.push(...flattenQuestions(list));
+    }
   }
   return out;
 }

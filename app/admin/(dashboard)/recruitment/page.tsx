@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   formStatus,
   parseQuestions,
+  flattenQuestions,
   parseAnswers,
   answerText,
 } from "@/lib/forms";
@@ -44,7 +45,9 @@ export default async function AdminRecruitmentPage() {
       })
     : [];
 
-  const questions = current ? parseQuestions(current.questions) : [];
+  const questions = current
+    ? flattenQuestions(parseQuestions(current.questions))
+    : [];
   const status = current ? formStatus(current, now) : "hidden";
   const badge = STATUS_BADGE[status];
 

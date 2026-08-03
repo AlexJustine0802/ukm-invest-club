@@ -14,6 +14,7 @@ import {
   CHOICE_TYPES,
   DEFAULT_MAX_MB,
   type FormAnswers,
+  type FormQuestion,
 } from "@/lib/forms";
 
 export interface SubmitState {
@@ -82,49 +83,70 @@ export async function submitRegistration(
   const questions = parseQuestions(form.questions);
   const answers: FormAnswers = {};
 
-  for (const q of questions) {
-    const key = `q_${q.id}`;
+  // Walks the questions the same way the form renders them: a branch is only
+  // read when its option was the one picked, so a required follow-up on a path
+  // nobody took cannot block the submission.
+  const collect = async (
+    list: FormQuestion[],
+  ): Promise<SubmitState | null> => {
+    for (const q of list) {
+      const key = `q_${q.id}`;
 
-    if (q.type === "FILE") {
-      const file = formData.get(key);
-      if (!(file instanceof File) || file.size === 0) {
-        if (q.required) return { error: `“${q.label}” needs a file.` };
+      // Not a question, just where one section ends and the next begins.
+      if (q.type === "PAGE_BREAK") continue;
+
+      if (q.type === "FILE") {
+        const file = formData.get(key);
+        if (!(file instanceof File) || file.size === 0) {
+          if (q.required) return { error: `“${q.label}” needs a file.` };
+          continue;
+        }
+        const maxMb = q.maxMb ?? DEFAULT_MAX_MB;
+        if (file.size > maxMb * 1024 * 1024) {
+          return { error: `“${q.label}”: file must be ${maxMb} MB or smaller.` };
+        }
+        try {
+          answers[q.id] = await uploadFile(file, "form-uploads");
+        } catch {
+          return { error: "ERROR" };
+        }
         continue;
       }
-      const maxMb = q.maxMb ?? DEFAULT_MAX_MB;
-      if (file.size > maxMb * 1024 * 1024) {
-        return { error: `“${q.label}”: file must be ${maxMb} MB or smaller.` };
-      }
-      try {
-        answers[q.id] = await uploadFile(file, "form-uploads");
-      } catch {
-        return { error: "ERROR" };
-      }
-      continue;
-    }
 
-    if (q.type === "CHECKBOX") {
-      const picked = formData
-        .getAll(key)
-        .map((v) => String(v))
-        .filter((v) => (q.options ?? []).includes(v));
-      if (q.required && picked.length === 0) {
-        return { error: `“${q.label}” needs at least one answer.` };
+      if (q.type === "CHECKBOX") {
+        const picked = formData
+          .getAll(key)
+          .map((v) => String(v))
+          .filter((v) => (q.options ?? []).includes(v));
+        if (q.required && picked.length === 0) {
+          return { error: `“${q.label}” needs at least one answer.` };
+        }
+        if (picked.length) answers[q.id] = picked;
+        continue;
       }
-      if (picked.length) answers[q.id] = picked;
-      continue;
-    }
 
-    const value = ((formData.get(key) as string) ?? "").trim();
-    if (!value) {
-      if (q.required) return { error: `“${q.label}” is required.` };
-      continue;
+      const value = ((formData.get(key) as string) ?? "").trim();
+      if (!value) {
+        if (q.required) return { error: `“${q.label}” is required.` };
+        continue;
+      }
+      if (CHOICE_TYPES.includes(q.type) && !(q.options ?? []).includes(value)) {
+        return { error: `“${q.label}”: pick one of the given options.` };
+      }
+      answers[q.id] = value;
+
+      // Only the branch belonging to the answer given is asked for.
+      const branch = q.branches?.[value];
+      if (branch) {
+        const failed = await collect(branch);
+        if (failed) return failed;
+      }
     }
-    if (CHOICE_TYPES.includes(q.type) && !(q.options ?? []).includes(value)) {
-      return { error: `“${q.label}”: pick one of the given options.` };
-    }
-    answers[q.id] = value;
-  }
+    return null;
+  };
+
+  const invalid = await collect(questions);
+  if (invalid) return invalid;
 
   await prisma.formResponse.create({
     data: {

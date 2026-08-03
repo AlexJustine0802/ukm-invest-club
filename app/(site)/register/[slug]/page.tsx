@@ -7,6 +7,7 @@ import { getUserSession } from "@/lib/userAuth";
 import RegistrationFormFill from "@/components/RegistrationFormFill";
 import {
   parseQuestions,
+  flattenQuestions,
   parseAnswers,
   answerText,
   formStatus,
@@ -77,6 +78,8 @@ export default async function RegisterPage({
 
   const session = await getUserSession();
   const questions = parseQuestions(form.questions);
+  // The recap below is a flat list; the form itself keeps the nesting.
+  const askedQuestions = flattenQuestions(questions);
   const full =
     form.capacity !== null && form._count.responses >= form.capacity;
 
@@ -166,7 +169,7 @@ export default async function RegisterPage({
           This form accepts one response per member. Here is what you sent:
         </p>
         <dl className="mt-5 space-y-4">
-          {questions.map((q) => (
+          {askedQuestions.map((q) => (
             <div key={q.id}>
               <dt className="text-sm font-semibold text-navy">{q.label}</dt>
               <dd className="mt-0.5 whitespace-pre-wrap break-words text-sm text-slate-600">
@@ -224,7 +227,7 @@ export default async function RegisterPage({
       "Not open to member accounts",
       "This form is for external applicants only.",
     );
-  } else if (questions.length === 0) {
+  } else if (askedQuestions.length === 0) {
     body = notice(
       <Lock className="h-10 w-10 text-slate-300" />,
       "This form has no questions yet",

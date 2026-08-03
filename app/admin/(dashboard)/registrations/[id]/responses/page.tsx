@@ -2,7 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
-import { parseQuestions, parseAnswers, answerText } from "@/lib/forms";
+import {
+  parseQuestions,
+  parseAnswers,
+  answerText,
+  flattenQuestions,
+} from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 import { deleteResponse } from "../../actions";
 import Can from "@/components/admin/Can";
@@ -30,7 +35,8 @@ export default async function ResponsesPage({
   });
   if (!form) notFound();
 
-  const questions = parseQuestions(form.questions);
+  // Branch answers are answers too, so the table gets a column for each.
+  const questions = flattenQuestions(parseQuestions(form.questions));
 
   return (
     <div>
