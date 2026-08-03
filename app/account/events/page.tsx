@@ -19,7 +19,6 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import { eventPalette, timeRange, eventDateLabel } from "@/lib/eventStyles";
-import { registerForEvent } from "./actions";
 
 export const metadata: Metadata = { title: "Events" };
 export const dynamic = "force-dynamic";
@@ -132,7 +131,6 @@ export default async function EventsPage({
     <>
       <AccountTopBar
         title="Events"
-        subtitle="Stay updated with all upcoming events, workshops, and activities."
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}
@@ -241,10 +239,6 @@ export default async function EventsPage({
             // takes no sign-ups at all.
             const needsRegistration =
               e.registrationForm?.registrationEnabled ?? false;
-            const formSlug =
-              needsRegistration && e.registrationForm?.published
-                ? e.registrationForm.slug
-                : null;
 
             return (
               <article
@@ -302,47 +296,34 @@ export default async function EventsPage({
 
                 {/* Action */}
                 <div className="flex shrink-0 flex-col items-stretch justify-center gap-2 lg:w-40">
+                  {/* One button whatever the state: read the event first, sign
+                      up at the bottom of its own page. */}
+                  <Link
+                    href={`/account/events/${e.slug}`}
+                    className="block w-full rounded-lg bg-primary px-6 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary-dark"
+                  >
+                    View details
+                  </Link>
+
+                  {/* Where the card's button used to say it. */}
                   {isPast ? (
-                    <span className="rounded-lg bg-slate-100 px-6 py-2.5 text-center text-sm font-semibold text-slate-400">
+                    <p className="text-center text-xs font-semibold text-slate-400">
                       Ended
-                    </span>
+                    </p>
                   ) : !needsRegistration ? (
-                    // Registration switched off in the admin: no button, but
-                    // the slot keeps its size so cards stay the same shape.
-                    <span className="rounded-lg bg-slate-50 px-6 py-2.5 text-center text-sm font-semibold text-slate-400">
+                    <p className="text-center text-xs font-semibold text-slate-400">
                       No registration needed
-                    </span>
+                    </p>
                   ) : isRegistered ? (
-                    // Same solid button as Register, so the card keeps one
-                    // consistent shape before and after signing up.
-                    <span className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white">
-                      <Check className="h-4 w-4" />
+                    <p className="flex items-center justify-center gap-1 text-xs font-semibold text-primary">
+                      <Check className="h-3.5 w-3.5" />
                       Registered
-                    </span>
+                    </p>
                   ) : isFull ? (
-                    <span className="rounded-lg bg-slate-100 px-6 py-2.5 text-center text-sm font-semibold text-slate-400">
+                    <p className="text-center text-xs font-semibold text-slate-400">
                       Full
-                    </span>
-                  ) : formSlug ? (
-                    // Events with a sign-up form go through it, same as the
-                    // public site  the answers land in the admin responses.
-                    <Link
-                      href={`/register/${formSlug}`}
-                      className="block w-full rounded-lg bg-primary px-6 py-2.5 text-center text-sm font-semibold text-white hover:bg-primary-dark"
-                    >
-                      Register
-                    </Link>
-                  ) : (
-                    <form action={registerForEvent}>
-                      <input type="hidden" name="eventId" value={e.id} />
-                      <button
-                        type="submit"
-                        className="w-full rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
-                      >
-                        Register
-                      </button>
-                    </form>
-                  )}
+                    </p>
+                  ) : null}
 
                   {left !== null && (
                     <p

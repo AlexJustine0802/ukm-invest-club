@@ -2,8 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import RegistrationFormForm from "@/components/admin/RegistrationFormForm";
-import { updateRegistrationForm } from "../../actions";
-import { requirePage } from "@/lib/adminAccess";
+import { updateRegistrationForm, createEventCategoryInline } from "../../actions";
+import { requirePage, can } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -27,22 +27,21 @@ export default async function EditRegistrationFormPage({
   ]);
   if (!form) notFound();
 
+  const mayAddCategory = await can("event-categories", "create");
+
   return (
     <div>
-      <Link href="/admin/registrations" className="text-sm text-accent-dark hover:text-accent">
-        ← Back to registrations
+      <Link href="/admin/recruitment" className="text-sm text-accent-dark hover:text-accent">
+        ← Back to recruitments
       </Link>
-      <h1 className="mt-2 text-2xl font-bold text-navy">Edit registration form</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Removing a question hides it from the form; answers already submitted stay
-        in the responses table.
-      </p>
+      <h1 className="mt-2 text-2xl font-bold text-navy">Edit recruitment form</h1>
       <div className="mt-6 max-w-3xl">
         <RegistrationFormForm
           action={updateRegistrationForm}
           form={form}
           categories={categories}
           event={form.event}
+          createCategory={mayAddCategory ? createEventCategoryInline : undefined}
         />
       </div>
     </div>

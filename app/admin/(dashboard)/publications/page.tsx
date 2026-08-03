@@ -60,11 +60,6 @@ export default async function AdminPublicationsPage() {
                     {pub.author && (
                       <p className="text-xs text-slate-400">{pub.author}</p>
                     )}
-                    {pub.featured && (
-                      <span className="badge mt-1 bg-primary-light text-primary">
-                        Featured
-                      </span>
-                    )}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
                     {pub.category?.title ?? ""}

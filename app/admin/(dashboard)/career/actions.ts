@@ -11,6 +11,7 @@ function revalidateCareer() {
   revalidatePath("/account/career");
   revalidatePath("/account/announcements");
   revalidatePath("/admin/announcements");
+  revalidatePath("/admin/highlights");
   // The notification bell reads career alerts, and it renders on every member
   // page  so a new posting has to invalidate the whole member area.
   revalidatePath("/account", "layout");
@@ -32,6 +33,7 @@ function dataFrom(formData: FormData) {
     color: str("color"),
     published: formData.get("published") === "on",
     announced: formData.get("announced") === "on",
+    highlighted: formData.get("highlighted") === "on",
   };
 }
 

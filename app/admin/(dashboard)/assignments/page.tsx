@@ -100,10 +100,6 @@ export default async function AdminAssignmentsPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy">Assignments</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Shown on <code>/account/assignments</code>. Counts and the Due Soon
-            tab are worked out from each due date.
-          </p>
         </div>
         <Can module="assignments" action="create">
           <Link href="/admin/assignments/new" className="btn-primary">

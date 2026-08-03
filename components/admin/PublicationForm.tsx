@@ -18,8 +18,6 @@ interface PublicationFormProps {
     published: boolean;
     publishedAt: Date;
     categoryId: string | null;
-    featured: boolean;
-    featuredOrder: number;
     pageCount: number | null;
     badge: string | null;
   };
@@ -114,65 +112,6 @@ export default function PublicationForm({
             </option>
           ))}
         </select>
-      </div>
-
-      <div className="rounded-lg border border-slate-200 p-4">
-        <label className="flex items-center gap-2 text-sm text-navy">
-          <input
-            type="checkbox"
-            name="featured"
-            defaultChecked={publication?.featured ?? false}
-            className="h-4 w-4 rounded border-slate-300"
-          />
-          Feature in research hero slideshow
-        </label>
-
-        <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="featuredOrder" className="label">
-              Hero order
-            </label>
-            <input
-              id="featuredOrder"
-              name="featuredOrder"
-              type="number"
-              defaultValue={publication?.featuredOrder ?? 0}
-              className="input"
-            />
-          </div>
-          <div>
-            <label htmlFor="pageCount" className="label">
-              Page count
-            </label>
-            <input
-              id="pageCount"
-              name="pageCount"
-              type="number"
-              min={0}
-              defaultValue={publication?.pageCount ?? ""}
-              placeholder="e.g. 24"
-              className="input"
-            />
-          </div>
-          <div>
-            <label htmlFor="badge" className="label">
-              Hero badge
-            </label>
-            <select
-              id="badge"
-              name="badge"
-              defaultValue={publication?.badge ?? ""}
-              className="input"
-            >
-              <option value="">Defaults to category name</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.title}>
-                  {c.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
       </div>
 
       <div>

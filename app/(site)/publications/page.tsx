@@ -22,12 +22,17 @@ const publicationSummarySelect = {
   category: { select: { title: true, slug: true } },
 } as const;
 
+/** How many publications the research hero cycles through. */
+const HERO_SLIDES = 5;
+
 export default async function PublicationsPage() {
-  const [featured, categories, latestPublications] = await Promise.all([
+  const [heroSlides, categories, latestPublications] = await Promise.all([
+    // The hero is the newest published research, nothing to tick in the admin:
+    // publish a sixth and the oldest slide drops off on its own.
     prisma.publication.findMany({
-      where: { published: true, featured: true },
-      orderBy: [{ featuredOrder: "asc" }, { publishedAt: "desc" }],
-      take: 6,
+      where: { published: true },
+      orderBy: { publishedAt: "desc" },
+      take: HERO_SLIDES,
       select: publicationSummarySelect,
     }),
     prisma.researchCategory.findMany({
@@ -48,10 +53,6 @@ export default async function PublicationsPage() {
       select: publicationSummarySelect,
     }),
   ]);
-
-  // Hero shows the ticked ("featured") publications; falls back to the latest.
-  const heroSlides =
-    featured.length > 0 ? featured : latestPublications.slice(0, 3);
 
   return (
     <ResearchPageContent

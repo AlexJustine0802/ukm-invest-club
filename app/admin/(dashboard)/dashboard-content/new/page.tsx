@@ -1,8 +1,9 @@
 import Link from "next/link";
 import DashboardItemForm from "@/components/admin/DashboardItemForm";
 import { sectionConfig } from "@/lib/dashboardSections";
-import { createDashboardItem } from "../actions";
-import { requirePage } from "@/lib/adminAccess";
+import { createDashboardItem, createFolderCategory } from "../actions";
+import { requirePage, can } from "@/lib/adminAccess";
+import { prisma } from "@/lib/prisma";
 
 export default async function NewDashboardItemPage({
   searchParams,
@@ -13,6 +14,19 @@ export default async function NewDashboardItemPage({
 
   const { section: sectionParam } = await searchParams;
   const config = sectionConfig(sectionParam);
+
+  // Folders file under the research categories; nothing else needs the list.
+  const categories =
+    config.id === "folder"
+      ? (
+          await prisma.researchCategory.findMany({
+            orderBy: [{ order: "asc" }, { title: "asc" }],
+            select: { title: true },
+          })
+        ).map((c) => c.title)
+      : [];
+  const mayAddCategory =
+    config.id === "folder" && (await can("research-categories", "create"));
 
   return (
     <div>
@@ -25,7 +39,12 @@ export default async function NewDashboardItemPage({
       <h1 className="mt-2 text-2xl font-bold text-navy">Add to {config.label}</h1>
       <p className="mt-1 text-sm text-slate-500">{config.description}</p>
       <div className="mt-6 max-w-2xl">
-        <DashboardItemForm action={createDashboardItem} section={config.id} />
+        <DashboardItemForm
+          action={createDashboardItem}
+          section={config.id}
+          categories={categories}
+          createCategory={mayAddCategory ? createFolderCategory : undefined}
+        />
       </div>
     </div>
   );

@@ -46,3 +46,28 @@ export async function deleteHighlight(formData: FormData) {
   await deleteIfExists(() => prisma.highlight.delete({ where: { id } }));
   revalidateHighlights();
 }
+
+/**
+ * Flip the highlight switch on something that already exists.
+ *
+ * Only one banner fits on the dashboard, so switching a second thing on does
+ * not hide the first  the newest simply wins, same as two active highlights.
+ */
+export async function setHighlighted(formData: FormData) {
+  await requirePermission("highlights", "manage");
+  const id = formData.get("id") as string;
+  const highlighted = formData.get("highlighted") === "1";
+
+  if (formData.get("kind") === "career") {
+    await prisma.careerAlert.update({ where: { id }, data: { highlighted } });
+  } else {
+    await prisma.registrationForm.update({
+      where: { id },
+      data: { highlighted },
+    });
+  }
+
+  revalidateHighlights();
+  revalidatePath("/admin/career");
+  revalidatePath("/admin/registrations");
+}

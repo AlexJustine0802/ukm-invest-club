@@ -22,10 +22,6 @@ export default async function AdminDiscussionsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy">Discussion channels</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Shown on <code>/account/discussions</code>. Members must join a
-            channel before they can read or post in it.
-          </p>
         </div>
         <Can module="discussions" action="create">
           <Link href="/admin/discussions/new" className="btn-primary">

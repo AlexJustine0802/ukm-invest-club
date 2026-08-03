@@ -171,7 +171,9 @@ export const ADMIN_MODULES: AdminModule[] = [
     href: "/admin/highlights",
     icon: "Megaphone",
     workspace: "dashboard",
-    actions: CRUD,
+    // "manage" is the highlight switches on events, recruitment and career
+    // alerts, same split as Announcements.
+    actions: [...CRUD, "manage"],
     description: "The banner at the top of the member dashboard.",
   },
   {

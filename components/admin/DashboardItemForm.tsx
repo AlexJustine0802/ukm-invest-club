@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
+import CategorySelect from "@/components/admin/CategorySelect";
 import { UI_ICON_KEYS } from "@/lib/uiIcons";
 import { colorOptions, sectionConfig } from "@/lib/dashboardSections";
 import { METRICS } from "@/lib/metrics";
@@ -9,6 +10,12 @@ interface DashboardItemFormProps {
   section: string;
   /** Where Cancel goes. Defaults to the section's Dashboard Content list. */
   backTo?: string;
+  /** Folder section only: the research categories to choose from. */
+  categories?: string[];
+  /** Omitted when the role may not add a research category. */
+  createCategory?: (
+    title: string,
+  ) => Promise<{ value: string; label: string } | { error: string }>;
   item?: {
     id: string;
     title: string;
@@ -30,6 +37,8 @@ export default function DashboardItemForm({
   section,
   item,
   backTo,
+  categories = [],
+  createCategory,
 }: DashboardItemFormProps) {
   const config = sectionConfig(section);
   const fields = config.fields;
@@ -93,7 +102,20 @@ export default function DashboardItemForm({
       {textField("subtitle")}
       {textField("meta")}
       {textField("note")}
-      {textField("badge")}
+      {/* Folders file under the research categories the public site uses; every
+          other section still types its own tag. */}
+      {fields.badge && section === "folder" ? (
+        <CategorySelect
+          name="badge"
+          label={fields.badge}
+          defaultValue={item?.badge}
+          options={categories.map((c) => ({ value: c, label: c }))}
+          createAction={createCategory}
+          hint="Also added to the research categories used on the public site."
+        />
+      ) : (
+        textField("badge")
+      )}
       {textField("href")}
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -138,18 +160,21 @@ export default function DashboardItemForm({
         )}
       </div>
 
-      <div>
-        <label htmlFor="order" className="label">
-          Display order
-        </label>
-        <input
-          id="order"
-          name="order"
-          type="number"
-          defaultValue={item?.order ?? 0}
-          className="input"
-        />
-      </div>
+      {/* Folders list in the order they were created; nothing to type. */}
+      {section !== "folder" && (
+        <div>
+          <label htmlFor="order" className="label">
+            Display order
+          </label>
+          <input
+            id="order"
+            name="order"
+            type="number"
+            defaultValue={item?.order ?? 0}
+            className="input"
+          />
+        </div>
+      )}
 
       <label className="flex items-center gap-3">
         <input

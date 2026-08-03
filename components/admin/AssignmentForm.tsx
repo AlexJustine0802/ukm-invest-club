@@ -14,7 +14,6 @@ interface AssignmentFormProps {
     description: string | null;
     opensAt: Date | null;
     dueDate: Date;
-    href: string | null;
     fileUrl: string | null;
     fileName: string | null;
     published: boolean;
@@ -152,19 +151,6 @@ export default function AssignmentForm({
             </span>
           </label>
         )}
-      </div>
-
-      <div>
-        <label htmlFor="href" className="label">
-          Link <span className="text-slate-400">(optional)</span>
-        </label>
-        <input
-          id="href"
-          name="href"
-          defaultValue={assignment?.href ?? ""}
-          placeholder="e.g. a submission form URL"
-          className="input"
-        />
       </div>
 
       <label className="flex items-center gap-3">

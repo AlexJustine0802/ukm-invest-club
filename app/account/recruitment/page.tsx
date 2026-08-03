@@ -92,11 +92,6 @@ export default async function RecruitmentPage() {
   const topBar = (
     <AccountTopBar
       title="Recruitment"
-      subtitle={
-        isOpen
-          ? "Open recruitment is running  pick a division and apply."
-          : "Join the committee behind Invest Club."
-      }
       showSearch={false}
       name={user.name}
       initial={user.name.charAt(0).toUpperCase()}

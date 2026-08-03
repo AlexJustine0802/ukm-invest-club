@@ -156,7 +156,6 @@ export default async function AssignmentsPage({
     <>
       <AccountTopBar
         title="Assignments"
-        subtitle="Track your tasks, submit your work, and stay on top of your deadlines."
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

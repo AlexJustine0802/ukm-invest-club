@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import RegistrationFormForm from "@/components/admin/RegistrationFormForm";
-import { createRegistrationForm } from "../actions";
-import { requirePage } from "@/lib/adminAccess";
+import { createRegistrationForm, createEventCategoryInline } from "../actions";
+import { requirePage, can } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +14,8 @@ export default async function NewRegistrationFormPage() {
     select: { id: true, title: true },
   });
 
+  const mayAddCategory = await can("event-categories", "create");
+
   return (
     <div>
       <Link href="/admin/registrations" className="text-sm text-accent-dark hover:text-accent">
@@ -24,6 +26,7 @@ export default async function NewRegistrationFormPage() {
         <RegistrationFormForm
           action={createRegistrationForm}
           categories={categories}
+          createCategory={mayAddCategory ? createEventCategoryInline : undefined}
         />
       </div>
     </div>

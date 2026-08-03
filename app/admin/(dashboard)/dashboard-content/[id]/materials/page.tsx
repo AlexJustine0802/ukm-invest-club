@@ -34,19 +34,6 @@ export default async function FolderMaterialsPage({
         ← Back to resource folders
       </Link>
       <h1 className="mt-2 text-2xl font-bold text-navy">{folder.title}</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        What members see after opening this folder.
-        {folder.href && (
-          <>
-            {" "}
-            <span className="font-semibold text-amber-600">
-              This folder has a Link set, so clicking it jumps straight to that
-              link and members never reach this list.
-            </span>{" "}
-            Clear the Link on the folder to use these materials instead.
-          </>
-        )}
-      </p>
 
       <Can module="resource-materials" action="create">
         <form
@@ -97,32 +84,6 @@ export default async function FolderMaterialsPage({
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="meta" className="label">
-                Detail <span className="text-slate-400">(optional)</span>
-              </label>
-              <input
-                id="meta"
-                name="meta"
-                placeholder="e.g. PDF · 12 pages"
-                className="input"
-              />
-            </div>
-            <div>
-              <label htmlFor="order" className="label">
-                Display order
-              </label>
-              <input
-                id="order"
-                name="order"
-                type="number"
-                defaultValue={0}
-                className="input"
-              />
-            </div>
-          </div>
-
           <SubmitButton label="Add material" />
         </form>
       </Can>
@@ -144,8 +105,8 @@ export default async function FolderMaterialsPage({
                   </p>
                 )}
                 <p className="mt-1 truncate text-xs text-slate-400">
-                  Order: {m.order}
-                  {m.meta ? ` · ${m.meta}` : ""} · {m.url}
+                  {m.meta ? `${m.meta} · ` : ""}
+                  {m.url}
                 </p>
               </div>
               <Can module="resource-materials" action="delete">

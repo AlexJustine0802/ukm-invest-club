@@ -13,7 +13,15 @@ interface Props {
 }
 
 async function getEvent(slug: string) {
-  return prisma.event.findFirst({ where: { slug, published: true } });
+  return prisma.event.findFirst({
+    where: { slug, published: true },
+    include: {
+      registrationForm: {
+        select: { slug: true, published: true, registrationEnabled: true },
+      },
+      _count: { select: { registrations: true } },
+    },
+  });
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -32,6 +40,16 @@ export default async function EventDetailPage({ params }: Props) {
   if (!event) notFound();
 
   const upcoming = isUpcoming(event.eventDate);
+
+  // The sign-up button only exists when there is somewhere for it to go: a
+  // published form with registration still switched on.
+  const form = event.registrationForm;
+  const formSlug =
+    form?.published && form.registrationEnabled ? form.slug : null;
+  const left =
+    event.capacity === null
+      ? null
+      : Math.max(event.capacity - event._count.registrations, 0);
 
   return (
     <article>
@@ -76,6 +94,38 @@ export default async function EventDetailPage({ params }: Props) {
 
         <div className="mt-8 max-w-3xl">
           <Markdown content={event.description} />
+        </div>
+
+        {/* Sign-up lives at the bottom, after what the event actually is. */}
+        <div className="mt-10 max-w-3xl rounded-2xl border border-slate-200 bg-white p-6">
+          {!upcoming ? (
+            <p className="font-semibold text-slate-500">
+              This event has ended.
+            </p>
+          ) : !formSlug ? (
+            <p className="font-semibold text-slate-600">
+              No registration needed — just come along.
+            </p>
+          ) : left === 0 ? (
+            <p className="font-semibold text-slate-500">
+              Registration is full.
+            </p>
+          ) : (
+            <>
+              <p className="font-bold text-navy">Register for this event</p>
+              {left !== null && (
+                <p className="mt-1 text-sm text-slate-500">
+                  {left} of {event.capacity} {event.seatUnit} left.
+                </p>
+              )}
+              <Link
+                href={`/register/${formSlug}`}
+                className="btn-primary mt-4 inline-block px-6 py-2.5"
+              >
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </article>

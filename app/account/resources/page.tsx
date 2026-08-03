@@ -60,7 +60,6 @@ export default async function ResourcesPage({
     <>
       <AccountTopBar
         title="Resources"
-        subtitle="Your central library for learning materials, research, templates, and more."
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

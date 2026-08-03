@@ -43,7 +43,6 @@ async function dataFrom(formData: FormData) {
     description: str("description"),
     opensAt,
     dueDate: new Date(formData.get("dueDate") as string),
-    href: str("href"),
     published: formData.get("published") === "on",
   };
 }

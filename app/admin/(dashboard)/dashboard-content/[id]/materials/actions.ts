@@ -23,8 +23,8 @@ export async function createResourceMaterial(formData: FormData) {
       title: (formData.get("title") as string).trim(),
       url: (formData.get("url") as string).trim(),
       description: str("description"),
-      meta: str("meta"),
-      order: Number(formData.get("order")) || 0,
+      // Detail and display order are not asked for any more; the column
+      // defaults stand, which lists materials newest first.
     },
   });
 

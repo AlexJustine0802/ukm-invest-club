@@ -68,7 +68,6 @@ export default async function CareerPage({
     <>
       <AccountTopBar
         title="Career Alert"
-        subtitle="Internships and job openings shared with Invest Club members."
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

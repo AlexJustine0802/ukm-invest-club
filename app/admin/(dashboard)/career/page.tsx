@@ -23,11 +23,6 @@ export default async function AdminCareerPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy">Career alerts</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Shown on <code>/account/career</code>. Publishing one also puts it in
-            every member&apos;s notification bell for 14 days  no separate
-            announcement needed.
-          </p>
         </div>
         <Can module="career" action="create">
           <Link href="/admin/career/new" className="btn-primary">

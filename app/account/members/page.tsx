@@ -76,7 +76,6 @@ export default async function MembersPage({
     <>
       <AccountTopBar
         title="Members"
-        subtitle={`${members.length} people are part of Invest Club.`}
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

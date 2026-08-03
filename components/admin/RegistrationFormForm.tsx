@@ -1,8 +1,7 @@
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import FormQuestionsEditor from "@/components/admin/FormQuestionsEditor";
-import { UI_ICON_KEYS } from "@/lib/uiIcons";
-import { EVENT_COLOR_KEYS } from "@/lib/eventStyles";
+import CategorySelect from "@/components/admin/CategorySelect";
 import { AUDIENCES, parseQuestions } from "@/lib/forms";
 import { toDateTimeLocalValue } from "@/lib/utils";
 
@@ -18,6 +17,7 @@ interface RegistrationFormFormProps {
     multipleResponses: boolean;
     isRecruitment: boolean;
     announced: boolean;
+    highlighted: boolean;
     registrationEnabled: boolean;
     questions: unknown;
     opensAt: Date | null;
@@ -41,6 +41,10 @@ interface RegistrationFormFormProps {
     categoryId: string | null;
     seatUnit: string;
   } | null;
+  /** Omitted when the role may not add an event category. */
+  createCategory?: (
+    title: string,
+  ) => Promise<{ value: string; label: string } | { error: string }>;
 }
 
 export default function RegistrationFormForm({
@@ -48,6 +52,7 @@ export default function RegistrationFormForm({
   form,
   categories = [],
   event,
+  createCategory,
 }: RegistrationFormFormProps) {
   return (
     <form action={action} className="space-y-6">
@@ -68,23 +73,6 @@ export default function RegistrationFormForm({
             placeholder="e.g. Staff Recruitment 2026"
             className="input"
           />
-        </div>
-
-        <div>
-          <label htmlFor="slug" className="label">
-            Link slug <span className="text-slate-400">(optional)</span>
-          </label>
-          <input
-            id="slug"
-            name="slug"
-            defaultValue={form?.slug}
-            placeholder="left blank = made from the title"
-            className="input"
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            The form lives at <code>/register/&lt;slug&gt;</code>  share that
-            link.
-          </p>
         </div>
 
         <div>
@@ -249,6 +237,22 @@ export default function RegistrationFormForm({
             </span>
           </span>
         </label>
+
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            name="highlighted"
+            defaultChecked={form?.highlighted ?? false}
+            className="mt-1 h-4 w-4"
+          />
+          <span className="text-sm font-medium text-navy">
+            Highlight this
+            <span className="mt-0.5 block text-xs font-normal text-slate-500">
+              Runs as the banner at the top of the member dashboard. Only one
+              banner fits, so the newest thing highlighted is the one shown.
+            </span>
+          </span>
+        </label>
       </div>
 
       <div className="card space-y-5 p-5">
@@ -328,24 +332,14 @@ export default function RegistrationFormForm({
               className="input"
             />
           </div>
-          <div>
-            <label htmlFor="categoryId" className="label">
-              Category
-            </label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              defaultValue={event?.categoryId ?? ""}
-              className="input"
-            >
-              <option value="">None</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.title}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CategorySelect
+            name="categoryId"
+            label="Category"
+            defaultValue={event?.categoryId}
+            options={categories.map((c) => ({ value: c.id, label: c.title }))}
+            createAction={createCategory}
+            hint="Also added to the event categories used on the public site."
+          />
           <div>
             <label htmlFor="seatUnit" className="label">
               Seats counted in
@@ -377,57 +371,9 @@ export default function RegistrationFormForm({
         />
       </div>
 
+      {/* Icon, colour and display order are set from what the form is (see
+          styleFor in the registrations actions), so there is nothing to pick. */}
       <div className="card space-y-5 p-5">
-        <p className="font-bold text-navy">Display</p>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
-            <label htmlFor="icon" className="label">
-              Icon
-            </label>
-            <select
-              id="icon"
-              name="icon"
-              defaultValue={form?.icon ?? "ClipboardList"}
-              className="input"
-            >
-              {UI_ICON_KEYS.map((key) => (
-                <option key={key} value={key}>
-                  {key}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="color" className="label">
-              Colour
-            </label>
-            <select
-              id="color"
-              name="color"
-              defaultValue={form?.color ?? EVENT_COLOR_KEYS[0]}
-              className="input"
-            >
-              {EVENT_COLOR_KEYS.map((key) => (
-                <option key={key} value={key}>
-                  {key}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="order" className="label">
-              Display order
-            </label>
-            <input
-              id="order"
-              name="order"
-              type="number"
-              defaultValue={form?.order ?? 0}
-              className="input"
-            />
-          </div>
-        </div>
-
         <label className="flex items-center gap-3">
           <input
             type="checkbox"

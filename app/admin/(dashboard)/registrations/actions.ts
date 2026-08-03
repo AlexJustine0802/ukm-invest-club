@@ -22,7 +22,19 @@ function revalidateForms(slug?: string) {
   revalidatePath("/account/events");
   revalidatePath("/account/announcements");
   revalidatePath("/admin/announcements");
+  revalidatePath("/admin/highlights");
   if (slug) revalidatePath(`/register/${slug}`);
+}
+
+/**
+ * Icon and colour are not asked for any more: what a form is already decides
+ * how it should look, and three kinds of form with a free choice each only
+ * produced inconsistent lists.
+ */
+function styleFor(isRecruitment: boolean, isEvent: boolean) {
+  if (isEvent) return { icon: "CalendarDays", color: "blue" };
+  if (isRecruitment) return { icon: "Search", color: "violet" };
+  return { icon: "FileSpreadsheet", color: "green" };
 }
 
 function dataFrom(formData: FormData) {
@@ -41,15 +53,20 @@ function dataFrom(formData: FormData) {
     questions = [];
   }
 
+  const isRecruitment = formData.get("isRecruitment") === "on";
+
   return {
     title,
-    slug: slugify(str("slug") || title),
+    // Made from the title; uniqueSlug below settles collisions. The admin form
+    // no longer asks for one.
+    slug: slugify(title),
     description: str("description"),
     coverImage: str("coverImage"),
     audience: isAudience(audience) ? audience : "MEMBERS",
     multipleResponses: formData.get("multipleResponses") === "on",
-    isRecruitment: formData.get("isRecruitment") === "on",
+    isRecruitment,
     announced: formData.get("announced") === "on",
+    highlighted: formData.get("highlighted") === "on",
     registrationEnabled: formData.get("registrationEnabled") === "on",
     // Prisma types Json columns structurally; our typed array needs the cast.
     questions: parseQuestions(questions).filter(
@@ -59,10 +76,45 @@ function dataFrom(formData: FormData) {
     closesAt: closesAt ? new Date(closesAt) : null,
     capacity: capacity ? Number(capacity) || null : null,
     published: formData.get("published") === "on",
-    order: Number(formData.get("order")) || 0,
-    icon: str("icon"),
-    color: str("color"),
+    ...styleFor(isRecruitment, Boolean(formData.get("showOnEvents"))),
   };
+}
+
+/**
+ * Add an event category from the event form's dialog.
+ *
+ * Guarded by event-categories, not registrations: the category shows up on the
+ * public events page, so it is that module's permission to give.
+ */
+export async function createEventCategoryInline(
+  title: string,
+): Promise<{ value: string; label: string } | { error: string }> {
+  await requirePermission("event-categories", "create");
+
+  const clean = title.trim();
+  if (!clean) return { error: "Give the category a name." };
+
+  const existing = await prisma.eventCategory.findFirst({
+    where: { title: clean },
+    select: { id: true, title: true },
+  });
+  const category =
+    existing ??
+    (await prisma.eventCategory.create({
+      data: {
+        title: clean,
+        slug: await uniqueSlug(
+          (s) => prisma.eventCategory.findUnique({ where: { slug: s } }),
+          slugify(clean),
+          "category",
+        ),
+      },
+      select: { id: true, title: true },
+    }));
+
+  revalidatePath("/events");
+  revalidatePath("/admin/event-categories");
+  return { value: category.id, label: category.title };
 }
 
 export async function createRegistrationForm(formData: FormData) {

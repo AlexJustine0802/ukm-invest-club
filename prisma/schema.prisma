@@ -237,6 +237,8 @@ model RegistrationForm {
   // Announced on the member Announcements page and dashboard rail. Reads as
   // the event, the recruitment round or the sign-up, depending on the form.
   announced Boolean @default(false)
+  // Runs as the banner at the top of the member dashboard.
+  highlighted Boolean @default(false)
 
   opensAt   DateTime?
   closesAt  DateTime?
@@ -297,6 +299,8 @@ model CareerAlert {
   // Also listed on the member Announcements page and dashboard rail. One flag,
   // no copied row to keep in step with the alert it describes.
   announced   Boolean   @default(false)
+  // Same idea for the dashboard banner: one flag, no copied Highlight row.
+  highlighted Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

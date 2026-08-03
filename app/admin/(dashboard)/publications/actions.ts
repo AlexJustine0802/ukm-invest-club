@@ -33,10 +33,16 @@ function parseFields(formData: FormData) {
     published: formData.get("published") === "on",
     publishedAt: publishedAtRaw ? new Date(publishedAtRaw) : new Date(),
     categoryId: categoryId || null,
-    featured: formData.get("featured") === "on",
-    featuredOrder: Number(formData.get("featuredOrder")) || 0,
-    pageCount: pageCountRaw ? Number(pageCountRaw) : null,
-    badge: (formData.get("badge") as string)?.trim() || null,
+    // featured / featuredOrder are not written any more: the research hero is
+    // the newest published research, see HERO_SLIDES in app/(site)/publications.
+    // Page count and hero badge left the form with it, so they are only written
+    // when something actually submitted them  never wiped by their absence.
+    ...(formData.has("pageCount")
+      ? { pageCount: pageCountRaw ? Number(pageCountRaw) : null }
+      : {}),
+    ...(formData.has("badge")
+      ? { badge: (formData.get("badge") as string)?.trim() || null }
+      : {}),
   };
 }
 

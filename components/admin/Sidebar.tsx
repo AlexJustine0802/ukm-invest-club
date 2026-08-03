@@ -36,7 +36,6 @@ const publicGroups: Group[] = [
     children: [
       { label: "Publications", href: "/admin/publications" },
       { label: "Research Categories", href: "/admin/research-categories" },
-      { label: "Hero Slides", href: "/admin/publications/featured" },
       { label: "Research Stats", href: "/admin/impact-stats?section=research" },
     ],
   },
@@ -107,15 +106,6 @@ const dashboardGroups: Group[] = [
     icon: "📣",
     href: "/admin/announcements",
     children: [{ label: "Announcements", href: "/admin/announcements" }],
-  },
-  {
-    label: "Dashboard Content",
-    icon: "🧩",
-    href: "/admin/dashboard-content",
-    children: [
-      { label: "Overview Stats", href: "/admin/dashboard-content?section=overview" },
-      { label: "Recent Resources", href: "/admin/dashboard-content?section=resource" },
-    ],
   },
   {
     label: "Resources Page",

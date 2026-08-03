@@ -88,12 +88,6 @@ export default async function AdminAnnouncementsPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-navy">Announcements</h1>
-          <p className="mt-1 max-w-2xl text-sm text-slate-500">
-            What members see on <code>/account/announcements</code> and in the
-            dashboard rail. Write one here, or switch on anything below  an
-            announced event, round or job is read live, so editing it there
-            updates the announcement too.
-          </p>
         </div>
         <Can module="announcements" action="create">
           <Link href="/admin/announcements/new" className="btn-primary">

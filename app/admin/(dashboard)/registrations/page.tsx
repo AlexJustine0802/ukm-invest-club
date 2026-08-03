@@ -89,15 +89,15 @@ export default async function AdminRegistrationsPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <Link
+        href="/admin/member-dashboard"
+        className="text-sm text-accent-dark hover:text-accent"
+      >
+        ← Back to member dashboard
+      </Link>
+      <div className="mt-2 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy">Registrations</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Recruitment and sign-up forms. A form with a start date is also a
-            public event; the shareable link is{" "}
-            <code>/register/&lt;slug&gt;</code>. Responses export to CSV for
-            Google Sheets or Excel.
-          </p>
         </div>
         <Can module="registrations" action="create">
           <Link href="/admin/registrations/new" className="btn-primary">

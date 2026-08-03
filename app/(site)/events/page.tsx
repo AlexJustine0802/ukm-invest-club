@@ -155,15 +155,6 @@ function eventHref(event: EventDisplay) {
   return `/events/${event.slug}`;
 }
 
-/**
- * "Register Now" goes straight to the event's sign-up form when one is linked
- * in the admin; otherwise it falls back to the event detail page.
- */
-function registerHref(event: EventDisplay) {
-  return event.registrationSlug
-    ? `/register/${event.registrationSlug}`
-    : eventHref(event);
-}
 
 function SectionHeader({
   title,
@@ -244,15 +235,14 @@ function UpcomingCard({ event }: { event: EventDisplay }) {
               {event.location}
             </p>
           </div>
-          {/* No button at all when the event needs no sign-up. */}
-          {event.registrationEnabled && (
-            <Link
-              href={registerHref(event)}
-              className="btn-primary mt-6 px-5 py-2 text-xs"
-            >
-              Register Now
-            </Link>
-          )}
+          {/* Always the detail page: what the event is comes before signing
+              up for it, and the sign-up button lives at the bottom there. */}
+          <Link
+            href={eventHref(event)}
+            className="btn-primary mt-6 px-5 py-2 text-xs"
+          >
+            View details
+          </Link>
         </div>
       </div>
     </article>
@@ -286,19 +276,12 @@ function CalendarRow({ event }: { event: EventDisplay }) {
           {event.location}
         </p>
       </div>
-      {/* The grid column stays either way, so rows keep their alignment. */}
-      {event.registrationEnabled ? (
-        <Link
-          href={registerHref(event)}
-          className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end"
-        >
-          Register
-        </Link>
-      ) : (
-        <span className="justify-self-start text-xs font-semibold text-slate-400 lg:justify-self-end">
-          No registration needed
-        </span>
-      )}
+      <Link
+        href={eventHref(event)}
+        className="btn-primary justify-self-start px-6 py-2 text-xs lg:justify-self-end"
+      >
+        View details
+      </Link>
     </div>
   );
 }

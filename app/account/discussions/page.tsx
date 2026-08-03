@@ -67,7 +67,6 @@ export default async function DiscussionsPage({
     <>
       <AccountTopBar
         title="Discussions"
-        subtitle="Join a channel to read the conversation and post your own questions."
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

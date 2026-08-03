@@ -11,6 +11,7 @@ import LatestUpdates from "@/components/account/LatestUpdates";
 import Reveal from "@/components/Reveal";
 import { getSections } from "@/lib/dashboardContent";
 import { getAnnouncements } from "@/lib/announcements";
+import { getBanner } from "@/lib/highlights";
 import { getUiIcon } from "@/lib/uiIcons";
 import { getMetricValues, resolveMetric } from "@/lib/metrics";
 import { greetingFor } from "@/lib/greeting";
@@ -100,11 +101,9 @@ export default async function AccountPage() {
     channels,
     announcements,
   ] = await Promise.all([
-    // Newest active highlight, managed from /admin/highlights.
-    prisma.highlight.findFirst({
-      where: { active: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    // Newest banner: a written highlight, or whatever is switched on in
+    // /admin/highlights (an event, recruitment round or career alert).
+    getBanner(),
     // Editable blocks, managed from /admin/dashboard-content.
     getSections(["overview", "resource"]),
     // Upcoming events reuse the existing public Event model.
@@ -175,28 +174,32 @@ export default async function AccountPage() {
 
   const railAnnouncements = announcements.slice(0, 3);
 
-  // Stat cards always render. Admin-configured rows win; with none configured
-  // the defaults above stand in so the row of cards never disappears.
-  const overviewCards = (
-    content.overview.length > 0
-      ? content.overview.map((o) => {
-          const metric = resolveMetric(o.metric, o.title);
-          return {
-            id: o.id,
-            title: o.title,
-            icon: o.icon,
-            color: o.color,
-            value: metric ? String(metrics[metric]) : (o.subtitle ?? "0"),
-            // A typed "↑ 3 this week" cannot be trusted next to a live count.
-            note: metric ? null : o.note,
-          };
-        })
-      : DEFAULT_OVERVIEW.map((d) => ({
-          ...d,
-          value: String(metrics[d.metric]),
-          note: null,
-        }))
-  ).slice(0, 4);
+  // Admin-configured cards lead; the defaults fill the rest of the row, so
+  // adding one card in the admin no longer replaces the other three. A default
+  // whose counter an admin card already shows is dropped, not duplicated.
+  const configured = content.overview.map((o) => {
+    const metric = resolveMetric(o.metric, o.title);
+    return {
+      id: o.id,
+      title: o.title,
+      icon: o.icon,
+      color: o.color,
+      metric,
+      value: metric ? String(metrics[metric]) : (o.subtitle ?? "0"),
+      // A typed "↑ 3 this week" cannot be trusted next to a live count.
+      note: metric ? null : o.note,
+    };
+  });
+  const usedMetrics = new Set(configured.map((c) => c.metric).filter(Boolean));
+
+  const overviewCards = [
+    ...configured,
+    ...DEFAULT_OVERVIEW.filter((d) => !usedMetrics.has(d.metric)).map((d) => ({
+      ...d,
+      value: String(metrics[d.metric]),
+      note: null,
+    })),
+  ].slice(0, 4);
 
   // Mobile-only summary bar. Reuses the data already fetched above for the
   // side rails  no extra queries, no second copy of the widgets.

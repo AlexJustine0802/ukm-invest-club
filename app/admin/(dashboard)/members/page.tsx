@@ -75,24 +75,16 @@ export default async function AdminMembersPage({
 
   return (
     <div>
-      <div>
+      <Link
+        href="/admin/member-dashboard"
+        className="text-sm text-accent-dark hover:text-accent"
+      >
+        ← Back to member dashboard
+      </Link>
+      <div className="mt-2">
         <h1 className="text-2xl font-bold text-navy">
           {manages ? "Members & roles" : "Members"}
         </h1>
-        <p className="mt-1 text-sm text-slate-500">
-          {manages ? (
-            <>
-              Every registered account. Set a division and a role  the role
-              list follows the division, and each division except PVPC has a
-              Head. Members see this on <code>/account/members</code>.
-            </>
-          ) : (
-            <>
-              Every registered account. Roles and divisions are set by the
-              super admin.
-            </>
-          )}
-        </p>
       </div>
 
       <form method="get" className="mt-6 flex flex-wrap items-center gap-2">

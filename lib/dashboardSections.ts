@@ -56,7 +56,6 @@ export const DASHBOARD_SECTIONS: SectionConfig[] = [
       badge: "Tag",
       note: "Age (e.g. Yesterday)",
       color: "Thumbnail colour",
-      href: "Link",
     },
   },
   {
@@ -64,13 +63,11 @@ export const DASHBOARD_SECTIONS: SectionConfig[] = [
     label: "Resource Folders",
     description: "Folder cards on the member Resources page.",
     // No `meta` here on purpose: the item count is counted from the materials
-    // actually in the folder, not typed in by hand.
+    // actually in the folder, not typed in by hand. Icon, colour and order are
+    // not asked for either  see FOLDER_STYLE in the dashboard-content actions.
     fields: {
       title: "Folder name",
       badge: "Category",
-      icon: "Icon",
-      color: "Header colour",
-      href: "Link",
     },
   },
 ];

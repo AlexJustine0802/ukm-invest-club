@@ -8,6 +8,8 @@ import {
 } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
 import Can from "@/components/admin/Can";
+import DeleteButton from "@/components/admin/DeleteButton";
+import { deleteRegistrationForm } from "../registrations/actions";
 import { requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
@@ -51,12 +53,6 @@ export default async function AdminRecruitmentPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-navy">Recruitment</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            The open-recruitment round members see on{" "}
-            <code>/account/recruitment</code>. The newest form ticked as “club
-            recruitment” is the live one; its open and close dates decide
-            whether members see the page or a closed notice.
-          </p>
         </div>
         <Can module="registrations" action="create">
           <Link href="/admin/registrations/new" className="btn-primary">
@@ -145,6 +141,14 @@ export default async function AdminRecruitmentPage() {
                 >
                   Open link
                 </Link>
+                <Can module="registrations" action="delete">
+                  <DeleteButton
+                    action={deleteRegistrationForm}
+                    id={current.id}
+                    className="btn-danger px-3 py-1.5 text-xs"
+                    confirmMessage="Delete this recruitment round? Its applicants and answers go with it. This cannot be undone."
+                  />
+                </Can>
               </div>
             </div>
 
@@ -253,6 +257,14 @@ export default async function AdminRecruitmentPage() {
                     >
                       Applicants
                     </Link>
+                    <Can module="registrations" action="delete">
+                      <DeleteButton
+                        action={deleteRegistrationForm}
+                        id={f.id}
+                        className="btn-danger px-3 py-1.5 text-xs"
+                        confirmMessage="Delete this recruitment round? Its applicants and answers go with it. This cannot be undone."
+                      />
+                    </Can>
                   </div>
                 ))}
               </div>

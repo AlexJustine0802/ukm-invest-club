@@ -19,6 +19,7 @@ interface CareerAlertFormProps {
     color: string | null;
     published: boolean;
     announced: boolean;
+    highlighted: boolean;
   };
 }
 
@@ -189,6 +190,22 @@ export default function CareerAlertForm({ action, alert }: CareerAlertFormProps)
           <span className="mt-0.5 block text-xs font-normal text-slate-500">
             Also lists it on the member Announcements page and dashboard rail.
             Can be switched on later from Announcements.
+          </span>
+        </span>
+      </label>
+
+      <label className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          name="highlighted"
+          defaultChecked={alert?.highlighted ?? false}
+          className="mt-1 h-4 w-4"
+        />
+        <span className="text-sm font-medium text-navy">
+          Highlight this
+          <span className="mt-0.5 block text-xs font-normal text-slate-500">
+            Runs as the banner at the top of the member dashboard. Only one
+            banner fits, so the newest thing highlighted is the one shown.
           </span>
         </span>
       </label>

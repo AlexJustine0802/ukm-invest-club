@@ -144,7 +144,6 @@ export default async function CalendarPage({
     <>
       <AccountTopBar
         title="Calendar"
-        subtitle="Everything happening this month, in one place."
         showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

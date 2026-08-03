@@ -27,10 +27,6 @@ export default async function AdminPartnersPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-navy">Partners</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Shown on Home and About as two sections: Company Partners, then
-            Community &amp; Media Partners.
-          </p>
         </div>
         <Can module="partners" action="create">
           <Link href="/admin/partners/new" className="btn-primary">

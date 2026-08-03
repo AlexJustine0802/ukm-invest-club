@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import DashboardItemForm from "@/components/admin/DashboardItemForm";
 import { sectionConfig } from "@/lib/dashboardSections";
-import { updateDashboardItem } from "../../actions";
-import { requirePage } from "@/lib/adminAccess";
+import { updateDashboardItem, createFolderCategory } from "../../actions";
+import { requirePage, can } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +21,18 @@ export default async function EditDashboardItemPage({
 
   const config = sectionConfig(item.section);
 
+  const categories =
+    config.id === "folder"
+      ? (
+          await prisma.researchCategory.findMany({
+            orderBy: [{ order: "asc" }, { title: "asc" }],
+            select: { title: true },
+          })
+        ).map((c) => c.title)
+      : [];
+  const mayAddCategory =
+    config.id === "folder" && (await can("research-categories", "create"));
+
   return (
     <div>
       <Link
@@ -35,6 +47,8 @@ export default async function EditDashboardItemPage({
           action={updateDashboardItem}
           section={item.section}
           item={item}
+          categories={categories}
+          createCategory={mayAddCategory ? createFolderCategory : undefined}
         />
       </div>
     </div>
