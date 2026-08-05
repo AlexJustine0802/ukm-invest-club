@@ -2,7 +2,8 @@
 
 import { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
-import { Users, AtSign, Link2, X } from "lucide-react";
+import { Users, X } from "lucide-react";
+import { InstagramIcon, LinkedInIcon } from "@/components/BrandIcons";
 import { getUiIcon } from "@/lib/uiIcons";
 
 /**
@@ -40,15 +41,19 @@ function MemberCard({
   const links = [
     member.instagram && {
       href: member.instagram,
-      icon: AtSign,
+      icon: InstagramIcon,
       label: `${member.name} on Instagram`,
     },
     member.linkedin && {
       href: member.linkedin,
-      icon: Link2,
+      icon: LinkedInIcon,
       label: `${member.name} on LinkedIn`,
     },
-  ].filter(Boolean) as { href: string; icon: typeof AtSign; label: string }[];
+  ].filter(Boolean) as {
+    href: string;
+    icon: typeof InstagramIcon;
+    label: string;
+  }[];
 
   return (
     <div
@@ -96,7 +101,7 @@ function MemberCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={l.label}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-light text-primary hover:bg-primary hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white hover:border-primary/60"
               >
                 <l.icon className="h-4 w-4" />
               </a>

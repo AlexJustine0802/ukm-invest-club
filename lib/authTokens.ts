@@ -1,10 +1,13 @@
 import { createHash, randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
 
-export type AuthTokenType = "RESET";
+export type AuthTokenType = "RESET" | "VERIFY";
 
 const TTL_MS: Record<AuthTokenType, number> = {
   RESET: 60 * 60 * 1000, // 1 hour
+  // Longer: confirming an address is not urgent, and people open club email
+  // the next day.
+  VERIFY: 24 * 60 * 60 * 1000,
 };
 
 function hashToken(token: string): string {

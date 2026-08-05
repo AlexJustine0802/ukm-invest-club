@@ -5,6 +5,7 @@ import CareerAlertForm from "@/components/admin/CareerAlertForm";
 import { updateCareerAlert } from "../../actions";
 import { requirePage } from "@/lib/adminAccess";
 import { isBlobConfigured } from "@/lib/upload";
+import { parseQuestions } from "@/lib/forms";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,13 @@ export default async function EditCareerAlertPage({
   await requirePage("career", "edit");
 
   const { id } = await params;
-  const alert = await prisma.careerAlert.findUnique({ where: { id } });
+  const alert = await prisma.careerAlert.findUnique({
+    where: { id },
+    include: {
+      // The posting's own application form, when it has one.
+      applyForm: { select: { slug: true, questions: true } },
+    },
+  });
   if (!alert) notFound();
 
   return (
@@ -30,6 +37,8 @@ export default async function EditCareerAlertPage({
           action={updateCareerAlert}
           alert={alert}
           uploadEnabled={isBlobConfigured()}
+          applyQuestions={parseQuestions(alert.applyForm?.questions)}
+          applyFormSlug={alert.applyForm?.slug ?? null}
         />
       </div>
     </div>

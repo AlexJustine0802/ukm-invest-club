@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Mail, CalendarDays, SearchX } from "lucide-react";
+import { InstagramIcon, LinkedInIcon } from "@/components/BrandIcons";
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
@@ -37,6 +38,8 @@ export default async function MembersPage({
       role: true,
       division: true,
       createdAt: true,
+      instagram: true,
+      linkedin: true,
     },
     orderBy: [{ division: "asc" }, { role: "asc" }, { name: "asc" }],
   });
@@ -170,6 +173,34 @@ export default async function MembersPage({
                     Member since {formatDate(m.createdAt)}
                   </p>
                 </div>
+
+                {/* Socials, when the member has filled them in. */}
+                {(m.instagram || m.linkedin) && (
+                  <div className="mt-3 flex items-center gap-2">
+                    {m.instagram && (
+                      <a
+                        href={m.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${m.name} on Instagram`}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:border-primary/60 hover:bg-slate-50"
+                      >
+                        <InstagramIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                    {m.linkedin && (
+                      <a
+                        href={m.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${m.name} on LinkedIn`}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:border-primary/60 hover:bg-slate-50"
+                      >
+                        <LinkedInIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                  </div>
+                )}
               </article>
             );
           })}

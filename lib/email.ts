@@ -54,14 +54,18 @@ export async function sendContactEmail(msg: ContactMessage): Promise<void> {
  */
 export async function sendAuthEmail(
   to: string,
-  kind: "reset",
+  kind: "reset" | "verify",
   link: string,
 ): Promise<void> {
-  const subject = "Reset your ICUnpar password";
-  const heading = "Reset your password";
-  const body =
-    "We received a request to reset your ICUnpar password. This link expires in 1 hour. If you did not request it, you can safely ignore this email.";
-  const cta = "Reset Password";
+  const verify = kind === "verify";
+  const subject = verify
+    ? "Confirm your ICUnpar email"
+    : "Reset your ICUnpar password";
+  const heading = verify ? "Confirm your email" : "Reset your password";
+  const body = verify
+    ? "Confirm this address so we know club email reaches you. This link expires in 24 hours. If you did not ask for it, you can safely ignore this email."
+    : "We received a request to reset your ICUnpar password. This link expires in 1 hour. If you did not request it, you can safely ignore this email.";
+  const cta = verify ? "Confirm Email" : "Reset Password";
 
   const apiKey = process.env.RESEND_API_KEY;
   const from =

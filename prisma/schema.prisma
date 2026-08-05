@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
   // Pooled, transaction mode (port 6543)  every runtime query.
   url       = env("DATABASE_URL")
   // Session mode (port 5432)  migrations only. Prisma needs advisory locks
@@ -74,17 +74,17 @@ model EventCategory {
 }
 
 model Publication {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
-  slug        String    @unique
-  excerpt     String    @db.Text
-  content     String    @db.Text
+  slug        String   @unique
+  excerpt     String   @db.Text
+  content     String   @db.Text
   coverImage  String?
   author      String?
-  published   Boolean   @default(true)
-  publishedAt DateTime  @default(now())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  published   Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   categoryId    String?
   category      ResearchCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
@@ -115,12 +115,12 @@ model ResearchCategory {
 // (/admin/members). Nothing reads this table; kept so `db push` does not drop it
 // behind your back. Safe to delete with a deliberate push.
 model TeamMember {
-  id        String  @id @default(cuid())
+  id        String   @id @default(cuid())
   name      String
   role      String
   photo     String?
-  bio       String? @db.Text
-  order     Int     @default(0)
+  bio       String?  @db.Text
+  order     Int      @default(0)
   linkedin  String?
   instagram String?
   createdAt DateTime @default(now())
@@ -129,23 +129,23 @@ model TeamMember {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  name          String
-  email         String      @unique
+  id           String  @id @default(cuid())
+  name         String
+  email        String  @unique
   // Collected at signup. Optional in the schema so accounts created before it
   // existed stay valid; the signup form asks for it.
-  phone         String?
-  passwordHash  String
-  role          String      @default("Member") // a role from lib/roles.ts
-  division      String? // division slug from lib/roles.ts; null = no division yet
+  phone        String?
+  passwordHash String
+  role         String  @default("Member") // a role from lib/roles.ts
+  division     String? // division slug from lib/roles.ts; null = no division yet
 
   // Public profile. A member with a division and role is shown in "Our
   // Divisions" on the public About page, so these are edited once in
   // /admin/members and appear in both places.
-  photo     String?
-  bio       String? @db.Text
-  instagram String?
-  linkedin  String?
+  photo         String?
+  bio           String?     @db.Text
+  instagram     String?
+  linkedin      String?
   emailVerified DateTime?
   createdAt     DateTime    @default(now())
   authTokens    AuthToken[]
@@ -236,7 +236,7 @@ model RegistrationForm {
 
   // Announced on the member Announcements page and dashboard rail. Reads as
   // the event, the recruitment round or the sign-up, depending on the form.
-  announced Boolean @default(false)
+  announced   Boolean @default(false)
   // Runs as the banner at the top of the member dashboard.
   highlighted Boolean @default(false)
 
@@ -251,7 +251,9 @@ model RegistrationForm {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  responses FormResponse[]
+  responses    FormResponse[]
+  // Job postings that take their applications through this form.
+  careerAlerts CareerAlert[]
 
   // The public event this form is the sign-up for. Null for forms that are not
   // events (recruitment, standalone sign-ups).
@@ -285,34 +287,38 @@ model FormResponse {
 // in the member notification bell automatically  there is no separate
 // announcement row to keep in sync.
 model CareerAlert {
-  id          String    @id @default(cuid())
-  company     String
-  role        String
-  location    String?
-  workType    String    @default("Internship") // e.g. Internship, Full-time, Part-time
-  description String?   @db.Text
-  applyUrl    String?
-  deadline    DateTime?
+  id              String            @id @default(cuid())
+  company         String
+  role            String
+  location        String?
+  workType        String            @default("Internship") // e.g. Internship, Full-time, Part-time
+  description     String?           @db.Text
+  // Two ways to apply, and only one is used: a link to the company's own
+  // posting, or one of our registration forms. `applyFormId` set wins.
+  applyUrl        String?
+  applyFormId     String?
+  applyForm       RegistrationForm? @relation(fields: [applyFormId], references: [id], onDelete: SetNull)
+  deadline        DateTime?
   // The company's logo, uploaded or pasted in the admin. `icon`/`color` are
   // what postings used before there was one; kept for rows that still have
   // them, no longer offered in the form.
-  logo        String?
+  logo            String?
   // Company profile, shown under the posting. Every field optional: a posting
   // is still worth publishing when all anyone has is the company's name.
   companyIndustry String?
   companySize     String? // free text, e.g. "51-100 employees"
   companyWebsite  String?
-  companyProfile  String? @db.Text // Markdown
-  icon        String? // key from lib/uiIcons
-  color       String? // palette key from lib/eventStyles
-  published   Boolean   @default(true)
+  companyProfile  String?           @db.Text // Markdown
+  icon            String? // key from lib/uiIcons
+  color           String? // palette key from lib/eventStyles
+  published       Boolean           @default(true)
   // Also listed on the member Announcements page and dashboard rail. One flag,
   // no copied row to keep in step with the alert it describes.
-  announced   Boolean   @default(false)
+  announced       Boolean           @default(false)
   // Same idea for the dashboard banner: one flag, no copied Highlight row.
-  highlighted Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  highlighted     Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 
   @@index([published, createdAt])
 }
@@ -407,9 +413,9 @@ model ResourceMaterial {
   description String?
   url         String
   // Free text under the title, e.g. "PDF · 12 pages".
-  meta   String?
-  order  Int     @default(0)
-  active Boolean @default(true)
+  meta        String?
+  order       Int     @default(0)
+  active      Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -442,8 +448,8 @@ model Division {
 // Member-area assignments. dueDate is a real date so "Due in N days" and the
 // "Due Soon" bucket stay correct without anyone re-typing them.
 model Assignment {
-  id          String   @id @default(cuid())
-  title String
+  id          String    @id @default(cuid())
+  title       String
   // Nullable since the admin form stopped asking for these; existing rows keep
   // whatever was typed in before.
   category    String?
@@ -452,21 +458,21 @@ model Assignment {
   // Null means open from the moment it is published. Set, and members can see
   // it but cannot submit until this passes  the nullable column is the
   // "needs an open date" switch, there is no second flag to keep in step.
-  opensAt DateTime?
-  dueDate DateTime
+  opensAt     DateTime?
+  dueDate     DateTime
   // Not editable any more  a member's own submission decides what they see,
   // see memberStatus in lib/assignments. Kept as the fallback for anyone who
   // has not submitted.
-  status String  @default("ACTIVE") // ACTIVE | SUBMITTED | COMPLETED
-  icon   String?
-  color  String?
+  status      String    @default("ACTIVE") // ACTIVE | SUBMITTED | COMPLETED
+  icon        String?
+  color       String?
   href        String?
   // The question paper, uploaded in the admin form. `href` stays the "link to
   // it somewhere else" option; a file here is the copy members download.
   fileUrl     String?
   fileName    String?
-  order       Int      @default(0)
-  published   Boolean  @default(true)
+  order       Int       @default(0)
+  published   Boolean   @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -518,19 +524,19 @@ model RolePermission {
 }
 
 model SiteSettings {
-  id             Int      @id @default(1) // singleton row
+  id             Int     @id @default(1) // singleton row
   homeAboutImage String? // home "About Us" strip picture
   aboutHeroImage String? // about page hero image
 
   // Which automatic bell notifications members receive. Announcements are not
   // listed: those are written by hand and are the whole point of the bell.
   // Default on, so turning the feature off is a deliberate act.
-  notifyAssignments  Boolean @default(true)
-  notifyMaterials    Boolean @default(true)
-  notifyEvents       Boolean @default(true)
-  notifyDiscussions  Boolean @default(true)
-  notifyRecruitment  Boolean @default(true)
-  notifyCareer       Boolean @default(true)
+  notifyAssignments Boolean @default(true)
+  notifyMaterials   Boolean @default(true)
+  notifyEvents      Boolean @default(true)
+  notifyDiscussions Boolean @default(true)
+  notifyRecruitment Boolean @default(true)
+  notifyCareer      Boolean @default(true)
 
   updatedAt DateTime @updatedAt
 }

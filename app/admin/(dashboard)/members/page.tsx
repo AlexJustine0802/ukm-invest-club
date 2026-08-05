@@ -5,6 +5,7 @@ import { DIVISIONS, divisionName, isHead, GENERAL_ROLES } from "@/lib/roles";
 import { formatDate } from "@/lib/utils";
 import { updateMemberRole, clearMemberRole } from "./actions";
 import Can from "@/components/admin/Can";
+import MemberDetailsCard from "@/components/admin/MemberDetailsCard";
 import { can, requireView } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,11 @@ export default async function AdminMembersPage({
       role: true,
       division: true,
       createdAt: true,
+      phone: true,
+      bio: true,
+      instagram: true,
+      linkedin: true,
+      photo: true,
     },
     orderBy: [{ division: "asc" }, { name: "asc" }],
   });
@@ -67,6 +73,15 @@ export default async function AdminMembersPage({
     return qs ? `/admin/members?${qs}` : "/admin/members";
   };
 
+  // The export takes the same filter and search, so the file matches the list
+  // on screen.
+  const exportParams = new URLSearchParams();
+  if (division && division !== "all") exportParams.set("division", division);
+  if (query) exportParams.set("q", q.trim());
+  const exportHref = `/admin/members/export${
+    exportParams.toString() ? `?${exportParams}` : ""
+  }`;
+
   const chips = [
     { id: "all", label: `All (${members.length})` },
     ...DIVISIONS.map((d) => ({ id: d.slug, label: `${d.name} (${countIn(d.slug)})` })),
@@ -81,10 +96,17 @@ export default async function AdminMembersPage({
       >
         ← Back to member dashboard
       </Link>
-      <div className="mt-2">
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-navy">
           {manages ? "Members & roles" : "Members"}
         </h1>
+        {/* A plain link, not a button: the browser downloads the file and the
+            page it was started from stays exactly where it was. */}
+        <Can module="members" action="export">
+          <a href={exportHref} className="btn-secondary px-3 py-2 text-xs">
+            ⬇ Export Excel
+          </a>
+        </Can>
       </div>
 
       <form method="get" className="mt-6 flex flex-wrap items-center gap-2">
@@ -135,33 +157,25 @@ export default async function AdminMembersPage({
         <div className="mt-6 space-y-3">
           {visible.map((m) => (
             <div key={m.id} className="card flex flex-wrap items-center gap-4 p-4">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-base font-bold text-primary">
-                {m.name.charAt(0).toUpperCase()}
-              </span>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-bold text-navy">{m.name}</p>
-                  {manages && isHead(m.role) && (
-                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-semibold text-primary-dark">
-                      Head
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-slate-500">{m.email}</p>
-                <p className="mt-1 text-xs text-slate-400">
-                  {manages && (
-                    <>
-                      {m.role}
-                      {divisionName(m.division)
-                        ? ` · ${divisionName(m.division)}`
-                        : ""}{" "}
-                      ·{" "}
-                    </>
-                  )}
-                  joined {formatDate(m.createdAt)}
-                </p>
-              </div>
+              {/* Clicking the summary opens everything the club knows about
+                  this member; the controls to its right stay their own. */}
+              <MemberDetailsCard
+                showRole={manages}
+                member={{
+                  id: m.id,
+                  name: m.name,
+                  email: m.email,
+                  phone: m.phone,
+                  role: m.role,
+                  divisionLabel: divisionName(m.division) || null,
+                  bio: m.bio,
+                  instagram: m.instagram,
+                  linkedin: m.linkedin,
+                  photo: m.photo,
+                  joined: formatDate(m.createdAt),
+                  isHead: isHead(m.role),
+                }}
+              />
 
               {/* The whole controls column is role management, so it is one
                   permission: the dropdowns carry the org chart in their

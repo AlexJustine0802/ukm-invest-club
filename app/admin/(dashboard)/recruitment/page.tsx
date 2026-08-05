@@ -126,7 +126,7 @@ export default async function AdminRecruitmentPage() {
                   href={`/admin/registrations/${current.id}/responses/export`}
                   className="btn-secondary px-3 py-1.5 text-xs"
                 >
-                  ⬇ CSV
+                  ⬇ Export Excel
                 </a>
                 <Can module="registrations" action="edit">
                   <Link

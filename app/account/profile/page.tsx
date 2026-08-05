@@ -6,6 +6,7 @@ import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { formatDate } from "@/lib/utils";
+import SocialLinksForm from "@/components/account/SocialLinksForm";
 
 export const metadata: Metadata = { title: "My Profile" };
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export default async function ProfilePage() {
       <AccountTopBar
         title="My Profile"
         subtitle="Your account details and membership information."
+        showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}
         role={user.role}
@@ -77,6 +79,19 @@ export default async function ProfilePage() {
               </div>
             ))}
           </dl>
+        </section>
+
+        {/* Socials — the member's own, shown on their card in Members. */}
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h3 className="font-bold text-navy">Social links</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Optional. Other members see these on your card, and they appear on
+            the public About page if you are listed in a division.
+          </p>
+          <SocialLinksForm
+            instagram={user.instagram}
+            linkedin={user.linkedin}
+          />
         </section>
       </div>
     </>

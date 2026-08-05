@@ -1,12 +1,18 @@
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import ImageField from "@/components/admin/ImageField";
+import ApplyMethodFields from "@/components/admin/ApplyMethodFields";
 import { toDateTimeLocalValue } from "@/lib/utils";
+import type { FormQuestion } from "@/lib/forms";
 
 interface CareerAlertFormProps {
   action: (formData: FormData) => void;
   /** Whether file uploads are configured (Vercel Blob). */
   uploadEnabled?: boolean;
+  /** Questions of the application form this posting owns, if any. */
+  applyQuestions?: FormQuestion[];
+  /** That form's slug, so the editor can show its link. */
+  applyFormSlug?: string | null;
   alert?: {
     id: string;
     company: string;
@@ -15,6 +21,7 @@ interface CareerAlertFormProps {
     workType: string;
     description: string | null;
     applyUrl: string | null;
+    applyFormId: string | null;
     deadline: Date | null;
     logo: string | null;
     companyIndustry: string | null;
@@ -51,6 +58,8 @@ export default function CareerAlertForm({
   action,
   alert,
   uploadEnabled = false,
+  applyQuestions = [],
+  applyFormSlug = null,
 }: CareerAlertFormProps) {
   return (
     <form action={action} className="space-y-5">
@@ -126,20 +135,14 @@ export default function CareerAlertForm({
         />
       </div>
 
+      <ApplyMethodFields
+        defaultUrl={alert?.applyUrl ?? null}
+        defaultFormId={alert?.applyFormId ?? null}
+        questions={applyQuestions}
+        formSlug={applyFormSlug}
+      />
+
       <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="applyUrl" className="label">
-            Apply link
-          </label>
-          <input
-            id="applyUrl"
-            name="applyUrl"
-            type="url"
-            defaultValue={alert?.applyUrl ?? ""}
-            placeholder="https://..."
-            className="input"
-          />
-        </div>
         <div>
           <label htmlFor="deadline" className="label">
             Application deadline <span className="text-slate-400">(optional)</span>

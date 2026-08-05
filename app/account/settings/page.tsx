@@ -5,6 +5,7 @@ import { KeyRound, Mail, Shield, ChevronRight } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
+import { VerifyEmailButton } from "@/components/account/AccountSettingsForms";
 
 export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -28,6 +29,7 @@ export default async function SettingsPage() {
       <AccountTopBar
         title="Settings"
         subtitle="Manage your account, security, and notification preferences."
+        showSearch={false}
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}
         role={user.role}
@@ -37,6 +39,7 @@ export default async function SettingsPage() {
         {/* Account */}
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
           <h3 className="font-bold text-navy">Account</h3>
+
           <div className="mt-4 space-y-4">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500">
@@ -46,10 +49,12 @@ export default async function SettingsPage() {
                 <p className="text-xs text-slate-400">Email</p>
                 <p className="truncate text-sm font-semibold text-navy">{user.email}</p>
               </div>
-              {user.emailVerified && (
+              {user.emailVerified ? (
                 <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-600">
                   Verified
                 </span>
+              ) : (
+                <VerifyEmailButton />
               )}
             </div>
             <div className="flex items-center gap-3">

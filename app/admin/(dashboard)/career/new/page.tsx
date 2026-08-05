@@ -3,6 +3,7 @@ import CareerAlertForm from "@/components/admin/CareerAlertForm";
 import { createCareerAlert } from "../actions";
 import { requirePage } from "@/lib/adminAccess";
 import { isBlobConfigured } from "@/lib/upload";
+import { defaultApplicationQuestions } from "@/lib/forms";
 
 export default async function NewCareerAlertPage() {
   await requirePage("career", "create");
@@ -17,6 +18,7 @@ export default async function NewCareerAlertPage() {
         <CareerAlertForm
           action={createCareerAlert}
           uploadEnabled={isBlobConfigured()}
+          applyQuestions={defaultApplicationQuestions()}
         />
       </div>
     </div>

@@ -257,6 +257,36 @@ export function defaultEventQuestions(): FormQuestion[] {
   ];
 }
 
+/**
+ * Where a job application starts. The admin edits, removes or adds to these
+ * under the posting — it just means "apply through our form" never saves an
+ * empty form that members cannot answer.
+ */
+export function defaultApplicationQuestions(): FormQuestion[] {
+  const id = (suffix: string) =>
+    `q${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}${suffix}`;
+
+  return [
+    { id: id("a"), type: "SHORT_TEXT", label: "Full name", required: true },
+    { id: id("b"), type: "SHORT_TEXT", label: "Email", required: true },
+    { id: id("c"), type: "SHORT_TEXT", label: "WhatsApp number", required: true },
+    {
+      id: id("d"),
+      type: "FILE",
+      label: "CV",
+      helpText: "PDF preferred.",
+      required: true,
+      maxMb: DEFAULT_MAX_MB,
+    },
+    {
+      id: id("e"),
+      type: "LONG_TEXT",
+      label: "Why are you a good fit for this role?",
+      required: false,
+    },
+  ];
+}
+
 /** RFC 4180 quoting: wrap in quotes and double any quote inside. */
 export function csvCell(value: string): string {
   return `"${value.replace(/"/g, '""')}"`;
