@@ -507,10 +507,9 @@ export default function ResearchPageContent({
         </Reveal>
       )}
 
-      <Reveal
+      {/* <Reveal
         as="section"
-        className="container-page border-t border-slate-100 py-8"
-      >
+        className="container-page border-t border-slate-100 py-8">
         <SectionHeader title="Market Insights & Data" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {marketCards.map((card) => (
@@ -537,7 +536,7 @@ export default function ResearchPageContent({
         <p className="mt-5 text-xs font-semibold text-slate-500">
           Source: IDX, Bank Indonesia, BPS
         </p>
-      </Reveal>
+      </Reveal> */}
     </div>
   );
 }
