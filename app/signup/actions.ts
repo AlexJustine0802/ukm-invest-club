@@ -1,5 +1,9 @@
 "use server";
 
+// TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED — restore these
+// imports together with the send block below.
+// import { issueAuthToken, siteUrl } from "@/lib/authTokens";
+// import { sendAuthEmail } from "@/lib/email";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
@@ -41,8 +45,12 @@ export async function signupUser(
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: "An account with this email already exists." };
 
-  // No email confirmation step: the address is taken as given and the account
-  // is usable straight away.
+  // TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED
+  // Resend still sends from the onboarding@resend.dev test domain, which can
+  // only deliver to the account owner. Until our own domain is verified the
+  // address is trusted as given and the account is usable straight away.
+  // To re-enable: drop `emailVerified: new Date()` below and send the link
+  // again (see the commented-out block after the create call).
   const user = await prisma.user.create({
     data: {
       name,
@@ -52,6 +60,14 @@ export async function signupUser(
       emailVerified: new Date(),
     },
   });
+
+  // TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED
+  // const verifyToken = await issueAuthToken(user.id, "VERIFY");
+  // await sendAuthEmail(
+  //   user.email,
+  //   "verify",
+  //   `${siteUrl()}/verify-email?token=${verifyToken}`,
+  // );
 
   const token = await createUserSessionToken(user.id, user.email);
   await setUserSessionCookie(token);

@@ -27,6 +27,9 @@ body {
   color: var(--foreground);
   background: var(--background);
   -webkit-font-smoothing: antialiased;
+  /* Admin-typed content can be one unbroken string; without this it runs past
+     the card it sits in, since `min-w-0` alone cannot wrap an unbreakable word. */
+  overflow-wrap: break-word;
   /* Safety net against sideways scroll. `clip` rather than `hidden` because
      `hidden` turns the body into a scroll container and breaks every
      `position: sticky` header in the app. */
