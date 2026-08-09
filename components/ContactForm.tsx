@@ -119,18 +119,6 @@ export default function ContactForm() {
         />
       </div>
 
-      <label className="flex items-start gap-2 text-sm font-medium text-navy">
-        <input
-          type="checkbox"
-          required
-          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-        />
-        <span>
-          I agree to the <LinkText href="/contact">terms</LinkText> and{" "}
-          <LinkText href="/contact">privacy policy</LinkText>.
-        </span>
-      </label>
-
       <div className="pt-2">
         <SubmitButton />
       </div>
