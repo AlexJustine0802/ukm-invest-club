@@ -86,7 +86,7 @@ export default async function MembersPage({
       />
 
       <div className="mt-8 flex items-center gap-3">
-        <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:thin]">
+        <div className="min-w-0 flex-1 overflow-x-auto">
           <div className="flex w-max items-center gap-3 pb-1">
             {[{ id: "all", label: "All" }, ...filters].map(
               (r) => (

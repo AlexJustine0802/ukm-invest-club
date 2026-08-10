@@ -69,7 +69,7 @@ export default async function ResourcesPage({
       {/* Category filters  pills scroll horizontally so the search button on
           the right stays on the same line however many categories exist. */}
       <div className="mt-8 flex items-center gap-3">
-        <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:thin]">
+        <div className="min-w-0 flex-1 overflow-x-auto">
           <div className="flex w-max items-center gap-2 pb-1">
             {categories.map((c) => (
               <Link

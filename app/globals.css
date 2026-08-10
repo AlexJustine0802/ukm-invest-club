@@ -221,41 +221,15 @@ body {
   overflow-x: clip;
 }
 
-/* Scrollbars follow the theme. Firefox gets the two-keyword form; WebKit gets
-   the pseudo-elements. The thumb is drawn inside a transparent border so it
-   reads as a slim pill rather than filling the whole gutter. */
+/* Scrollbars hidden everywhere — page and every inner scroll container (menus,
+   panels, the notification list). Scrolling itself is untouched: wheel, touch,
+   keyboard and scroll-into-view still work, only the visible bar is gone.
+   `scrollbar-width` covers Firefox, the pseudo-element covers Chromium/WebKit. */
 * {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  scrollbar-width: none;
 }
-.dark * {
-  scrollbar-color: #334155 transparent;
-}
-
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #cbd5e1;
-  border: 3px solid transparent;
-  background-clip: content-box;
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background-color: #94a3b8;
-}
-::-webkit-scrollbar-corner {
-  background: transparent;
-}
-.dark ::-webkit-scrollbar-thumb {
-  background-color: #334155;
-}
-.dark ::-webkit-scrollbar-thumb:hover {
-  background-color: #475569;
+  display: none;
 }
 
 /* Media never pushes past its column, whatever the intrinsic size is. */
