@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { Geist } from "next/font/google";
+import Script from "next/script";
 import { cn } from "@/lib/utils";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
@@ -31,14 +32,17 @@ export default function RootLayout({
       className={cn("font-sans", geist.variable)}
     >
       <head>
-        {/* Applies the saved theme before first paint. In <head> and
-            synchronous on purpose: run any later and the page paints light for
-            a frame before flipping to dark. */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.theme==='dark')document.documentElement.classList.add('dark')}catch(e){}`,
-          }}
-        />
+        {/* Applies the saved theme before first paint: run any later and the
+            page paints light for a frame before flipping to dark.
+
+            next/script with beforeInteractive rather than a bare <script>:
+            React never executes a plain script tag rendered on the client, and
+            says so in the console. This one is injected into the initial HTML
+            and runs ahead of hydration, which is exactly what the flash needs
+            to be avoided. */}
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`try{if(localStorage.theme==='dark')document.documentElement.classList.add('dark')}catch(e){}`}
+        </Script>
         {/* Scroll-reveal starts sections at opacity 0 and animates them in with
             JavaScript. With scripting off that never happens, so the whole page
             would read as blank  this puts every revealed section back. */}
