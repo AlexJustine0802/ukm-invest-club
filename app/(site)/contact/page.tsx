@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -105,15 +106,19 @@ export default function ContactPage() {
             community? Feel free to reach out to us.
           </p>
           <div className="mt-9 flex flex-wrap justify-center gap-4">
-            <Link href="#send-message" className="btn-primary">
-              <Mail className="mr-2 h-5 w-5" />
+            <InteractiveHoverButton
+              href="#send-message"
+              className="bg-primary text-white"
+              fillClassName="bg-white"
+              hoverTextClassName="text-primary"
+            >
+              <Mail className="mr-2 inline h-5 w-5" />
               Send Message
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-            <Link href="/contact#send-message" className="btn-secondary">
-              <Users className="mr-2 h-5 w-5" />
+            </InteractiveHoverButton>
+            <InteractiveHoverButton href="/contact#send-message">
+              <Users className="mr-2 inline h-5 w-5" />
               Join Our Community
-            </Link>
+            </InteractiveHoverButton>
           </div>
         </div>
       </Reveal>

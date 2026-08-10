@@ -72,7 +72,7 @@ export default async function AssignmentsPage({
 
   // Per member, not the shared column  see memberState in lib/assignments.
   const stateOf = (a: (typeof all)[number]) =>
-    memberState(a.opensAt, mySubmissions.get(a.id), now);
+    memberState(a.opensAt, mySubmissions.get(a.id), now, a.dueDate);
 
   const counts = {
     active: all.filter((a) => stateOf(a) === "ACTIVE").length,
@@ -236,9 +236,11 @@ export default async function AssignmentsPage({
                 ? { text: "Completed", cls: "bg-emerald-50 text-emerald-600" }
                 : !isOpen(a.opensAt, now)
                   ? { text: "Coming soon", cls: "bg-violet-50 text-violet-600" }
-                  : soon
-                    ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
-                    : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
+                  : stateOf(a) === "OVERDUE"
+                    ? { text: "Missed", cls: "bg-rose-50 text-rose-600" }
+                    : soon
+                      ? { text: "Due Soon", cls: "bg-amber-50 text-amber-600" }
+                      : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
 
             return (
               <Link
@@ -261,7 +263,11 @@ export default async function AssignmentsPage({
                 <div className="shrink-0 lg:w-48">
                   <p
                     className={`text-sm font-semibold ${
-                      soon ? "text-red-600" : "text-navy"
+                      stateOf(a) === "OVERDUE"
+                        ? "text-rose-600"
+                        : soon
+                          ? "text-amber-600"
+                          : "text-navy"
                     }`}
                   >
                     {dueLabel(a.dueDate, now)}

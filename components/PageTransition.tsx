@@ -85,7 +85,7 @@ export default function PageTransition({
         // The outgoing page lifts slightly as it fades and the incoming one
         // rises into its place, so a navigation reads as one movement in a
         // single direction rather than a crossfade between two stills.
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{
           opacity: 1,
           y: 0,
@@ -93,7 +93,7 @@ export default function PageTransition({
         }}
         exit={{
           opacity: 0,
-          y: -12,
+          y: -4,
           transition: { duration: leave, ease: EASE },
         }}
       >

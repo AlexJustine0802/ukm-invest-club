@@ -157,7 +157,12 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
 
   const list: Omit<TopBarNotification, "read">[] = [
     ...assignments.map((a) => {
-      const state = memberState(a.opensAt, submissionFor.get(a.id), now);
+      const state = memberState(
+        a.opensAt,
+        submissionFor.get(a.id),
+        now,
+        a.dueDate,
+      );
       return {
         id: assignmentKey(a.id),
         title:

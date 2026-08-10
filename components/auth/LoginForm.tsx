@@ -9,18 +9,21 @@ import { Mail, Lock } from "lucide-react";
 import { loginUser } from "@/app/login/actions";
 import type { AuthState } from "@/app/signup/actions";
 import { IconInput, PasswordInput } from "./authParts";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button
+    <InteractiveHoverButton
       type="submit"
-      className="btn-primary w-full py-3"
+      className="w-full bg-primary py-3 text-white"
+      fillClassName="bg-white"
+      hoverTextClassName="text-primary"
       disabled={pending}
     >
       {pending && <Spinner />}
       {pending ? "Logging in…" : "Log In"}
-    </button>
+    </InteractiveHoverButton>
   );
 }
 
@@ -31,12 +34,18 @@ export default function LoginForm() {
   );
   const params = useSearchParams();
   const reset = params.get("reset") === "1";
+  const registered = params.get("registered") === "1";
 
   return (
     <form action={formAction} className="space-y-5">
       {reset && !state.error && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
           Password updated  please log in.
+        </p>
+      )}
+      {registered && !state.error && (
+        <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
+          Account created — please log in.
         </p>
       )}
       {state.error && (

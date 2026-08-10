@@ -27,19 +27,19 @@ export const DUR = {
   hover: 0.24,
   /** Dropdowns, menus, disclosure. */
   ui: 0.32,
-  /** Page enter. */
-  page: 0.6,
+  /** Page enter. Short: content the reader asked for should not be withheld. */
+  page: 0.16,
   /**
    * Page exit  deliberately quicker than the enter. Waiting on an outgoing
    * page is dead time; the incoming one is what should feel generous.
    */
-  pageExit: 0.3,
+  pageExit: 0.08,
   /** Section scroll reveal. */
-  reveal: 1,
+  reveal: 0.28,
   /** A single card inside a staggered grid. */
-  item: 0.85,
+  item: 0.22,
   /** Gap between consecutive cards in a grid. */
-  stagger: 0.12,
+  stagger: 0.03,
   /**
    * Statistic count-up, in milliseconds.
    *

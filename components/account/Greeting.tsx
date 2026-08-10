@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { greetingFor } from "@/lib/greeting";
+import { TypingAnimation } from "@/components/ui/typing-animation";
 
 /**
  * "Good afternoon, Alexander! 👋"  from the *reader's* clock, and kept right
@@ -31,9 +32,16 @@ export default function Greeting({
     return () => window.clearInterval(id);
   }, []);
 
+  // The typing restarts whenever its text changes, which here is only when the
+  // clock crosses into a new part of the day — `setLabel` with the same string
+  // is a no-op, so the minute tick above does not retype anything.
   return (
-    <>
-      {label}, {name}! 👋
-    </>
+    <TypingAnimation
+      duration={95}
+      startOnView={false}
+      className="leading-tight tracking-normal"
+    >
+      {`${label}, ${name}! 👋`}
+    </TypingAnimation>
   );
 }

@@ -1,4 +1,6 @@
+import { Suspense } from "react";
 import Sidebar from "@/components/account/Sidebar";
+import WelcomeSplash from "@/components/account/WelcomeSplash";
 import TopBarMenus from "@/components/account/TopBarMenus";
 import DrawerProfile from "@/components/account/DrawerProfile";
 import PageTransition from "@/components/PageTransition";
@@ -28,6 +30,12 @@ export default async function MemberShell({
   return (
     // Below lg this stacks: the sidebar renders a sticky bar + drawer instead.
     <div className="min-h-screen bg-slate-50 text-navy lg:flex">
+      {/* Suspense: it reads the query string, which opts the subtree into
+          client-side rendering. */}
+      <Suspense>
+        <WelcomeSplash name={user.name} />
+      </Suspense>
+
       {/* The bell and profile menu ride in the mobile nav bar; the page's own
           top bar shows them from lg up. */}
       <Sidebar

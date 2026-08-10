@@ -1,6 +1,8 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  // Class, not media: the toggle owns the theme, and it writes `dark` on <html>.
+  darkMode: "class",
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -50,11 +52,29 @@ const config: Config = {
           "0%": { opacity: "0", transform: "translateX(24px)" },
           "100%": { opacity: "1", transform: "translateX(0)" },
         },
+        // The caret in components/ui/typing-animation. It ships expecting
+        // tw-animate-css (a Tailwind v4 package); this project is on v3.
+        "blink-cursor": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
+        // -50% because components/ui/marquee renders its children twice.
+        marquee: {
+          to: { transform: "translateX(-50%)" },
+        },
+        "marquee-reverse": {
+          from: { transform: "translateX(-50%)" },
+          to: { transform: "translateX(0)" },
+        },
       },
       animation: {
         "fade-up": "fade-up 0.6s ease-out forwards",
         "slide-in-left": "slide-in-left 0.25s ease-out",
         "slide-in-right": "slide-in-right 0.25s ease-out",
+        "blink-cursor": "blink-cursor 1s step-end infinite",
+        marquee: "marquee var(--duration, 30s) linear infinite",
+        "marquee-reverse":
+          "marquee-reverse var(--duration, 30s) linear infinite",
       },
     },
   },

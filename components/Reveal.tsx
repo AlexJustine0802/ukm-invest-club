@@ -44,7 +44,7 @@ export default function Reveal({
       data-reveal
       id={id}
       className={className}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       // Fires a touch before the section is fully on screen, so the motion has
       // finished by the time it is properly in view rather than starting then.

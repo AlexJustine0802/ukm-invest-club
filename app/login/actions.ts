@@ -43,5 +43,6 @@ export async function loginUser(
 
   const token = await createUserSessionToken(user.id, user.email);
   await setUserSessionCookie(token);
-  redirect("/account");
+  // ?welcome=1 is what triggers the one-time splash in MemberShell.
+  redirect("/account?welcome=1");
 }

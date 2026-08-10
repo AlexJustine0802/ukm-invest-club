@@ -19,6 +19,7 @@ import {
   markNotificationRead,
 } from "@/app/account/actions";
 import { getUiIcon } from "@/lib/uiIcons";
+import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 import { DUR, EASE } from "@/lib/motion";
 
 export interface TopBarNotification {
@@ -116,6 +117,12 @@ export default function TopBarMenus({
 
   return (
     <div ref={wrapRef} className="flex items-center gap-3">
+      {/* Theme */}
+      <AnimatedThemeToggler
+        aria-label="Toggle dark mode"
+        className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 [&>svg]:h-5 [&>svg]:w-5"
+      />
+
       {/* Notifications */}
       <div className="relative">
         <button

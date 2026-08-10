@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
-import { isNewAlert, postedLabel, deadlineLabel } from "@/lib/career";
+import { isInBell, postedLabel, deadlineLabel } from "@/lib/career";
 import { deleteCareerAlert } from "./actions";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
@@ -59,7 +59,7 @@ export default async function AdminCareerPage() {
                     <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
                       {a.workType}
                     </span>
-                    {a.published && isNewAlert(a.createdAt, now) && (
+                    {a.published && isInBell(a.createdAt, now) && (
                       <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
                         In the bell
                       </span>

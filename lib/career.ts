@@ -1,11 +1,26 @@
 // Helpers shared by the member career page and the notification bell.
 
-/** A posting stays "New"  and stays in the bell  for this many days. */
+/** How long a posting stays in the notification bell. */
 export const NEW_ALERT_DAYS = 14;
+
+/**
+ * How long it wears the "New" / "Newly posted" badge.
+ *
+ * Shorter than the bell window on purpose: the badge is a "look at this now"
+ * marker and stops meaning anything if half the list carries it, while the bell
+ * is a backlog the member may not have opened for a week.
+ */
+export const NEW_BADGE_DAYS = 3;
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
+/** Whether the "New" badge still shows. */
 export function isNewAlert(createdAt: Date, now: Date = new Date()): boolean {
+  return now.getTime() - createdAt.getTime() < NEW_BADGE_DAYS * MS_PER_DAY;
+}
+
+/** Whether the posting is still listed in the bell. */
+export function isInBell(createdAt: Date, now: Date = new Date()): boolean {
   return now.getTime() - createdAt.getTime() < NEW_ALERT_DAYS * MS_PER_DAY;
 }
 

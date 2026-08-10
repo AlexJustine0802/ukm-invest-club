@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
+import { ChatMessages } from "@/components/ui/chat-messages";
 import { joinChannel, leaveChannel, createPost } from "../actions";
 
 export const metadata: Metadata = { title: "Discussion" };
@@ -166,78 +167,65 @@ export default async function ChannelPage({
         </form>
       </div>
 
-      {/* Feed */}
-      <div className="mt-4 space-y-4 rounded-2xl border border-slate-200 bg-white p-5">
-        {posts.length === 0 ? (
+      {/* Feed — own messages on the right, everyone else's on the left. */}
+      <ChatMessages
+        className="mt-4 h-[560px]"
+        title={channel.name}
+        subtitle={`${channel._count.members} member${
+          channel._count.members === 1 ? "" : "s"
+        } · ${posts.length} message${posts.length === 1 ? "" : "s"}`}
+        headerIcon={<Icon className="size-4" />}
+        // A real conversation is already there when the page loads: no reveal
+        // animation, no replay, and the demo input is replaced by the form.
+        autoPlay={false}
+        showReplay={false}
+        messages={posts.map((p) => ({
+          id: p.id,
+          sender: p.user.id === user.id ? "user" : "assistant",
+          content: p.body,
+          // Own messages carry a name too — a thread where only other people
+          // are labelled reads as if your own posts came from nobody.
+          authorName: p.user.id === user.id ? "You" : p.user.name,
+          authorRole: p.user.role,
+          authorInitial: p.user.name.charAt(0).toUpperCase(),
+          timestamp: ago(p.createdAt, now),
+        }))}
+        emptyState={
           <div className="flex flex-col items-center gap-2 py-12 text-center">
             <MessagesSquare className="h-9 w-9 text-slate-300" />
             <p className="font-semibold text-navy">No messages yet</p>
-            <p className="text-sm text-slate-500">Start the conversation below.</p>
+            <p className="text-sm text-slate-500">
+              Start the conversation below.
+            </p>
           </div>
-        ) : (
-          posts.map((p) => {
-            const mine = p.user.id === user.id;
-            const authorPalette = eventPalette(null, p.user.name);
-            return (
-              <article key={p.id} className="flex gap-3">
-                <span
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-bold ${authorPalette.badge}`}
-                >
-                  {p.user.name.charAt(0).toUpperCase()}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-baseline gap-2">
-                    <p className="text-sm font-semibold text-navy">
-                      {p.user.name}
-                      {mine && (
-                        <span className="ml-1.5 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500">
-                          You
-                        </span>
-                      )}
-                    </p>
-                    <span className="text-xs text-slate-400">{p.user.role}</span>
-                    <span className="text-xs text-slate-400">
-                      · {ago(p.createdAt, now)}
-                    </span>
-                  </div>
-                  <p className="mt-1 whitespace-pre-wrap break-words text-sm text-slate-600">
-                    {p.body}
-                  </p>
-                </div>
-              </article>
-            );
-          })
-        )}
-      </div>
-
-      {/* Composer */}
-      <form
-        action={createPost}
-        className="mt-4 rounded-2xl border border-slate-200 bg-white p-4"
-      >
-        <input type="hidden" name="channelId" value={channel.id} />
-        <label htmlFor="body" className="sr-only">
-          Message
-        </label>
-        <textarea
-          id="body"
-          name="body"
-          required
-          rows={3}
-          maxLength={2000}
-          placeholder={`Write a message in ${channel.name}...`}
-          className="w-full resize-y rounded-xl border border-slate-200 p-3 text-sm text-navy outline-none placeholder:text-slate-400 focus:border-primary"
-        />
-        <div className="mt-3 flex items-center justify-between">
-          <p className="text-xs text-slate-400">Up to 2000 characters.</p>
-          <button
-            type="submit"
-            className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
-          >
-            Post message
-          </button>
-        </div>
-      </form>
+        }
+        footer={
+          <form action={createPost} className="space-y-2">
+            <input type="hidden" name="channelId" value={channel.id} />
+            <label htmlFor="body" className="sr-only">
+              Message
+            </label>
+            <textarea
+              id="body"
+              name="body"
+              required
+              rows={2}
+              maxLength={2000}
+              placeholder={`Write a message in ${channel.name}...`}
+              className="w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-navy outline-none placeholder:text-slate-400 focus:border-primary focus:bg-white"
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-slate-400">Up to 2000 characters.</p>
+              <button
+                type="submit"
+                className="rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white hover:bg-primary-dark"
+              >
+                Post message
+              </button>
+            </div>
+          </form>
+        }
+      />
     </>
   );
 }

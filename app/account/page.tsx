@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChevronRight, Bookmark, MapPin, Clock } from "lucide-react";
+import { ChevronRight, MapPin, Clock } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
@@ -9,7 +9,6 @@ import AccountTopBar from "@/components/account/AccountTopBar";
 import EmptyState from "@/components/EmptyState";
 import LatestUpdates from "@/components/account/LatestUpdates";
 import Reveal from "@/components/Reveal";
-import { getSections } from "@/lib/dashboardContent";
 import { getAnnouncements } from "@/lib/announcements";
 import { getBanner } from "@/lib/highlights";
 import { getUiIcon } from "@/lib/uiIcons";
@@ -19,6 +18,7 @@ import Greeting from "@/components/account/Greeting";
 import { eventPalette } from "@/lib/eventStyles";
 import { dueLabel, isDueSoon } from "@/lib/assignments";
 import { isNewAlert } from "@/lib/career";
+import { quoteOfTheDay } from "@/lib/quotes";
 
 export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
@@ -90,7 +90,7 @@ export default async function AccountPage() {
 
   const [
     highlight,
-    content,
+    resourceFolders,
     events,
     metrics,
     careerAlerts,
@@ -101,8 +101,15 @@ export default async function AccountPage() {
     // Newest banner: a written highlight, or whatever is switched on in
     // /admin/highlights (an event, recruitment round or career alert).
     getBanner(),
-    // Editable blocks, managed from /admin/dashboard-content.
-    getSections(["resource"]),
+    // The real folders from /admin/resources, same rows the Resources page
+    // lists. This used to read a "resource" block in Dashboard Content, which
+    // is a separate hand-typed list — adding a resource never showed up here.
+    prisma.dashboardItem.findMany({
+      where: { section: "folder", active: true },
+      orderBy: [{ order: "asc" }, { createdAt: "desc" }],
+      take: 3,
+      include: { _count: { select: { materials: true } } },
+    }),
     // Upcoming events reuse the existing public Event model.
     prisma.event.findMany({
       where: { published: true, eventDate: { gte: now } },
@@ -130,10 +137,13 @@ export default async function AccountPage() {
       take: 3,
     }),
     prisma.assignment.findMany({
-      // Already handed in = no longer a deadline for this member.
+      // Already handed in = no longer a deadline for this member. Past the
+      // deadline it is not one either: it can no longer be submitted, so it
+      // drops off the rail rather than sitting there reading "Overdue".
       where: {
         published: true,
         status: "ACTIVE",
+        dueDate: { gte: now },
         submissions: { none: { userId: session.userId } },
       },
       orderBy: { dueDate: "asc" },
@@ -162,6 +172,8 @@ export default async function AccountPage() {
 
   // Starting value only; Greeting switches to the reader's own clock.
   const greeting = greetingFor(now);
+
+  const quote = quoteOfTheDay(now);
 
   const week = weekOf(now);
   const weekDays = new Set(week.map((w) => w.iso));
@@ -217,8 +229,7 @@ export default async function AccountPage() {
         title={<Greeting name={firstName} initial={greeting} />}
         subtitle={
           <span className="italic">
-            &ldquo;The best investment you can make is in yourself.&rdquo; –
-            Warren Buffett
+            &ldquo;{quote.text}&rdquo; – {quote.author}
           </span>
         }
         showSearch={false}
@@ -329,15 +340,23 @@ export default async function AccountPage() {
             {/* Left: resources + discussions */}
             <div className="min-w-0 space-y-6">
               <section className="flex flex-col rounded-2xl border border-slate-200 bg-white p-6">
-                <h3 className="font-bold text-navy">Recent Resources</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-navy">Recent Resources</h3>
+                  <Link
+                    href="/account/resources"
+                    className="text-sm font-semibold text-primary hover:underline"
+                  >
+                    View All
+                  </Link>
+                </div>
                 <div className={`flex flex-col ${LIST_BODY}`}>
-                  {content.resource.length === 0 ? (
+                  {resourceFolders.length === 0 ? (
                     <EmptyState message="No resources available." />
                   ) : (
-                    content.resource.map((r) => (
+                    resourceFolders.map((r) => (
                       <Link
                         key={r.id}
-                        href={r.href || "/account/resources"}
+                        href={`/account/resources/${r.id}`}
                         className="flex items-center gap-3"
                       >
                         <span
@@ -354,18 +373,11 @@ export default async function AccountPage() {
                               </span>
                             )}
                           </div>
-                          {r.subtitle && (
-                            <p className="truncate text-xs text-slate-400">
-                              {r.subtitle}
-                            </p>
-                          )}
+                          <p className="truncate text-xs text-slate-400">
+                            {r._count.materials} material
+                            {r._count.materials === 1 ? "" : "s"}
+                          </p>
                         </div>
-                        {r.note && (
-                          <span className="shrink-0 text-xs text-slate-400">
-                            {r.note}
-                          </span>
-                        )}
-                        <Bookmark className="h-4 w-4 shrink-0 text-slate-300" />
                       </Link>
                     ))
                   )}

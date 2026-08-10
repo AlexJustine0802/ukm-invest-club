@@ -3,10 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { site } from "@/lib/site";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { DUR, EASE } from "@/lib/motion";
 
 export default function Navbar({
@@ -22,11 +23,28 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
 
+  // Flat and transparent while the page is at the top, solid once it moves.
+  // Initialised from the current offset so a reload part-way down the page
+  // does not flash the transparent state.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+    <header
+      className={`sticky top-0 z-50 border-b transition-colors duration-[--dur-ui] ease-[--ease-out] ${
+        scrolled || open
+          ? "border-slate-200 bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/80"
+          : "border-transparent bg-transparent"
+      }`}
+    >
       <nav className="container-page flex h-16 items-center justify-between">
         <Link
           href={homeHref}
@@ -78,12 +96,17 @@ export default function Navbar({
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 md:flex">
-            <Link href="/login" className="btn-secondary">
-              Login
-            </Link>
-            <Link href="/signup" className="btn-primary">
+            <InteractiveHoverButton href="/login">Login</InteractiveHoverButton>
+            <InteractiveHoverButton
+              href="/signup"
+              // Filled variant: blue at rest, sweeps to white on hover, so the
+              // label has to flip to blue with it.
+              className="bg-primary text-white"
+              fillClassName="bg-white"
+              hoverTextClassName="text-primary"
+            >
               Sign Up
-            </Link>
+            </InteractiveHoverButton>
           </div>
           {/* Mobile toggle */}
           <button
@@ -128,20 +151,22 @@ export default function Navbar({
                   </li>
                 ))}
                 <li className="mt-2 flex gap-2">
-                  <Link
+                  <InteractiveHoverButton
                     href="/login"
                     onClick={() => setOpen(false)}
-                    className="btn-secondary flex-1 text-center"
+                    className="flex-1"
                   >
                     Login
-                  </Link>
-                  <Link
+                  </InteractiveHoverButton>
+                  <InteractiveHoverButton
                     href="/signup"
                     onClick={() => setOpen(false)}
-                    className="btn-primary flex-1 text-center"
+                    className="flex-1 bg-primary text-white"
+                    fillClassName="bg-white"
+                    hoverTextClassName="text-primary"
                   >
                     Sign Up
-                  </Link>
+                  </InteractiveHoverButton>
                 </li>
               </ul>
             </div>

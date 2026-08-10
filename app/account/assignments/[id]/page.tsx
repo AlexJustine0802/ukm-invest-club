@@ -17,7 +17,13 @@ import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import SubmitAssignmentForm from "@/components/account/SubmitAssignmentForm";
-import { dueLabel, isDueSoon, isOpen, memberState } from "@/lib/assignments";
+import {
+  dueLabel,
+  isDueSoon,
+  isOpen,
+  isPastDue,
+  memberState,
+} from "@/lib/assignments";
 import { formatDateTime } from "@/lib/utils";
 import { withdrawSubmission } from "./actions";
 
@@ -45,10 +51,10 @@ export default async function AssignmentDetailPage({
 
   const now = new Date();
   const open = isOpen(assignment.opensAt, now);
-  const overdue = assignment.dueDate < now;
+  const overdue = isPastDue(assignment.dueDate, now);
   const soon = isDueSoon(
     assignment.dueDate,
-    memberState(assignment.opensAt, submission, now),
+    memberState(assignment.opensAt, submission, now, assignment.dueDate),
     now,
   );
   const graded = Boolean(submission?.gradedAt);
@@ -191,6 +197,14 @@ export default async function AssignmentDetailPage({
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                 Marked  your submission is locked.
+              </p>
+            ) : overdue ? (
+              // Closed for everyone once the deadline passes, including a
+              // member who already handed something in and wants to swap it.
+              <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+                <CalendarClock className="h-4 w-4 text-rose-600" />
+                The deadline passed on {formatDateTime(assignment.dueDate)}. This
+                assignment no longer accepts submissions.
               </p>
             ) : (
               <div className="mt-5">

@@ -6,11 +6,7 @@
 // import { sendAuthEmail } from "@/lib/email";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import {
-  createUserSessionToken,
-  hashPassword,
-  setUserSessionCookie,
-} from "@/lib/userAuth";
+import { hashPassword } from "@/lib/userAuth";
 
 export interface AuthState {
   error?: string;
@@ -69,7 +65,7 @@ export async function signupUser(
   //   `${siteUrl()}/verify-email?token=${verifyToken}`,
   // );
 
-  const token = await createUserSessionToken(user.id, user.email);
-  await setUserSessionCookie(token);
-  redirect("/account");
+  // No auto-login: signing up and signing in stay separate steps, so the new
+  // member enters their credentials once before reaching the dashboard.
+  redirect("/login?registered=1");
 }

@@ -3,6 +3,7 @@ import { ArrowRight, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { withDefaultStats } from "@/lib/impactStats";
 import EmptyState from "@/components/EmptyState";
 import EventCard from "@/components/EventCard";
@@ -219,10 +220,14 @@ export default async function HomePage() {
                 </p>
               </div>
             </div>
-            <Link href="/contact" className="btn-primary shrink-0">
+            <InteractiveHoverButton
+              href="/contact"
+              className="shrink-0 bg-primary text-white"
+              fillClassName="bg-white"
+              hoverTextClassName="text-primary"
+            >
               Contact Us
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            </InteractiveHoverButton>
           </div>
         </div>
       </Reveal>

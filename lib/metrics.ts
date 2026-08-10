@@ -81,6 +81,9 @@ export async function getMetricValues(
       (SELECT count(*) FROM "Assignment" a
         WHERE a.published = true
           AND (a."opensAt" IS NULL OR a."opensAt" <= ${now})
+          -- Past the deadline it can no longer be handed in, so it is not
+          -- something the member still owes.
+          AND a."dueDate" >= ${now}
           AND NOT EXISTS (
             SELECT 1 FROM "AssignmentSubmission" s
             WHERE s."assignmentId" = a.id

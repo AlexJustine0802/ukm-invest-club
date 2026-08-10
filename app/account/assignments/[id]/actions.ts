@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
 import { isBlobConfigured, uploadFile } from "@/lib/upload";
-import { isOpen } from "@/lib/assignments";
+import { isOpen, isPastDue } from "@/lib/assignments";
 import { formatDateTime } from "@/lib/utils";
 import {
   MAX_SUBMISSION_MB,
@@ -28,7 +28,7 @@ export async function submitAssignment(
 
   const assignment = await prisma.assignment.findUnique({
     where: { id: assignmentId },
-    select: { id: true, published: true, opensAt: true },
+    select: { id: true, published: true, opensAt: true, dueDate: true },
   });
   if (!assignment || !assignment.published) {
     return { error: "This assignment is not available." };
@@ -38,6 +38,13 @@ export async function submitAssignment(
   if (!isOpen(assignment.opensAt)) {
     return {
       error: `This assignment opens on ${formatDateTime(assignment.opensAt!)}.`,
+    };
+  }
+  // Same reason as the check above: the page hides the upload once the
+  // deadline passes, but hiding a form does not stop a post from reaching here.
+  if (isPastDue(assignment.dueDate)) {
+    return {
+      error: `The deadline passed on ${formatDateTime(assignment.dueDate)}. This assignment no longer accepts submissions.`,
     };
   }
 
@@ -105,6 +112,14 @@ export async function withdrawSubmission(formData: FormData) {
 
   const assignmentId = formData.get("assignmentId") as string;
   if (!assignmentId) return;
+
+  // Withdrawing after the deadline would delete the only submission the member
+  // can no longer replace, so the window closes with the deadline.
+  const assignment = await prisma.assignment.findUnique({
+    where: { id: assignmentId },
+    select: { dueDate: true },
+  });
+  if (!assignment || isPastDue(assignment.dueDate)) return;
 
   await prisma.assignmentSubmission.deleteMany({
     where: { assignmentId, userId: session.userId, gradedAt: null },

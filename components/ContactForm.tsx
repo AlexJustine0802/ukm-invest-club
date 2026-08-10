@@ -8,16 +8,23 @@ import {
   submitContact,
   type ContactFormState,
 } from "@/app/(site)/contact/actions";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 const initialState: ContactFormState = { status: "idle" };
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className="btn-primary px-6" disabled={pending}>
-      {pending ? <Spinner /> : <Send className="mr-2 h-4 w-4" />}
+    <InteractiveHoverButton
+      type="submit"
+      className="bg-primary text-white"
+      fillClassName="bg-white"
+      hoverTextClassName="text-primary"
+      disabled={pending}
+    >
+      {pending ? <Spinner /> : <Send className="mr-2 inline h-4 w-4" />}
       {pending ? "Sending..." : "Send Message"}
-    </button>
+    </InteractiveHoverButton>
   );
 }
 

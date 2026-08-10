@@ -8,6 +8,7 @@ import { formatDate } from "@/lib/utils";
 import { getResearchIcon } from "@/lib/researchIcons";
 import EmptyState from "@/components/EmptyState";
 import Reveal from "@/components/Reveal";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 export type PublicationSummary = {
   id: string;
@@ -268,14 +269,18 @@ export default function ResearchPageContent({
               help you make smarter investment decisions.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="#featured-research" className="btn-primary">
+              <InteractiveHoverButton
+                href="#featured-research"
+                className="bg-primary text-white"
+                fillClassName="bg-white"
+                hoverTextClassName="text-primary"
+              >
                 Explore Research
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-              <Link href="/publications/all" className="btn-secondary">
+              </InteractiveHoverButton>
+              <InteractiveHoverButton href="/publications/all">
                 View All Publications
-                <FileText className="ml-2 h-4 w-4" />
-              </Link>
+                <FileText className="ml-2 inline h-4 w-4" />
+              </InteractiveHoverButton>
             </div>
           </div>
 

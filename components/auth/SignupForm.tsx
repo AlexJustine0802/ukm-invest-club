@@ -7,18 +7,21 @@ import { useFormStatus } from "react-dom";
 import { User, Mail, Phone, Lock } from "lucide-react";
 import { signupUser, type AuthState } from "@/app/signup/actions";
 import { IconInput, PasswordInput } from "./authParts";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button
+    <InteractiveHoverButton
       type="submit"
-      className="btn-primary w-full py-3"
+      className="w-full bg-primary py-3 text-white"
+      fillClassName="bg-white"
+      hoverTextClassName="text-primary"
       disabled={pending}
     >
       {pending && <Spinner />}
       {pending ? "Creating account…" : "Sign Up"}
-    </button>
+    </InteractiveHoverButton>
   );
 }
 

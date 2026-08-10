@@ -19,8 +19,193 @@
   --dur-reveal: 1000ms; /* scroll reveal, matches lib/motion.ts DUR.reveal */
 }
 
+.dark {
+  --background: #020617;
+  --foreground: #e2e8f0;
+}
+
 html {
   scroll-behavior: smooth;
+}
+
+/* Dark theme.
+ *
+ * ponytail: the app hardcodes light utilities (bg-white, text-navy,
+ * border-slate-200) in several hundred places, so this remaps those utilities
+ * under `.dark` instead of adding a `dark:` variant to every one of them. It is
+ * a broad brush: a surface that must stay light in both themes needs an
+ * explicit `dark:` class to win over these rules. Upgrade path is per-component
+ * `dark:` variants, one screen at a time.
+ */
+.dark .bg-white {
+  background-color: #0f172a;
+}
+.dark .bg-slate-50,
+.dark .hover\:bg-slate-50:hover {
+  background-color: #111c33;
+}
+.dark .bg-slate-100,
+.dark .hover\:bg-slate-100:hover {
+  background-color: #1e293b;
+}
+.dark .bg-blue-50 {
+  background-color: rgba(20, 77, 200, 0.18);
+}
+.dark .bg-slate-950,
+.dark .bg-navy {
+  background-color: #0b1220;
+}
+
+/* Gradient stops are custom properties, so `.bg-white` above never reaches
+   them — a `from-blue-50 to-white` panel would stay bright in dark mode. */
+.dark .from-white,
+.dark .to-white {
+  --tw-gradient-from: #0f172a var(--tw-gradient-from-position);
+  --tw-gradient-to: #0f172a var(--tw-gradient-to-position);
+}
+.dark .from-slate-50,
+.dark .to-slate-50,
+.dark .from-blue-50,
+.dark .to-blue-50 {
+  --tw-gradient-from: #111c33 var(--tw-gradient-from-position);
+  --tw-gradient-to: #111c33 var(--tw-gradient-to-position);
+}
+
+/* The brand blue (#144DC8) is a dark blue: legible on white, muddy against a
+   navy page. Dark mode lifts it a few steps so buttons and links keep their
+   contrast. */
+.dark .bg-primary,
+.dark .hover\:bg-primary:hover {
+  background-color: #3b82f6;
+}
+.dark .hover\:bg-primary-dark:hover {
+  background-color: #60a5fa;
+}
+.dark .text-primary,
+.dark .hover\:text-primary:hover {
+  color: #7cb0ff;
+}
+.dark .border-primary {
+  border-color: #3b82f6;
+}
+.dark .bg-primary-light,
+.dark .hover\:bg-primary-light:hover {
+  background-color: rgba(59, 130, 246, 0.18);
+}
+
+/* Status tints. The 50/100 shades are near-white by design, so a badge keeps
+   its meaning in dark mode only if the fill drops to a translucent wash of the
+   same hue and the label lifts to the light end of that hue. */
+.dark .bg-amber-50,
+.dark .bg-amber-100 {
+  background-color: rgba(245, 158, 11, 0.16);
+}
+.dark .bg-emerald-50,
+.dark .bg-emerald-100,
+.dark .bg-green-50 {
+  background-color: rgba(16, 185, 129, 0.16);
+}
+.dark .bg-rose-50,
+.dark .bg-red-50,
+.dark .hover\:bg-red-50:hover {
+  background-color: rgba(244, 63, 94, 0.16);
+}
+.dark .bg-violet-50,
+.dark .bg-purple-50,
+.dark .bg-indigo-50 {
+  background-color: rgba(139, 92, 246, 0.16);
+}
+.dark .bg-sky-50,
+.dark .bg-cyan-50 {
+  background-color: rgba(14, 165, 233, 0.16);
+}
+
+.dark .text-amber-700,
+.dark .text-amber-600 {
+  color: #fbbf24;
+}
+.dark .text-emerald-700,
+.dark .text-emerald-600,
+.dark .text-green-700,
+.dark .text-green-600 {
+  color: #34d399;
+}
+.dark .text-rose-700,
+.dark .text-rose-600,
+.dark .text-red-700,
+.dark .text-red-600 {
+  color: #fb7185;
+}
+.dark .text-violet-700,
+.dark .text-violet-600,
+.dark .text-purple-600 {
+  color: #a78bfa;
+}
+.dark .text-sky-700,
+.dark .text-sky-600 {
+  color: #38bdf8;
+}
+
+.dark .text-navy {
+  color: #e2e8f0;
+}
+/* 700–900 are body-copy shades: near-black, so they vanish against a dark
+   card. Markdown bodies (.prose-content) are the main users. */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .prose-content {
+  color: #cbd5e1;
+}
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #94a3b8;
+}
+.dark .text-slate-400,
+.dark .text-slate-300 {
+  color: #64748b;
+}
+
+.dark .border-slate-200 {
+  border-color: #1e293b;
+}
+.dark .border-slate-100,
+.dark .border-slate-50 {
+  border-color: #172033;
+}
+
+/* Form controls: the browser paints them white regardless of the utilities on
+   them, so dark mode has to set the surface on the element itself — both the
+   `.input` component class and the several forms that style inputs inline. */
+.dark .input,
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.dark textarea,
+.dark select {
+  background-color: #111c33;
+  border-color: #1e293b;
+  color: #e2e8f0;
+}
+.dark .input::placeholder,
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b;
+}
+/* Date and time pickers draw their own glyphs in the UA's colour. */
+.dark input[type="date"],
+.dark input[type="datetime-local"],
+.dark input[type="time"] {
+  color-scheme: dark;
+}
+
+/* The theme toggle's view transition: the collapsed clip-path is pinned in CSS
+   so Firefox never paints the incoming theme unclipped for a frame. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+[data-magicui-theme-vt="active"]::view-transition-new(root) {
+  clip-path: var(--magicui-theme-vt-clip-from);
 }
 
 body {
@@ -34,6 +219,43 @@ body {
      `hidden` turns the body into a scroll container and breaks every
      `position: sticky` header in the app. */
   overflow-x: clip;
+}
+
+/* Scrollbars follow the theme. Firefox gets the two-keyword form; WebKit gets
+   the pseudo-elements. The thumb is drawn inside a transparent border so it
+   reads as a slim pill rather than filling the whole gutter. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.dark * {
+  scrollbar-color: #334155 transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background-color: #334155;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
 }
 
 /* Media never pushes past its column, whatever the intrinsic size is. */
@@ -225,3 +447,4 @@ code,
     transform: none;
   }
 }
+

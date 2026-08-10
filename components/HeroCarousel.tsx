@@ -1,9 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 
 export type HeroSlideView = {
   eyebrow: string | null;
@@ -70,7 +70,10 @@ export default function HeroCarousel({
 
   return (
     <section
-      className="relative overflow-hidden bg-white"
+      // -mt-16 pulls the hero up under the (transparent-at-top) navbar so the
+      // artwork starts at the very top of the page; the matching pt below
+      // keeps the copy clear of the bar.
+      className="relative -mt-16 overflow-hidden bg-white"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
@@ -102,8 +105,8 @@ export default function HeroCarousel({
               <div className="absolute inset-0 bg-gradient-to-b from-primary-light/45 via-transparent to-white/70" />
             </div>
 
-            <div className="container-page relative py-10 lg:py-14">
-              <div className="grid min-h-[500px] items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="container-page relative pb-16 pt-[4.5rem] lg:pb-20 lg:pt-[5.5rem]">
+              <div className="grid min-h-[520px] items-center gap-10 lg:min-h-[560px] lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="max-w-2xl">
                   <span className="text-sm font-semibold uppercase tracking-widest text-primary">
                     {slide.eyebrow}
@@ -117,14 +120,18 @@ export default function HeroCarousel({
                     {slide.description}
                   </p>
                   <div className="mt-8 flex flex-wrap gap-4">
-                    <Link href="/publications" className="btn-primary">
+                    <InteractiveHoverButton
+                      href="/publications"
+                      className="bg-primary text-white"
+                      fillClassName="bg-white"
+                      hoverTextClassName="text-primary"
+                    >
                       Explore Research
-                      <ArrowRight className="ml-2 h-4 w-4" />
-                    </Link>
-                    <Link href="/events" className="btn-secondary">
-                      <Calendar className="mr-2 h-4 w-4" />
+                    </InteractiveHoverButton>
+                    <InteractiveHoverButton href="/events">
+                      <Calendar className="mr-2 inline h-4 w-4" />
                       View Events
-                    </Link>
+                    </InteractiveHoverButton>
                   </div>
                 </div>
 

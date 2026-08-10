@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
 import { issueAuthToken, siteUrl } from "@/lib/authTokens";
 import { sendAuthEmail } from "@/lib/email";
+import { uploadImage } from "@/lib/upload";
 
 export interface ProfileState {
   error?: string;
@@ -58,6 +59,67 @@ export async function updateMySocials(
   // The public About page builds its people from these accounts.
   revalidatePath("/about");
   return { saved: true };
+}
+
+/** Same ceiling the browser cannot be trusted to enforce. */
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
+/**
+ * The member's own profile picture.
+ *
+ * Submitting with no file and `remove` set clears it; the old blob is left in
+ * place rather than deleted, which is what every other image in the CMS does.
+ */
+export async function updateMyPhoto(
+  _prev: ProfileState,
+  formData: FormData,
+): Promise<ProfileState> {
+  const session = await getUserSession();
+  if (!session) return { error: "Please sign in again." };
+
+  if (formData.get("remove") === "1") {
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { photo: null },
+    });
+    revalidateProfile();
+    return { saved: true };
+  }
+
+  const file = formData.get("photoFile");
+  if (!(file instanceof File) || file.size === 0) {
+    return { error: "Choose an image first." };
+  }
+  // Both checks run on the server: the `accept` attribute and any client-side
+  // size check are hints, not limits.
+  if (!file.type.startsWith("image/")) {
+    return { error: "That file is not an image." };
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    return { error: "Image must be 5 MB or smaller." };
+  }
+
+  let url: string;
+  try {
+    url = await uploadImage(file);
+  } catch {
+    return { error: "Upload failed. Please try again." };
+  }
+
+  await prisma.user.update({
+    where: { id: session.userId },
+    data: { photo: url },
+  });
+
+  revalidateProfile();
+  return { saved: true };
+}
+
+/** Everywhere a member's photo is rendered. */
+function revalidateProfile() {
+  revalidatePath("/account/profile");
+  revalidatePath("/account/members");
+  revalidatePath("/about");
 }
 
 /**

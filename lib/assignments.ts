@@ -33,7 +33,7 @@ export function dueLabel(due: Date, now: Date = new Date()): string {
 }
 
 /** What one member sees an assignment as. */
-export type MemberState = "UPCOMING" | "ACTIVE" | "COMPLETED";
+export type MemberState = "UPCOMING" | "ACTIVE" | "OVERDUE" | "COMPLETED";
 
 /**
  * NotificationRead key for an assignment.
@@ -62,10 +62,24 @@ export function memberState(
   opensAt: Date | null,
   submission?: { gradedAt: Date | null } | null,
   now: Date = new Date(),
+  /** Omit only where the caller genuinely has no deadline to hand. */
+  dueDate?: Date | null,
 ): MemberState {
   if (submission) return "COMPLETED";
   if (!isOpen(opensAt, now)) return "UPCOMING";
+  // Past the deadline with nothing handed in is its own state. Leaving it
+  // ACTIVE is what made an overdue assignment keep counting as active work and
+  // still show up under "Due soon".
+  if (dueDate && isPastDue(dueDate, now)) return "OVERDUE";
   return "ACTIVE";
+}
+
+/**
+ * Past the deadline. Compared to the minute, not the day: the deadline the
+ * member is shown includes a time, so that is the one that has to bite.
+ */
+export function isPastDue(due: Date, now: Date = new Date()): boolean {
+  return due.getTime() < now.getTime();
 }
 
 /**
@@ -86,7 +100,8 @@ export function isDueSoon(
 ): boolean {
   if (state !== "ACTIVE") return false;
   const days = daysUntil(due, now);
-  return days <= DUE_SOON_DAYS;
+  // days >= 0: an overdue deadline is not "soon", it is gone.
+  return days >= 0 && days <= DUE_SOON_DAYS && !isPastDue(due, now);
 }
 
 export const ASSIGNMENT_TABS = [
