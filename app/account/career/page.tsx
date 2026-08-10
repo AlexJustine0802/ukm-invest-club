@@ -110,11 +110,14 @@ export default async function CareerPage({
               <Link
                 key={a.id}
                 href={`/account/career/${a.id}`}
-                className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-primary/60 hover:bg-blue-50/20"
+                // min-w-0: a grid item defaults to min-width:auto, so one long
+                // unbroken word in the description widens the whole card past
+                // the screen instead of wrapping inside it.
+                className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-primary/60 hover:bg-blue-50/20"
               >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h2 className="font-bold leading-snug text-navy underline-offset-2 group-hover:underline">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="break-words font-bold leading-snug text-navy underline-offset-2 group-hover:underline">
                       {a.role}
                     </h2>
                     <p className="mt-0.5 flex items-center gap-2 text-sm text-slate-600">
@@ -125,7 +128,7 @@ export default async function CareerPage({
                   <CompanyLogo
                     logo={a.logo}
                     company={a.company}
-                    className="h-11 w-11"
+                    className="h-11 w-11 shrink-0"
                     fallbackClassName={palette.badge}
                   />
                 </div>
@@ -159,7 +162,7 @@ export default async function CareerPage({
                 {/* Clamped so every card in the row is the same height whatever
                     the admin wrote. The full text is on the detail page. */}
                 {a.description && (
-                  <p className="mt-2 line-clamp-3 text-sm text-slate-500">
+                  <p className="mt-2 line-clamp-3 break-words text-sm text-slate-500">
                     {a.description}
                   </p>
                 )}

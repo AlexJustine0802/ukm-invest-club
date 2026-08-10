@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { site } from "@/lib/site";
 import { EASE } from "@/lib/motion";
@@ -23,9 +23,7 @@ const PAUSE_AFTER_TYPING_MS = 1000;
  * bookmark, or navigating back to the dashboard never replays it.
  */
 export default function WelcomeSplash({ name }: { name: string }) {
-  const params = useSearchParams();
   const router = useRouter();
-  const pathname = usePathname();
   const reduced = useReducedMotion();
 
   const [showing, setShowing] = useState(false);
@@ -39,19 +37,32 @@ export default function WelcomeSplash({ name }: { name: string }) {
     Array.from(message).length * TYPE_MS +
     PAUSE_AFTER_TYPING_MS;
 
+  // Read inside a mount-only effect, so they cannot re-trigger it.
+  const holdRef = useRef(holdMs);
+  const reducedRef = useRef(reduced);
+  holdRef.current = holdMs;
+  reducedRef.current = reduced;
+
+  // Mount-only, and the flag is read from the URL rather than useSearchParams.
+  // With `params` in the dependency list this effect re-ran the moment the
+  // replace() below rewrote the URL; its cleanup cancelled the timer that hides
+  // the splash, and the curtain stayed up forever.
   useEffect(() => {
-    if (params.get("welcome") !== "1") return;
+    const isWelcome =
+      new URLSearchParams(window.location.search).get("welcome") === "1";
+    if (!isWelcome) return;
 
     // Drop the parameter immediately: the splash owns its own lifetime from
     // here, and the URL should be clean if the member reloads mid-animation.
-    router.replace(pathname, { scroll: false });
+    router.replace(window.location.pathname, { scroll: false });
 
-    if (reduced) return;
+    if (reducedRef.current) return;
 
     setShowing(true);
-    const id = window.setTimeout(() => setShowing(false), holdMs);
+    const id = window.setTimeout(() => setShowing(false), holdRef.current);
     return () => window.clearTimeout(id);
-  }, [params, pathname, router, reduced, holdMs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <AnimatePresence>
