@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import LoginForm from "@/components/auth/LoginForm";
+import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
 import SignupCelebration from "@/components/auth/SignupCelebration";
 
 export const metadata: Metadata = { title: "Log In" };
@@ -13,8 +14,11 @@ export default function LoginPage() {
     // min-h-dvh, not min-h-screen: on mobile browsers `100vh` is the height
     // with the URL bar hidden, which is taller than what you can actually see
     // and puts the card just past the fold.
-    <main className="flex min-h-dvh items-center justify-center bg-slate-100 px-4 py-6">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg sm:p-8">
+    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-slate-100 px-4 py-6">
+      {/* Decorative: the radial mask fades the grid out well before the edges,
+          so it reads as texture behind the card rather than a full page grid. */}
+      <InteractiveGridPattern className="inset-x-0 inset-y-[-30%] h-[200%] skew-y-12 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)]" />
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg sm:p-8">
         <Link href="/" className="mx-auto mb-4 flex justify-center">
           <Image
             src="/images/logo-nobg.png"

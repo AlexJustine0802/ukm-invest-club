@@ -30,6 +30,7 @@ import { withDefaultStats } from "@/lib/impactStats";
 import { formatDate } from "@/lib/utils";
 import PartnerStrip from "@/components/PartnerStrip";
 import DivisionsSection from "@/components/DivisionsSection";
+import HeroCursorArea from "@/components/HeroCursorArea";
 import EmptyState from "@/components/EmptyState";
 import Reveal from "@/components/Reveal";
 import CountUp from "@/components/CountUp";
@@ -201,63 +202,74 @@ export default async function AboutPage() {
         // trick the home carousel uses; the pt below keeps the copy clear of it.
         className="relative -mt-16 overflow-hidden border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white"
       >
-        {/* multiply, not the default screen: this hero is near-white, and
+        {/* The smooth cursor is mounted only while the pointer is over this
+            box, so it never takes over the rest of the page. */}
+        <HeroCursorArea>
+          {/* multiply, not the default screen: this hero is near-white, and
             screen-blended rays are invisible on white. */}
-        <LightRays blend="multiply" color="rgba(90, 150, 255, 0.35)" />
-        <div className="container-page relative z-10 flex min-h-[80vh] flex-col justify-center pb-24 pt-32 text-center lg:min-h-[85vh] lg:pb-32 lg:pt-40">
-          <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
-            <TextAnimate
-              as="span"
-              animation="blurInUp"
-              by="character"
-              once
-              className="inline-block"
-            >
-              {"About "}
-            </TextAnimate>
-            <TextAnimate
-              as="span"
-              animation="blurInUp"
-              by="character"
-              once
-              className="inline-block text-primary"
-            >
-              {site.name}
-            </TextAnimate>
-          </h1>
-          <p className="mx-auto mt-4 min-h-[3.5rem] max-w-2xl text-lg leading-7 text-slate-600">
-            <TypingAnimation
-              as="span"
-              className="leading-7 tracking-normal"
-              duration={22}
-            >
-              We are a campus community that shares knowledge, analyzes markets,
-              and grows together in the world of investment.
-            </TypingAnimation>
-          </p>
+          <LightRays
+            blend="multiply"
+            color="rgba(45, 110, 255, 0.5)"
+            count={10}
+            blur={26}
+            speed={9}
+            length="100vh"
+          />
+          <div className="container-page relative z-10 flex min-h-[80vh] flex-col justify-center pb-24 pt-32 text-center lg:min-h-[85vh] lg:pb-32 lg:pt-40">
+            <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="inline-block"
+              >
+                {"About "}
+              </TextAnimate>
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="inline-block text-primary"
+              >
+                {site.name}
+              </TextAnimate>
+            </h1>
+            <p className="mx-auto mt-4 min-h-[3.5rem] max-w-2xl text-lg leading-7 text-slate-600">
+              <TypingAnimation
+                as="span"
+                className="leading-7 tracking-normal"
+                duration={22}
+              >
+                We are a campus community that shares knowledge, analyzes
+                markets, and grows together in the world of investment.
+              </TypingAnimation>
+            </p>
 
-          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {withDefaultStats(stats, "home").map((s) => {
-              const Icon = getUiIcon(s.icon);
-              return (
-                <div
-                  key={s.id}
-                  className="card flex items-center justify-center gap-3 p-5"
-                >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <div className="text-left">
-                    <p className="text-2xl font-extrabold text-navy">
-                      <CountUp value={s.value} />
-                    </p>
-                    <p className="text-xs text-slate-500">{s.label}</p>
+            <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {withDefaultStats(stats, "home").map((s) => {
+                const Icon = getUiIcon(s.icon);
+                return (
+                  <div
+                    key={s.id}
+                    className="card flex items-center justify-center gap-3 p-5"
+                  >
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
+                      <Icon className="h-5 w-5" />
+                    </span>
+                    <div className="text-left">
+                      <p className="text-2xl font-extrabold text-navy">
+                        <CountUp value={s.value} />
+                      </p>
+                      <p className="text-xs text-slate-500">{s.label}</p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
+        </HeroCursorArea>
       </Reveal>
 
       {/* Who we are / Vision / Mission */}

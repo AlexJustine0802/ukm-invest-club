@@ -3,13 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import SignupForm from "@/components/auth/SignupForm";
+import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern";
 
 export const metadata: Metadata = { title: "Create Account" };
 
 export default function SignupPage() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4 py-10">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg sm:p-10">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-10">
+      {/* Same decorative grid as the login page. */}
+      <InteractiveGridPattern className="inset-x-0 inset-y-[-30%] h-[200%] skew-y-12 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)]" />
+      <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-8 shadow-lg sm:p-10">
         <Link href="/" className="mx-auto mb-6 flex justify-center">
           <Image
             src="/images/logo-nobg.png"

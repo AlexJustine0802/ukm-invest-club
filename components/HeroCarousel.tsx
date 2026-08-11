@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
-import { LightRays } from "@/components/ui/light-rays";
 
 export type HeroSlideView = {
   eyebrow: string | null;
@@ -106,7 +105,7 @@ export default function HeroCarousel({
               <div className="absolute inset-0 bg-gradient-to-b from-primary-light/45 via-transparent to-white/70" />
             </div>
 
-            <div className="container-page relative z-10 pb-16 pt-[4.5rem] lg:pb-20 lg:pt-[5.5rem]">
+            <div className="container-page relative z-10 pb-20 pt-[3.75rem] lg:pb-24 lg:pt-[4.75rem]">
               <div className="grid min-h-[520px] items-center gap-10 lg:min-h-[560px] lg:grid-cols-[0.9fr_1.1fr]">
                 <div className="max-w-2xl">
                   <span className="text-sm font-semibold uppercase tracking-widest text-primary">
@@ -142,11 +141,6 @@ export default function HeroCarousel({
           </div>
         ))}
       </div>
-
-      {/* Above the slide artwork, below the copy (which carries z-10).
-          multiply, not the default screen: the slide is white behind the copy,
-          and screen-blended rays leave white untouched. */}
-      <LightRays blend="multiply" color="rgba(90, 150, 255, 0.35)" />
 
       <div className="container-page pointer-events-none absolute inset-x-0 bottom-0 top-0">
         <div
