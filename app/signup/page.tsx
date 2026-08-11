@@ -11,7 +11,12 @@ export default function SignupPage() {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-100 px-4 py-10">
       {/* Same decorative grid as the login page. */}
-      <InteractiveGridPattern className="inset-x-0 inset-y-[-30%] h-[200%] skew-y-12 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)]" />
+      <InteractiveGridPattern
+        width={40}
+        height={40}
+        squares={[76, 46]}
+        className="scale-150 skew-y-12"
+      />
       <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-8 shadow-lg sm:p-10">
         <Link href="/" className="mx-auto mb-6 flex justify-center">
           <Image

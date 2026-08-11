@@ -42,8 +42,14 @@ export function InteractiveGridPattern({
     <svg
       width={width * horizontal}
       height={height * vertical}
+      // Without a viewBox the drawing keeps its intrinsic pixel size no matter
+      // what CSS says about the element box, so any container wider than
+      // width * horizontal ends up with bare space. slice scales the grid to
+      // cover the box and crops the overflow, keeping the cells square.
+      viewBox={`0 0 ${width * horizontal} ${height * vertical}`}
+      preserveAspectRatio="xMidYMid slice"
       className={cn(
-        "absolute inset-0 h-full w-full border border-gray-400/30",
+        "absolute inset-0 h-full w-full border border-gray-400/10",
         className
       )}
       {...props}
@@ -59,8 +65,10 @@ export function InteractiveGridPattern({
             width={width}
             height={height}
             className={cn(
-              "stroke-gray-400/30 transition-all duration-100 ease-in-out",
-              hoveredSquare === index ? "fill-gray-300/30" : "fill-transparent",
+              "stroke-gray-400/10 transition-all duration-100 ease-in-out",
+              // Brand blue rather than the stock grey wash: on a slate page the
+              // grey hover is almost invisible.
+              hoveredSquare === index ? "fill-primary/20" : "fill-transparent",
               squaresClassName
             )}
             onMouseEnter={() => setHoveredSquare(index)}

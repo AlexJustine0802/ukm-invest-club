@@ -15,9 +15,16 @@ export default function LoginPage() {
     // with the URL bar hidden, which is taller than what you can actually see
     // and puts the card just past the fold.
     <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-slate-100 px-4 py-6">
-      {/* Decorative: the radial mask fades the grid out well before the edges,
-          so it reads as texture behind the card rather than a full page grid. */}
-      <InteractiveGridPattern className="inset-x-0 inset-y-[-30%] h-[200%] skew-y-12 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)]" />
+      {/* The box stays exactly the size of the page (inset-0); scale-150 does
+          the oversizing as a transform, which is what stops the skew from
+          leaving bare edges — offsets and widths fought the inset-0 in the
+          component's own base classes. */}
+      <InteractiveGridPattern
+        width={40}
+        height={40}
+        squares={[76, 46]}
+        className="scale-150 skew-y-12"
+      />
       <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg sm:p-8">
         <Link href="/" className="mx-auto mb-4 flex justify-center">
           <Image
