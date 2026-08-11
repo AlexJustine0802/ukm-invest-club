@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import EmptyState from "@/components/EmptyState";
 import { site } from "@/lib/site";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export const dynamic = "force-dynamic";
 
@@ -94,16 +95,34 @@ export default async function CommunityPage({
           </Link>
 
           <div className="mx-auto mt-8 max-w-2xl text-center">
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+            <TextAnimate
+              as="span"
+              animation="blurInUp"
+              by="character"
+              once
+              className="block text-sm font-semibold uppercase tracking-widest text-primary"
+            >
               Our Community
-            </span>
-            <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
+            </TextAnimate>
+            <TextAnimate
+              as="h1"
+              animation="blurInUp"
+              by="character"
+              once
+              className="mt-3 text-4xl font-extrabold tracking-tight text-navy sm:text-5xl"
+            >
               Community Moments
-            </h1>
-            <p className="mt-4 text-lg text-slate-600">
-              A collection of our precious moments in every event. Together,
-              we learn, grow, and make an impact.
-            </p>
+            </TextAnimate>
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-4 text-lg text-slate-600"
+            >
+              A collection of our precious moments in every event. Together, we
+              learn, grow, and make an impact.
+            </TextAnimate>
           </div>
         </div>
       </section>

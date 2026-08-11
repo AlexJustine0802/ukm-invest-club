@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import LoginForm from "@/components/auth/LoginForm";
+import SignupCelebration from "@/components/auth/SignupCelebration";
 
 export const metadata: Metadata = { title: "Log In" };
 
@@ -32,6 +33,7 @@ export default function LoginPage() {
         </p>
         <div className="mt-6">
           <Suspense>
+            <SignupCelebration />
             <LoginForm />
           </Suspense>
         </div>

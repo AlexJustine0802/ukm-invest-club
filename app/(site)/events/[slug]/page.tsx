@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { formatDateTime, isUpcoming } from "@/lib/utils";
 import { formStatus } from "@/lib/forms";
 import Markdown from "@/components/Markdown";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export const dynamic = "force-dynamic";
 
@@ -95,9 +96,15 @@ export default async function EventDetailPage({ params }: Props) {
           </span>
         </div>
 
-        <h1 className="mt-3 text-4xl font-extrabold text-navy">
+        <TextAnimate
+          as="h1"
+          animation="blurInUp"
+          by="character"
+          once
+          className="mt-3 text-4xl font-extrabold text-navy"
+        >
           {event.title}
-        </h1>
+        </TextAnimate>
         {event.location && (
           <p className="mt-2 text-slate-600">📍 {event.location}</p>
         )}

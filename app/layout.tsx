@@ -41,7 +41,7 @@ export default function RootLayout({
             and runs ahead of hydration, which is exactly what the flash needs
             to be avoided. */}
         <Script id="theme-init" strategy="beforeInteractive">
-          {`try{if(localStorage.theme==='dark')document.documentElement.classList.add('dark')}catch(e){}`}
+          {`try{if(localStorage.theme==='dark'&&location.pathname.startsWith('/account'))document.documentElement.classList.add('dark')}catch(e){}`}
         </Script>
         {/* Scroll-reveal starts sections at opacity 0 and animates them in with
             JavaScript. With scripting off that never happens, so the whole page

@@ -7,6 +7,7 @@ import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
 import { formStatus, parseQuestions, flattenQuestions } from "@/lib/forms";
 import { formatDateTime } from "@/lib/utils";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export const metadata: Metadata = {
   title: "Register",
@@ -38,13 +39,33 @@ export default async function PublicRegisterPage() {
   return (
     <div className="bg-slate-50">
       <div className="mx-auto max-w-3xl px-4 py-14">
-        <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+        <TextAnimate
+          as="span"
+          animation="blurInUp"
+          by="character"
+          once
+          className="block text-sm font-semibold uppercase tracking-widest text-primary"
+        >
           Join us
-        </span>
-        <h1 className="mt-3 text-3xl font-bold text-navy">Registration</h1>
-        <p className="mt-3 text-slate-600">
+        </TextAnimate>
+        <TextAnimate
+          as="h1"
+          animation="blurInUp"
+          by="character"
+          once
+          className="mt-3 text-3xl font-bold text-navy"
+        >
+          Registration
+        </TextAnimate>
+        <TextAnimate
+          as="p"
+          animation="blurInUp"
+          by="word"
+          once
+          className="mt-3 text-slate-600"
+        >
           Open recruitment and event sign-ups. Pick one to fill in its form.
-        </p>
+        </TextAnimate>
 
         {listed.length === 0 ? (
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center">
@@ -53,7 +74,7 @@ export default async function PublicRegisterPage() {
               Nothing open at the moment
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              Follow our socials or check back soon  new recruitment opens here.
+              Follow our socials or check back soon new recruitment opens here.
             </p>
             <Link
               href="/events"

@@ -9,6 +9,7 @@ import { getResearchIcon } from "@/lib/researchIcons";
 import EmptyState from "@/components/EmptyState";
 import Reveal from "@/components/Reveal";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export type PublicationSummary = {
   id: string;
@@ -83,9 +84,15 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
-      <h2 className="text-sm font-bold uppercase tracking-widest text-primary">
+      <TextAnimate
+        as="h2"
+        animation="blurInUp"
+        by="character"
+        once
+        className="text-sm font-bold uppercase tracking-widest text-primary"
+      >
         {title}
-      </h2>
+      </TextAnimate>
       {action && (
         <Link
           href={href ?? "/publications/all"}
@@ -260,14 +267,55 @@ export default function ResearchPageContent({
         <div className="container-page relative grid min-h-[460px] items-center gap-10 py-14 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="max-w-2xl">
             <h1 className="mt-5 text-4xl font-bold leading-tight text-navy sm:text-5xl">
-              Insight Today,
-              <br />
-              Better <span className="text-primary">Investment</span> Tomorrow
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="block"
+              >
+                Insight Today,
+              </TextAnimate>
+              <span className="block">
+                <TextAnimate
+                  as="span"
+                  animation="blurInUp"
+                  by="character"
+                  once
+                  className="inline-block"
+                >
+                  {"Better "}
+                </TextAnimate>
+                <TextAnimate
+                  as="span"
+                  animation="blurInUp"
+                  by="character"
+                  once
+                  className="inline-block text-primary"
+                >
+                  Investment
+                </TextAnimate>
+                <TextAnimate
+                  as="span"
+                  animation="blurInUp"
+                  by="character"
+                  once
+                  className="inline-block"
+                >
+                  {" Tomorrow"}
+                </TextAnimate>
+              </span>
             </h1>
-            <p className="mt-6 max-w-xl text-base font-medium leading-7 text-slate-600">
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-6 max-w-xl text-base font-medium leading-7 text-slate-600"
+            >
               Our research provides in-depth analysis and valuable insights to
               help you make smarter investment decisions.
-            </p>
+            </TextAnimate>
             <div className="mt-8 flex flex-wrap gap-4">
               <InteractiveHoverButton
                 href="#featured-research"

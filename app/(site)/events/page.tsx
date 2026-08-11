@@ -19,6 +19,7 @@ import EventHeroSlider, {
 import EventCategoriesInteractive, {
   type EventCategoryWithPreview,
 } from "@/components/EventCategoriesInteractive";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export const dynamic = "force-dynamic";
 
@@ -155,7 +156,6 @@ function eventHref(event: EventDisplay) {
   return `/events/${event.slug}`;
 }
 
-
 function SectionHeader({
   title,
   action,
@@ -167,9 +167,15 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-6 flex items-center justify-between gap-4">
-      <h2 className="text-sm font-semibold uppercase tracking-widest text-primary">
+      <TextAnimate
+        as="h2"
+        animation="blurInUp"
+        by="character"
+        once
+        className="text-sm font-semibold uppercase tracking-widest text-primary"
+      >
         {title}
-      </h2>
+      </TextAnimate>
       {action && (
         <Link
           href={href}
@@ -438,15 +444,36 @@ export default async function EventsPage() {
         <div className="container-page relative grid min-h-[470px] items-center gap-10 py-14 lg:grid-cols-[0.88fr_1.12fr]">
           <div className="max-w-xl">
             <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl">
-              Learn, Connect,
-              <br />
-              Grow Together
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="block"
+              >
+                Learn, Connect,
+              </TextAnimate>
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="block"
+              >
+                Grow Together
+              </TextAnimate>
             </h1>
-            <p className="mt-6 max-w-lg text-base font-medium leading-7 text-slate-600">
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-6 max-w-lg text-base font-medium leading-7 text-slate-600"
+            >
               Bergabunglah dalam berbagai kegiatan dan event yang dirancang
               untuk memperluas wawasan, mengasah skill, dan membangun jaringan
               di dunia investasi.
-            </p>
+            </TextAnimate>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="#upcoming-events" className="btn-primary">
                 Upcoming Events

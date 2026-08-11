@@ -14,6 +14,7 @@ import {
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -96,15 +97,49 @@ export default function ContactPage() {
         <div className="absolute bottom-10 left-0 h-28 w-36 bg-[radial-gradient(circle_at_center,#93b4ff_1.4px,transparent_1.4px)] opacity-55 [background-size:24px_24px]" />
 
         <div className="container-page relative flex min-h-[460px] flex-col items-center justify-center py-16 text-center">
+          {/* Split across three TextAnimate runs: it takes a plain string, so
+              the line break and the coloured word each need their own. */}
           <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-tight text-navy sm:text-5xl lg:text-6xl">
-            We&apos;d Love to
-            <br />
-            Hear from <span className="text-primary">You!</span>
+            <TextAnimate
+              as="span"
+              animation="blurInUp"
+              by="character"
+              once
+              className="block"
+            >
+              {"We'd Love to"}
+            </TextAnimate>
+            <span className="block">
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="inline-block"
+              >
+                {"Hear from "}
+              </TextAnimate>
+              <TextAnimate
+                as="span"
+                animation="blurInUp"
+                by="character"
+                once
+                className="inline-block text-primary"
+              >
+                You!
+              </TextAnimate>
+            </span>
           </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-600">
+          <TextAnimate
+            as="p"
+            animation="blurInUp"
+            by="word"
+            once
+            className="mt-7 max-w-2xl text-lg leading-8 text-slate-600"
+          >
             Have a question, collaboration idea, or want to learn more about our
             community? Feel free to reach out to us.
-          </p>
+          </TextAnimate>
           <div className="mt-9 flex flex-wrap justify-center gap-4">
             <InteractiveHoverButton
               href="#send-message"
@@ -124,7 +159,15 @@ export default function ContactPage() {
       </Reveal>
 
       <Reveal as="section" className="container-page py-10">
-        <h2 className="text-lg font-bold uppercase text-navy">Get in Touch</h2>
+        <TextAnimate
+          as="h2"
+          animation="blurInUp"
+          by="character"
+          once
+          className="text-lg font-bold uppercase text-navy"
+        >
+          Get in Touch
+        </TextAnimate>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {contactCards.map((card) => (
             <article
@@ -157,7 +200,15 @@ export default function ContactPage() {
       </Reveal>
 
       <Reveal as="section" className="container-page pb-8">
-        <h2 className="text-lg font-bold uppercase text-navy">Follow Us</h2>
+        <TextAnimate
+          as="h2"
+          animation="blurInUp"
+          by="character"
+          once
+          className="text-lg font-bold uppercase text-navy"
+        >
+          Follow Us
+        </TextAnimate>
         <div className="mt-5 grid overflow-hidden rounded-lg border border-slate-200 bg-blue-50/45 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
           {socialLinks.map((social, index) => (
             <Link
@@ -190,9 +241,15 @@ export default function ContactPage() {
       </Reveal>
 
       <Reveal as="section" id="send-message" className="container-page pb-10">
-        <h2 className="text-lg font-bold uppercase text-navy">
+        <TextAnimate
+          as="h2"
+          animation="blurInUp"
+          by="character"
+          once
+          className="text-lg font-bold uppercase text-navy"
+        >
           Send Us a Message
-        </h2>
+        </TextAnimate>
         <div className="mt-5 rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <ContactForm />
         </div>

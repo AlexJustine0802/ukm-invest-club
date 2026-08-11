@@ -8,6 +8,7 @@ import { withDefaultStats } from "@/lib/impactStats";
 import EmptyState from "@/components/EmptyState";
 import EventCard from "@/components/EventCard";
 import HeroCarousel from "@/components/HeroCarousel";
+import { TextAnimate } from "@/components/ui/text-animate";
 import AboutSlideshow from "@/components/AboutSlideshow";
 import PublicationCard from "@/components/PublicationCard";
 import PartnerStrip from "@/components/PartnerStrip";
@@ -87,9 +88,15 @@ export default async function HomePage() {
       {/* Impact */}
       <Reveal as="section" className="bg-slate-50 py-16">
         <div className="container-page">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+          <TextAnimate
+            as="span"
+            animation="blurInUp"
+            by="character"
+            once
+            className="block text-sm font-semibold uppercase tracking-widest text-primary"
+          >
             Our Impact
-          </span>
+          </TextAnimate>
           <div className="mt-8 grid grid-cols-2 gap-6 lg:grid-cols-4">
             {withDefaultStats(impact, "home").map((stat) => {
               const Icon = getUiIcon(stat.icon);
@@ -115,17 +122,33 @@ export default async function HomePage() {
       <Reveal as="section" className="container-page py-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+            <TextAnimate
+              as="span"
+              animation="blurInUp"
+              by="character"
+              once
+              className="block text-sm font-semibold uppercase tracking-widest text-primary"
+            >
               About Us
-            </span>
-            <h2 className="mt-3 text-3xl font-bold text-navy">
+            </TextAnimate>
+            <TextAnimate
+              as="h2"
+              animation="blurInUp"
+              by="character"
+              once
+              className="mt-3 text-3xl font-bold text-navy"
+            >
               Building Knowledge, Creating Impact
-            </h2>
-            <p className="mt-4 text-slate-600">
-              {site.fullName} ({site.name}) is a student-run investment club
-              focused on financial literacy, market analysis, and self-growth 
-              creating smart, competitive investors.
-            </p>
+            </TextAnimate>
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-4 text-slate-600"
+            >
+              {`${site.fullName} (${site.name}) is a student-run investment club focused on financial literacy, market analysis, and self-growth creating smart, competitive investors.`}
+            </TextAnimate>
             <Link
               href="/about"
               className="mt-6 inline-flex items-center text-sm font-semibold text-primary hover:text-primary-dark"
@@ -143,10 +166,24 @@ export default async function HomePage() {
         <div className="container-page">
           <div className="flex items-end justify-between">
             <div>
-              <h2 className="text-3xl font-bold text-navy">Latest Research</h2>
-              <p className="mt-2 text-slate-600">
+              <TextAnimate
+                as="h2"
+                animation="blurInUp"
+                by="character"
+                once
+                className="text-3xl font-bold text-navy"
+              >
+                Latest Research
+              </TextAnimate>
+              <TextAnimate
+                as="p"
+                animation="blurInUp"
+                by="word"
+                once
+                className="mt-2 text-slate-600"
+              >
                 Research, insights, and learning resources from our members.
-              </p>
+              </TextAnimate>
             </div>
             <Link
               href="/publications"
@@ -174,12 +211,24 @@ export default async function HomePage() {
       <Reveal as="section" className="container-page py-16">
         <div className="flex items-end justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-navy">
+            <TextAnimate
+              as="h2"
+              animation="blurInUp"
+              by="character"
+              once
+              className="text-3xl font-bold text-navy"
+            >
               {upcomingEvents.length > 0 ? "Upcoming Events" : "Recent Events"}
-            </h2>
-            <p className="mt-2 text-slate-600">
+            </TextAnimate>
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-2 text-slate-600"
+            >
               Join our activities and grow your investing skills.
-            </p>
+            </TextAnimate>
           </div>
           <Link
             href="/events"
@@ -211,13 +260,24 @@ export default async function HomePage() {
                 <Mail className="h-7 w-7" />
               </span>
               <div>
-                <h2 className="text-2xl font-bold sm:text-3xl">
+                <TextAnimate
+                  as="h2"
+                  animation="blurInUp"
+                  by="character"
+                  once
+                  className="text-2xl font-bold sm:text-3xl"
+                >
                   Have a question? Get in touch.
-                </h2>
-                <p className="mt-2 max-w-xl text-blue-100">
-                  Reach out to {site.name} for collaborations, membership, or
-                  anything about our activities.
-                </p>
+                </TextAnimate>
+                <TextAnimate
+                  as="p"
+                  animation="blurInUp"
+                  by="word"
+                  once
+                  className="mt-2 max-w-xl text-blue-100"
+                >
+                  {`Reach out to ${site.name} for collaborations, membership, or anything about our activities.`}
+                </TextAnimate>
               </div>
             </div>
             <InteractiveHoverButton

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Users, X } from "lucide-react";
 import { InstagramIcon, LinkedInIcon } from "@/components/BrandIcons";
 import { getUiIcon } from "@/lib/uiIcons";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 /**
  * A person on the public page is a member account (see /admin/members)  email
@@ -160,15 +161,33 @@ export default function DivisionsSection({
 
   return (
     <section id="divisions" className="container-page py-16">
-      <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+      <TextAnimate
+        as="span"
+        animation="blurInUp"
+        by="character"
+        once
+        className="block text-sm font-semibold uppercase tracking-widest text-primary"
+      >
         Our Divisions
-      </span>
-      <h2 className="mt-3 max-w-2xl text-3xl font-bold text-navy">
+      </TextAnimate>
+      <TextAnimate
+        as="h2"
+        animation="blurInUp"
+        by="character"
+        once
+        className="mt-3 max-w-2xl text-3xl font-bold text-navy"
+      >
         The teams that make it happen
-      </h2>
-      <p className="mt-3 max-w-2xl text-slate-600">
+      </TextAnimate>
+      <TextAnimate
+        as="p"
+        animation="blurInUp"
+        by="word"
+        once
+        className="mt-3 max-w-2xl text-slate-600"
+      >
         Select a division to see what they do and who leads it.
-      </p>
+      </TextAnimate>
 
       {/* The open panel is a full-width grid item placed straight after its
           card, so the browser drops it under that card's row on its own 

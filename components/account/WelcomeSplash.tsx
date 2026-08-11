@@ -75,7 +75,14 @@ export default function WelcomeSplash({ name }: { name: string }) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: EASE }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-white via-slate-50 to-primary-light"
+          // Inline colours, not utilities: the member area's dark theme remaps
+          // .bg-white / .from-white / .text-navy globally, and this curtain is
+          // meant to read the same in both themes. Inline wins over those rules.
+          style={{
+            backgroundImage:
+              "linear-gradient(to bottom right, #ffffff, #f8fafc, #DCE9FF)",
+          }}
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center gap-6"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 8 }}
@@ -96,7 +103,8 @@ export default function WelcomeSplash({ name }: { name: string }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.7, ease: EASE }}
-            className="px-6 text-center text-2xl font-extrabold text-navy sm:text-3xl"
+            style={{ color: "#1E293B" }}
+            className="px-6 text-center text-2xl font-extrabold sm:text-3xl"
           >
             <TypingAnimation
               duration={TYPE_MS}
@@ -113,7 +121,8 @@ export default function WelcomeSplash({ name }: { name: string }) {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: holdMs / 1000, ease: "linear" }}
-            className="h-0.5 w-40 origin-left rounded-full bg-primary/60"
+            style={{ backgroundColor: "rgba(20, 77, 200, 0.6)" }}
+            className="h-0.5 w-40 origin-left rounded-full"
           />
         </motion.div>
       )}

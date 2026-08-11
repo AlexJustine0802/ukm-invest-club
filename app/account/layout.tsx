@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import MemberShell from "@/components/account/MemberShell";
+import DarkModeScope from "@/components/account/DarkModeScope";
 import { getCurrentMember } from "@/lib/currentUser";
 
 export default async function AccountLayout({
@@ -10,5 +11,10 @@ export default async function AccountLayout({
   const user = await getCurrentMember();
   if (!user) redirect("/login");
 
-  return <MemberShell user={user}>{children}</MemberShell>;
+  return (
+    <>
+      <DarkModeScope />
+      <MemberShell user={user}>{children}</MemberShell>
+    </>
+  );
 }

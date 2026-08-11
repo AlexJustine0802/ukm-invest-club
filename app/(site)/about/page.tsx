@@ -20,6 +20,9 @@ import {
   ArrowRight,
   type LucideIcon,
 } from "lucide-react";
+import { LightRays } from "@/components/ui/light-rays";
+import { TextAnimate } from "@/components/ui/text-animate";
+import { TypingAnimation } from "@/components/ui/typing-animation";
 import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
@@ -194,28 +197,43 @@ export default async function AboutPage() {
       {/* Hero */}
       <Reveal
         as="section"
-        className="relative overflow-hidden border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white"
+        // -mt-16 pulls the hero up under the (transparent-at-top) navbar, same
+        // trick the home carousel uses; the pt below keeps the copy clear of it.
+        className="relative -mt-16 overflow-hidden border-b border-slate-200 bg-gradient-to-b from-primary-light/40 to-white"
       >
-        {settings?.aboutHeroImage && (
-          <>
-            <Image
-              src={settings.aboutHeroImage}
-              alt=""
-              fill
-              priority
-              className="object-cover"
-              sizes="100vw"
-            />
-            <div className="absolute inset-0 bg-white/80" />
-          </>
-        )}
-        <div className="container-page relative py-16 text-center lg:py-20">
+        {/* multiply, not the default screen: this hero is near-white, and
+            screen-blended rays are invisible on white. */}
+        <LightRays blend="multiply" color="rgba(90, 150, 255, 0.35)" />
+        <div className="container-page relative z-10 flex min-h-[80vh] flex-col justify-center pb-24 pt-32 text-center lg:min-h-[85vh] lg:pb-32 lg:pt-40">
           <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
-            About <span className="text-primary">{site.name}</span>
+            <TextAnimate
+              as="span"
+              animation="blurInUp"
+              by="character"
+              once
+              className="inline-block"
+            >
+              {"About "}
+            </TextAnimate>
+            <TextAnimate
+              as="span"
+              animation="blurInUp"
+              by="character"
+              once
+              className="inline-block text-primary"
+            >
+              {site.name}
+            </TextAnimate>
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-            We are a campus community that shares knowledge, analyzes markets,
-            and grows together in the world of investment.
+          <p className="mx-auto mt-4 min-h-[3.5rem] max-w-2xl text-lg leading-7 text-slate-600">
+            <TypingAnimation
+              as="span"
+              className="leading-7 tracking-normal"
+              duration={22}
+            >
+              We are a campus community that shares knowledge, analyzes markets,
+              and grows together in the world of investment.
+            </TypingAnimation>
           </p>
 
           <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -246,44 +264,96 @@ export default async function AboutPage() {
       <Reveal as="section" className="container-page py-16">
         <div className="grid gap-8 lg:grid-cols-3">
           <div>
-            <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+            <TextAnimate
+              as="span"
+              animation="blurInUp"
+              by="character"
+              once
+              className="block text-sm font-semibold uppercase tracking-widest text-primary"
+            >
               Who We Are
-            </span>
-            <h2 className="mt-3 text-3xl font-bold text-navy">
+            </TextAnimate>
+            <TextAnimate
+              as="h2"
+              animation="blurInUp"
+              by="character"
+              once
+              className="mt-3 text-3xl font-bold text-navy"
+            >
               Building Knowledge, Creating Impact
-            </h2>
-            <p className="mt-4 text-slate-600">
-              {site.fullName} ({site.name}) is a student-run investment club
-              dedicated to building financial literacy and a passion for
-              investing among students.
-            </p>
-            <p className="mt-4 text-slate-600">
+            </TextAnimate>
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-4 text-slate-600"
+            >
+              {`${site.fullName} (${site.name}) is a student-run investment club dedicated to building financial literacy and a passion for investing among students.`}
+            </TextAnimate>
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-4 text-slate-600"
+            >
               We believe collaboration, consistency, and curiosity are the keys
               to growing together and making a positive impact.
-            </p>
+            </TextAnimate>
           </div>
 
           <div className="card p-6">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
               <Eye className="h-5 w-5" />
             </span>
-            <h3 className="mt-4 text-lg font-bold text-navy">Our Vision</h3>
-            <p className="mt-3 text-sm text-slate-600">
+            <TextAnimate
+              as="h3"
+              animation="blurInUp"
+              by="character"
+              once
+              className="mt-4 text-lg font-bold text-navy"
+            >
+              Our Vision
+            </TextAnimate>
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-3 text-sm text-slate-600"
+            >
               To be a leading student investment community that creates a
               generation of smart, ethical investors who contribute to society.
-            </p>
+            </TextAnimate>
           </div>
 
           <div className="card p-6">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
               <Target className="h-5 w-5" />
             </span>
-            <h3 className="mt-4 text-lg font-bold text-navy">Our Mission</h3>
+            <TextAnimate
+              as="h3"
+              animation="blurInUp"
+              by="character"
+              once
+              className="mt-4 text-lg font-bold text-navy"
+            >
+              Our Mission
+            </TextAnimate>
             <ul className="mt-3 space-y-2">
               {missions.map((m) => (
                 <li key={m} className="flex gap-2 text-sm text-slate-600">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <span>{m}</span>
+                  <TextAnimate
+                    as="span"
+                    animation="blurInUp"
+                    by="word"
+                    once
+                    className="inline-block"
+                  >
+                    {m}
+                  </TextAnimate>
                 </li>
               ))}
             </ul>
@@ -294,16 +364,34 @@ export default async function AboutPage() {
       {/* Our Community */}
       <Reveal as="section" id="community" className="container-page py-16">
         <div className="text-center">
-          <span className="text-sm font-semibold uppercase tracking-widest text-primary">
+          <TextAnimate
+            as="span"
+            animation="blurInUp"
+            by="character"
+            once
+            className="block text-sm font-semibold uppercase tracking-widest text-primary"
+          >
             Our Community
-          </span>
-          <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold text-navy">
+          </TextAnimate>
+          <TextAnimate
+            as="h2"
+            animation="blurInUp"
+            by="character"
+            once
+            className="mx-auto mt-3 max-w-2xl text-3xl font-bold text-navy"
+          >
             More Than Investing
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+          </TextAnimate>
+          <TextAnimate
+            as="p"
+            animation="blurInUp"
+            by="word"
+            once
+            className="mx-auto mt-4 max-w-2xl text-slate-600"
+          >
             We build friendships, share knowledge, and create opportunities to
             grow together as a community.
-          </p>
+          </TextAnimate>
         </div>
 
         {moments.length === 0 ? (

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatDate } from "@/lib/utils";
 import Markdown from "@/components/Markdown";
+import { TextAnimate } from "@/components/ui/text-animate";
 
 export const dynamic = "force-dynamic";
 
@@ -42,8 +43,24 @@ export default async function PublicationDetailPage({ params }: Props) {
           {formatDate(pub.publishedAt)}
           {pub.author && ` · ${pub.author}`}
         </p>
-        <h1 className="mt-2 text-4xl font-extrabold text-navy">{pub.title}</h1>
-        <p className="mt-3 text-lg text-slate-600">{pub.excerpt}</p>
+        <TextAnimate
+          as="h1"
+          animation="blurInUp"
+          by="character"
+          once
+          className="mt-2 text-4xl font-extrabold text-navy"
+        >
+          {pub.title}
+        </TextAnimate>
+        <TextAnimate
+          as="p"
+          animation="blurInUp"
+          by="word"
+          once
+          className="mt-3 text-lg text-slate-600"
+        >
+          {pub.excerpt}
+        </TextAnimate>
 
         {pub.coverImage && (
           <div className="relative mt-8 aspect-[16/9] w-full overflow-hidden rounded-xl bg-slate-100">
