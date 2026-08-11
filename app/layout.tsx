@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { site } from "@/lib/site";
-import { Geist } from "next/font/google";
 import Script from "next/script";
-import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: {
@@ -29,7 +25,7 @@ export default function RootLayout({
       lang="en"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={cn("font-sans", geist.variable)}
+      className="font-sans"
     >
       <head>
         {/* Applies the saved theme before first paint: run any later and the
