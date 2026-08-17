@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { X, Mail, Phone, Shield, CalendarDays } from "lucide-react";
 import { InstagramIcon, LinkedInIcon } from "@/components/BrandIcons";
@@ -36,6 +37,28 @@ export default function MemberDetailsCard({
   showRole: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open]);
 
   const rows: { icon: React.ReactNode; label: string; value: React.ReactNode }[] =
     [
@@ -104,13 +127,15 @@ export default function MemberDetailsCard({
         </span>
       </button>
 
-      {open && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
-          // Clicking the backdrop closes it; clicks inside the card do not
-          // bubble out to here.
-          onClick={() => setOpen(false)}
-        >
+      {open &&
+        mounted &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            // Clicking the backdrop closes it; clicks inside the card do not
+            // bubble out to here.
+            onClick={() => setOpen(false)}
+          >
           <div
             role="dialog"
             aria-modal="true"
@@ -210,8 +235,9 @@ export default function MemberDetailsCard({
               )}
             </div>
           </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </>
   );
 }
