@@ -259,7 +259,7 @@ export function defaultEventQuestions(): FormQuestion[] {
 
 /**
  * Where a job application starts. The admin edits, removes or adds to these
- * under the posting — it just means "apply through our form" never saves an
+ * under the posting  it just means "apply through our form" never saves an
  * empty form that members cannot answer.
  */
 export function defaultApplicationQuestions(): FormQuestion[] {

@@ -15,7 +15,7 @@ import { buildSheet, XLSX_CONTENT_TYPE } from "@/lib/xlsx";
  * response.
  *
  * A workbook rather than a CSV because Excel guesses a CSV's separator from
- * the machine's locale — a comma-separated file lands in a single column on
+ * the machine's locale  a comma-separated file lands in a single column on
  * anything set to Indonesian. Answers also routinely contain commas and line
  * breaks, which a sheet carries without quoting rules to get wrong.
  */

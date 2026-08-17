@@ -17,7 +17,7 @@ export default function LoginPage() {
     <main className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-slate-100 px-4 py-6">
       {/* The box stays exactly the size of the page (inset-0); scale-150 does
           the oversizing as a transform, which is what stops the skew from
-          leaving bare edges — offsets and widths fought the inset-0 in the
+          leaving bare edges  offsets and widths fought the inset-0 in the
           component's own base classes. */}
       <InteractiveGridPattern
         width={40}

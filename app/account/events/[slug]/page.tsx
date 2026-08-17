@@ -150,7 +150,7 @@ export default async function MemberEventPage({
           <p className="font-semibold text-slate-500">This event has ended.</p>
         ) : !needsRegistration ? (
           <p className="font-semibold text-slate-600">
-            No registration needed — just come along.
+            No registration needed  just come along.
           </p>
         ) : formState === "not-yet" ? (
           <>

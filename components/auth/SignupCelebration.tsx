@@ -9,7 +9,7 @@ import { Confetti, type ConfettiRef } from "@/components/ui/confetti";
  * Fires once when signup lands here with `?registered=1`.
  *
  * The parameter is stripped straight away, so a reload or a back-navigation
- * does not replay the burst — the same trick the member WelcomeSplash uses.
+ * does not replay the burst  the same trick the member WelcomeSplash uses.
  */
 export default function SignupCelebration() {
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function SignupCelebration() {
       {celebrating && (
         <p className="mb-4 flex items-center justify-center gap-2 rounded-lg bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
-          Account created — thanks for signing up! Log in to get started.
+          Account created  thanks for signing up! Log in to get started.
         </p>
       )}
     </>

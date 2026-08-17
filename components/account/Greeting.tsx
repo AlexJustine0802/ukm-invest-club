@@ -33,7 +33,7 @@ export default function Greeting({
   }, []);
 
   // The typing restarts whenever its text changes, which here is only when the
-  // clock crosses into a new part of the day — `setLabel` with the same string
+  // clock crosses into a new part of the day  `setLabel` with the same string
   // is a no-op, so the minute tick above does not retype anything.
   return (
     <TypingAnimation

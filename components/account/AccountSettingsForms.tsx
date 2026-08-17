@@ -11,7 +11,7 @@ import {
  * Send yourself a confirmation link.
  *
  * Not a plain form action because the button sits inside the email row rather
- * than owning it — the address comes from the session on the server anyway.
+ * than owning it  the address comes from the session on the server anyway.
  */
 export function VerifyEmailButton() {
   const [state, setState] = useState<ProfileState>({});
@@ -32,7 +32,7 @@ export function VerifyEmailButton() {
       {state.sent && (
         <p className="mt-1 flex items-center justify-end gap-1 text-[11px] font-semibold text-emerald-600">
           <MailCheck className="h-3.5 w-3.5" />
-          Link sent — check your inbox.
+          Link sent  check your inbox.
         </p>
       )}
       {state.error && (

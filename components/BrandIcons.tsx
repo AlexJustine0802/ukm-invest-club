@@ -2,7 +2,7 @@
  * Instagram and LinkedIn marks.
  *
  * lucide-react carries no brand icons, so these are the official glyph paths
- * (Simple Icons, CC0) drawn inline — no extra dependency, and they colour
+ * (Simple Icons, CC0) drawn inline  no extra dependency, and they colour
  * themselves rather than inheriting `currentColor`, because a brand mark in
  * slate-500 stops being recognisable.
  */

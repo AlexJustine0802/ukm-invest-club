@@ -10,7 +10,7 @@ import { AlertTriangle, RotateCcw } from "lucide-react";
  * In practice it is nearly always the database: Supabase pauses a free project
  * after a week idle, and every page here reads Prisma, so the whole app would
  * otherwise show a raw stack trace. This says what happened in one sentence and
- * offers the only two useful actions — try again, or go somewhere else.
+ * offers the only two useful actions  try again, or go somewhere else.
  */
 export default function AppError({
   error,

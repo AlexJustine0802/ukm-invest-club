@@ -8,8 +8,8 @@ import { SmoothCursor } from "@/components/ui/smooth-cursor";
  *
  * The component itself is global: it listens on `window` and sets
  * `body { cursor: none }` for as long as it is mounted. Mounting it only while
- * the pointer is inside this box is what keeps the effect — and the hidden
- * native cursor — from leaking into the rest of the page, since its own effect
+ * the pointer is inside this box is what keeps the effect  and the hidden
+ * native cursor  from leaking into the rest of the page, since its own effect
  * cleanup restores the cursor on unmount.
  */
 export default function HeroCursorArea({

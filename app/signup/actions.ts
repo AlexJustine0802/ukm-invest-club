@@ -1,6 +1,6 @@
 "use server";
 
-// TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED — restore these
+// TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED  restore these
 // imports together with the send block below.
 // import { issueAuthToken, siteUrl } from "@/lib/authTokens";
 // import { sendAuthEmail } from "@/lib/email";

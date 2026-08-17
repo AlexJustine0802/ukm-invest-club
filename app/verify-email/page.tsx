@@ -10,8 +10,8 @@ export const dynamic = "force-dynamic";
 /**
  * The other end of the confirmation link.
  *
- * The token is consumed on sight — single use, whether or not it was still
- * valid — so a link that leaks from an inbox cannot be replayed later.
+ * The token is consumed on sight  single use, whether or not it was still
+ * valid  so a link that leaks from an inbox cannot be replayed later.
  */
 export default async function VerifyEmailPage({
   searchParams,
@@ -36,7 +36,7 @@ export default async function VerifyEmailPage({
             <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
             <h1 className="mt-4 text-xl font-bold text-navy">Email confirmed</h1>
             <p className="mt-2 text-sm text-slate-500">
-              Thanks — your address is verified.
+              Thanks  your address is verified.
             </p>
           </>
         ) : (

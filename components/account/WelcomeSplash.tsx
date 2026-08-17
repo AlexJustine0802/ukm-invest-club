@@ -19,7 +19,7 @@ const PAUSE_AFTER_TYPING_MS = 1000;
  * The curtain shown once, straight after signing in.
  *
  * It is keyed off `?welcome=1`, which the login action adds to its redirect,
- * and the parameter is stripped as soon as the splash starts — so a reload, a
+ * and the parameter is stripped as soon as the splash starts  so a reload, a
  * bookmark, or navigating back to the dashboard never replays it.
  */
 export default function WelcomeSplash({ name }: { name: string }) {

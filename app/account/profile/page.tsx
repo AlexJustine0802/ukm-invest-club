@@ -100,7 +100,7 @@ export default async function ProfilePage() {
           </dl>
         </section>
 
-        {/* Socials — the member's own, shown on their card in Members. */}
+        {/* Socials  the member's own, shown on their card in Members. */}
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
           <h3 className="font-bold text-navy">Social links</h3>
           <p className="mt-1 text-sm text-slate-500">

@@ -25,7 +25,7 @@ function revalidateCareer() {
 /**
  * The application form a posting owns.
  *
- * Postings do not pick an existing registration form — they carry their own
+ * Postings do not pick an existing registration form  they carry their own
  * questions, and this writes them into a real RegistrationForm behind the
  * scenes. That way the member fill page, the responses table and the CSV
  * export all work on it exactly as they do for any other form, with nothing
@@ -50,7 +50,7 @@ async function syncApplyForm(
     (q) => q.label.trim() !== "",
   ) as unknown as Prisma.InputJsonValue;
 
-  const title = `${alert.role} — ${alert.company}`;
+  const title = `${alert.role}  ${alert.company}`;
 
   if (existingFormId) {
     // Renaming the posting renames its form; the slug stays put so a link

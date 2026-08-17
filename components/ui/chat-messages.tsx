@@ -12,7 +12,7 @@ export interface ChatMessage {
   timestamp?: string;
   /** Shown above the bubble. Omit in a two-party chat. */
   authorName?: string;
-  /** Sits above the name, quieter — the person is what you read first. */
+  /** Sits above the name, quieter  the person is what you read first. */
   authorRole?: string;
   /** Letter in the avatar circle; falls back to the assistant sparkle. */
   authorInitial?: string;

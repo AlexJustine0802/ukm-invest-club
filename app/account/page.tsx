@@ -103,7 +103,7 @@ export default async function AccountPage() {
     getBanner(),
     // The real folders from /admin/resources, same rows the Resources page
     // lists. This used to read a "resource" block in Dashboard Content, which
-    // is a separate hand-typed list — adding a resource never showed up here.
+    // is a separate hand-typed list  adding a resource never showed up here.
     prisma.dashboardItem.findMany({
       where: { section: "folder", active: true },
       orderBy: [{ order: "asc" }, { createdAt: "desc" }],

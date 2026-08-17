@@ -45,7 +45,7 @@ export default function LoginForm() {
       )}
       {registered && !state.error && (
         <p className="rounded-lg bg-emerald-50 px-4 py-2 text-sm text-emerald-700">
-          Account created — please log in.
+          Account created  please log in.
         </p>
       )}
       {state.error && (

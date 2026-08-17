@@ -57,7 +57,7 @@ html {
 }
 
 /* Gradient stops are custom properties, so `.bg-white` above never reaches
-   them — a `from-blue-50 to-white` panel would stay bright in dark mode. */
+   them  a `from-blue-50 to-white` panel would stay bright in dark mode. */
 .dark .from-white,
 .dark .to-white {
   --tw-gradient-from: #0f172a var(--tw-gradient-from-position);
@@ -175,7 +175,7 @@ html {
 }
 
 /* Form controls: the browser paints them white regardless of the utilities on
-   them, so dark mode has to set the surface on the element itself — both the
+   them, so dark mode has to set the surface on the element itself  both the
    `.input` component class and the several forms that style inputs inline. */
 .dark .input,
 .dark input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
@@ -224,7 +224,7 @@ body {
   overflow-x: clip;
 }
 
-/* Scrollbars hidden everywhere — page and every inner scroll container (menus,
+/* Scrollbars hidden everywhere  page and every inner scroll container (menus,
    panels, the notification list). Scrolling itself is untouched: wheel, touch,
    keyboard and scroll-into-view still work, only the visible bar is gone.
    `scrollbar-width` covers Firefox, the pseudo-element covers Chromium/WebKit. */

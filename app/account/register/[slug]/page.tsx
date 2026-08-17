@@ -26,7 +26,7 @@ export async function generateMetadata({
 /**
  * The member-area copy of a registration form.
  *
- * Identical to the public page — same panel, same submit — but inside the
+ * Identical to the public page  same panel, same submit  but inside the
  * member chrome. A signed-in member following a Register link should not land
  * on the public site's Login / Sign Up header.
  */

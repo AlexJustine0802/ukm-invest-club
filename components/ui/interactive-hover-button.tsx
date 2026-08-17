@@ -25,7 +25,7 @@ export function InteractiveHoverButton({
 }: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> & {
   /** Colour that sweeps in on hover. */
   fillClassName?: string
-  /** Label colour once the fill is in place — must contrast with it. */
+  /** Label colour once the fill is in place  must contrast with it. */
   hoverTextClassName?: string
   href?: string
   onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>

@@ -14,7 +14,7 @@ interface LightRaysProps extends React.HTMLAttributes<HTMLDivElement> {
   length?: string
   /**
    * `screen` (the default) lightens what is behind it, so on a white surface it
-   * does nothing at all — use `multiply` with a saturated colour there.
+   * does nothing at all  use `multiply` with a saturated colour there.
    */
   blend?: "screen" | "multiply" | "overlay" | "soft-light" | "normal"
 }

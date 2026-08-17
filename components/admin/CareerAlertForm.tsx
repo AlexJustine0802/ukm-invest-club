@@ -159,7 +159,7 @@ export default function CareerAlertForm({
         </div>
       </div>
 
-      {/* Company profile — shown as its own block under the posting. */}
+      {/* Company profile  shown as its own block under the posting. */}
       <div className="space-y-4 rounded-lg border border-slate-200 p-4">
         <div>
           <p className="font-bold text-navy">Company profile</p>

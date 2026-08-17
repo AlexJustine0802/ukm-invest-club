@@ -3,7 +3,7 @@
  *
  * Every public page reads Supabase from the server, which is a second or so
  * away, so without this the old page is already gone and the new one has not
- * arrived — the reader stares at an empty white screen and reads the delay as
+ * arrived  the reader stares at an empty white screen and reads the delay as
  * a broken animation.
  */
 export default function SiteLoading() {

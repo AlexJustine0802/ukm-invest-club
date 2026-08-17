@@ -14,7 +14,7 @@ import {
 /**
  * The question builder. Everything is kept in local state and serialised into
  * one hidden input, so the whole form saves through the same plain server
- * action as every other admin page — no per-question endpoints.
+ * action as every other admin page  no per-question endpoints.
  */
 export default function FormQuestionsEditor({
   name,
@@ -126,7 +126,7 @@ function QuestionRow({
   // buttons is to look at one path through the form at a time.
   const [openOption, setOpenOption] = useState<string | null>(null);
   // Kept separately from `branches` so the switch stays on while the first
-  // branch is still empty — otherwise it flicks itself back off.
+  // branch is still empty  otherwise it flicks itself back off.
   const [branchOn, setBranchOn] = useState(Object.keys(branches).length > 0);
 
   const branchable = q.type === "DROPDOWN" && depth < MAX_BRANCH_DEPTH - 1;
@@ -338,7 +338,7 @@ function QuestionRow({
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
               {namedOptions.length === 0 ? (
                 <p className="text-sm text-slate-500">
-                  Name the options above first — each one gets its own
+                  Name the options above first  each one gets its own
                   follow-up questions.
                 </p>
               ) : (

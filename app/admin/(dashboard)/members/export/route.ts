@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       ? divisionParam
       : "all";
 
-  // Explicit select — never pull passwordHash out of the database.
+  // Explicit select  never pull passwordHash out of the database.
   const members = await prisma.user.findMany({
     select: {
       name: true,

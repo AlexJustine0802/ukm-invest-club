@@ -121,7 +121,7 @@ export default async function EventDetailPage({ params }: Props) {
             </p>
           ) : !formSlug ? (
             <p className="font-semibold text-slate-600">
-              No registration needed — just come along.
+              No registration needed  just come along.
             </p>
           ) : formState === "not-yet" ? (
             <>

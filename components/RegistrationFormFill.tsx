@@ -31,7 +31,7 @@ function Submit() {
  * One question.
  *
  * `live` is false for a section that is not on screen. Those stay mounted so
- * their answers are still submitted, but nothing in them is `required` — the
+ * their answers are still submitted, but nothing in them is `required`  the
  * browser refuses to submit a form with a required field it cannot show.
  *
  * Dropdown answers are held by the form above, because they decide which
@@ -167,7 +167,7 @@ function Question({
 
 interface FlowItem {
   question: FormQuestion;
-  /** How deep in a branch it is — drives the indent, nothing else. */
+  /** How deep in a branch it is  drives the indent, nothing else. */
   depth: number;
 }
 
@@ -175,7 +175,7 @@ interface FlowItem {
  * Flatten the questions into the sequence being asked right now.
  *
  * Only the branch matching the answer given is included, so changing a
- * dropdown rewrites everything after it — including where the sections fall.
+ * dropdown rewrites everything after it  including where the sections fall.
  */
 function expand(
   list: FormQuestion[],
@@ -199,7 +199,7 @@ export default function RegistrationFormFill({
 }: {
   formId: string;
   questions: FormQuestion[];
-  /** True when nobody is signed in — we need a name and email on the row. */
+  /** True when nobody is signed in  we need a name and email on the row. */
   askGuestDetails: boolean;
   /** Which area is showing the form; the submit returns to the same one. */
   basePath: "/register" | "/account/register";
@@ -292,7 +292,7 @@ export default function RegistrationFormFill({
 
       {/* Every section stays mounted: leaving one must not throw away what was
           typed into it, and the whole form posts in one submit. Changing a
-          dropdown does drop the sections after it, which is the point — those
+          dropdown does drop the sections after it, which is the point  those
           questions belong to a branch nobody is on any more. */}
       {sections.map((section, i) => (
         <div key={i} className={i === stepIndex ? "space-y-4" : "hidden"}>

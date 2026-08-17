@@ -8,7 +8,7 @@ import type { FormQuestion } from "@/lib/forms";
  * How people apply for a posting: the company's own link, or one of our
  * registration forms.
  *
- * One or the other, never both — a posting with two Apply buttons is a posting
+ * One or the other, never both  a posting with two Apply buttons is a posting
  * where half the applicants land somewhere the club cannot see. The radio is
  * what decides; the unused field is not rendered, so it cannot be saved by
  * accident.

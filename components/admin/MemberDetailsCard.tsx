@@ -26,7 +26,7 @@ export interface MemberDetails {
  *
  * A dialog rather than a page: looking someone up is a glance, and a page
  * would lose the filter and search the admin just typed. Only the summary is
- * the trigger — the role controls beside it stay independently clickable.
+ * the trigger  the role controls beside it stay independently clickable.
  */
 export default function MemberDetailsCard({
   member,
@@ -77,7 +77,7 @@ export default function MemberDetailsCard({
       {
         icon: <Phone className="h-4 w-4" />,
         label: "Phone",
-        value: member.phone ?? "—",
+        value: member.phone ?? "-",
       },
       {
         icon: <Shield className="h-4 w-4" />,

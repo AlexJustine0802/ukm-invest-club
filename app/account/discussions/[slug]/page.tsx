@@ -167,7 +167,7 @@ export default async function ChannelPage({
         </form>
       </div>
 
-      {/* Feed — own messages on the right, everyone else's on the left. */}
+      {/* Feed  own messages on the right, everyone else's on the left. */}
       <ChatMessages
         className="mt-4 h-[560px]"
         title={channel.name}
@@ -183,7 +183,7 @@ export default async function ChannelPage({
           id: p.id,
           sender: p.user.id === user.id ? "user" : "assistant",
           content: p.body,
-          // Own messages carry a name too — a thread where only other people
+          // Own messages carry a name too  a thread where only other people
           // are labelled reads as if your own posts came from nobody.
           authorName: p.user.id === user.id ? "You" : p.user.name,
           authorRole: p.user.role,

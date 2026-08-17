@@ -37,7 +37,7 @@ export default function EventDatesFields({
           </span>
           <span className="mt-0.5 block text-xs text-slate-500">
             Needs a start date below. Leave unticked for a sign-up that is
-            shared by link only — a recruitment, for example. Unticking it
+            shared by link only  a recruitment, for example. Unticking it
             later removes the public event; the form and its responses stay.
           </span>
         </span>
