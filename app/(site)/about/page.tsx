@@ -288,11 +288,11 @@ export default async function AboutPage() {
             <TextAnimate
               as="h2"
               animation="blurInUp"
-              by="character"
+              by="word"
               once
               className="mt-3 text-3xl font-bold text-navy"
             >
-              Building Knowledge, Creating Impact
+              Learn, Invest, Grow
             </TextAnimate>
             <TextAnimate
               as="p"
@@ -301,9 +301,9 @@ export default async function AboutPage() {
               once
               className="mt-4 text-slate-600"
             >
-              {`${site.fullName} (${site.name}) is a student-run investment club dedicated to building financial literacy and a passion for investing among students.`}
+              {`IC UNPAR is the sole official investment club at UNPAR, serving as a dynamic hub where students gather to learn, collaborate, and compete in financial challenges. By fostering a tight-knit community and providing comprehensive financial education through structured curricula and hands-on experiences, the club empowers members to make informed investment decisions. `}
             </TextAnimate>
-            <TextAnimate
+            {/* <TextAnimate
               as="p"
               animation="blurInUp"
               by="word"
@@ -312,9 +312,9 @@ export default async function AboutPage() {
             >
               We believe collaboration, consistency, and curiosity are the keys
               to growing together and making a positive impact.
-            </TextAnimate>
+            </TextAnimate> */}
           </div>
-
+              
           <div className="card p-6">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
               <Eye className="h-5 w-5" />
@@ -335,8 +335,7 @@ export default async function AboutPage() {
               once
               className="mt-3 text-sm text-slate-600"
             >
-              To be a leading student investment community that creates a
-              generation of smart, ethical investors who contribute to society.
+              To become a leading investment club that empowers UNPAR students to become financially literate, skilled investors, and responsible global citizens.
             </TextAnimate>
           </div>
 
@@ -353,7 +352,16 @@ export default async function AboutPage() {
             >
               Our Mission
             </TextAnimate>
-            <ul className="mt-3 space-y-2">
+            <TextAnimate
+              as="p"
+              animation="blurInUp"
+              by="word"
+              once
+              className="mt-3 text-sm text-slate-600"
+            >
+              Through education, mentorship, and practical experience, UNPAR aims to cultivate a generation of financially educated individuals who can contribute positively to the investment landscape. We are dedicated to providing a dynamic platform for students to learn, grow. and excel in the field of investments.
+            </TextAnimate>
+            {/* <ul className="mt-3 space-y-2">
               {missions.map((m) => (
                 <li key={m} className="flex gap-2 text-sm text-slate-600">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -368,7 +376,7 @@ export default async function AboutPage() {
                   </TextAnimate>
                 </li>
               ))}
-            </ul>
+            </ul> */}
           </div>
         </div>
       </Reveal>

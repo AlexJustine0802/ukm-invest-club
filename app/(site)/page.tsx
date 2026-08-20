@@ -134,11 +134,11 @@ export default async function HomePage() {
             <TextAnimate
               as="h2"
               animation="blurInUp"
-              by="character"
+              by="word"
               once
               className="mt-3 text-3xl font-bold text-navy"
             >
-              Building Knowledge, Creating Impact
+              Learn, Invest, Grow
             </TextAnimate>
             <TextAnimate
               as="p"
@@ -147,7 +147,7 @@ export default async function HomePage() {
               once
               className="mt-4 text-slate-600"
             >
-              {`${site.fullName} (${site.name}) is a student-run investment club focused on financial literacy, market analysis, and self-growth creating smart, competitive investors.`}
+              {`IC UNPAR is the sole official investment club at UNPAR, serving as a dynamic hub where students gather to learn, collaborate, and compete in financial challenges. By fostering a tight-knit community and providing comprehensive financial education through structured curricula and hands-on experiences, the club empowers members to make informed investment decisions.`}
             </TextAnimate>
             <Link
               href="/about"

@@ -26,14 +26,14 @@ export default function LoginPage() {
         className="scale-150 skew-y-12"
       />
       <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-lg sm:p-8">
-        <Link href="/" className="mx-auto mb-4 flex justify-center">
+        <Link href="/" className="mx-auto mb-2 flex justify-center">
           <Image
-            src="/images/logo-nobg.png"
+            src="/images/logo_new_notxt.png"
             alt={`${site.name} logo`}
             width={260}
             height={104}
             priority
-            className="h-16 w-auto object-contain"
+            className="h-20 w-auto object-contain"
           />
         </Link>
         <h1 className="text-center text-2xl font-extrabold text-navy sm:text-3xl">

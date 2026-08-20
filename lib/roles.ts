@@ -8,8 +8,8 @@
 //   EXECUTIVE          the units are the roles      President, Vice President
 //   HEAD_MANAGER_STAFF Head + "<unit> Manager"      Head of Finance & Legality,
 //                      + "<unit> Staff"             Legal Manager, Legal Staff
-//   HEAD_STAFF         Head + "<unit> Staff"        Head of Project & Event,
-//                      (no manager tier)            Project & Event Staff
+//   HEAD_STAFF         Head + "<unit> Staff"        Head of Project Management,
+//                      (no manager tier)            Project Management Staff
 //
 // Generating them is what keeps the four levels below (roleLevel, reportsTo)
 // true by construction: add a unit and its Manager, its Staff, the reporting
@@ -109,9 +109,9 @@ export const DIVISIONS: DivisionRoles[] = [
     // One operational division, not a Project arm and an Event arm: the same
     // people run both, so there is no manager tier to split them across.
     // Staff report straight to the Head.
-    slug: "project-event",
-    name: "Project & Event",
-    units: ["Project & Event"],
+    slug: "project-management",
+    name: "Project Management",
+    units: ["Project Management"],
     structure: "HEAD_STAFF",
     description:
       "Plans and runs the club's events end to end  seminars, workshops, competitions and everything on the day itself.",

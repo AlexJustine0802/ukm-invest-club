@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
-  BriefcaseBusiness,
-  Camera,
   Clock,
   Mail,
   MapPin,
   Phone,
   Users,
-  Video,
 } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import Reveal from "@/components/Reveal";
@@ -59,28 +57,22 @@ const contactCards = [
 
 const socialLinks = [
   {
-    title: "@icu.unpar",
+    title: "@IC_Unpar",
     label: "Instagram",
-    icon: Camera,
+    logo: "/images/instagram.png",
     href: "https://instagram.com/",
   },
   {
     title: "Investment Club Unpar",
     label: "LinkedIn",
-    icon: BriefcaseBusiness,
+    logo: "/images/linkedin.png",
     href: "https://linkedin.com/",
   },
   {
-    title: "ICU Unpar",
-    label: "YouTube",
-    icon: Video,
-    href: "https://youtube.com/",
-  },
-  {
-    title: "info@investmentclubunpar.com",
-    label: "Email",
-    icon: Mail,
-    href: "mailto:info@investmentclubunpar.com",
+    title: "IC_Unpar",
+    label: "TikTok",
+    logo: "/images/tiktok.png",
+    href: "https://tiktok.com/",
   },
 ];
 
@@ -209,7 +201,7 @@ export default function ContactPage() {
         >
           Follow Us
         </TextAnimate>
-        <div className="mt-5 grid overflow-hidden rounded-lg border border-slate-200 bg-blue-50/45 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid overflow-hidden rounded-lg border border-slate-200 bg-blue-50/45 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
           {socialLinks.map((social, index) => (
             <Link
               key={social.title}
@@ -224,8 +216,14 @@ export default function ContactPage() {
                 index > 0 ? "lg:border-l lg:border-slate-200" : ""
               } ${index % 2 === 1 ? "sm:border-l sm:border-slate-200 lg:border-l" : ""}`}
             >
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-primary text-white">
-                <social.icon className="h-8 w-8" />
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-2">
+                <Image
+                  src={social.logo}
+                  alt={`${social.label} logo`}
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-contain"
+                />
               </span>
               <span>
                 <span className="block font-bold text-navy">

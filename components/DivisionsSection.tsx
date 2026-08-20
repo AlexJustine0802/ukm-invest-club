@@ -4,8 +4,17 @@ import { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
 import { Users, X } from "lucide-react";
 import { InstagramIcon, LinkedInIcon } from "@/components/BrandIcons";
-import { getUiIcon } from "@/lib/uiIcons";
 import { TextAnimate } from "@/components/ui/text-animate";
+
+const DIVISION_LOGOS: Record<string, string> = {
+  pvpc: "/images/divisions/PVP.png",
+  "finance-legality": "/images/divisions/FNL.png",
+  "human-resource-development": "/images/divisions/HRD.png",
+  "external-relationship": "/images/divisions/ERBD.png",
+  "creative-brand-marketing": "/images/divisions/CBM.png",
+  "project-management": "/images/divisions/PM.png",
+  "research-development": "/images/divisions/RND.png",
+};
 
 /**
  * A person on the public page is a member account (see /admin/members)  email
@@ -194,7 +203,7 @@ export default function DivisionsSection({
           correct at 1, 2 or 3 columns without measuring anything. */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {divisions.map((d, index) => {
-          const Icon = getUiIcon(d.icon);
+          const logo = DIVISION_LOGOS[d.slug];
           const isOpen = d.id === openId;
 
           return (
@@ -209,8 +218,16 @@ export default function DivisionsSection({
                     : "hover:-translate-y-0.5 hover:shadow-md"
                 }`}
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-light text-primary">
-                  <Icon className="h-6 w-6" />
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-navy-dark p-2">
+                  {logo && (
+                    <Image
+                      src={logo}
+                      alt={`${d.name} logo`}
+                      width={48}
+                      height={48}
+                      className="h-full w-full object-contain"
+                    />
+                  )}
                 </span>
                 <h3 className="mt-4 text-lg font-bold text-navy">{d.name}</h3>
                 {d.tagline && (

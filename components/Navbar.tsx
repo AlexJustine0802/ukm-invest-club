@@ -51,12 +51,12 @@ export default function Navbar({
           className="group relative left-0 flex shrink-0 items-center text-navy md:-left-12"
         >
           <Image
-            src="/images/logo-nobg.png"
+            src="/images/logo_new_txt.png"
             alt={`${site.name} logo`}
             width={156}
             height={100}
             priority
-            className="h-12 w-auto shrink-0 object-contain transition-transform duration-[--dur-ui] ease-[--ease-out] group-hover:scale-[1.03] sm:h-16 md:h-20"
+            className="h-10 w-auto shrink-0 object-contain transition-transform duration-[--dur-ui] ease-[--ease-out] group-hover:scale-[1.03] sm:h-12 md:h-14"
           />
         </Link>
 

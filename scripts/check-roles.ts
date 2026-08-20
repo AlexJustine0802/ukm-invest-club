@@ -49,10 +49,10 @@ assert.ok(
   "the board has no manager or staff tier",
 );
 
-// Project & Event is one operational division: Head + Staff, no managers.
+// Project Management is one operational division: Head + Staff, no managers.
 assert.deepEqual(rolesFor("project-event"), [
-  "Head of Project & Event",
-  "Project & Event Staff",
+  "Head of Project Management",
+  "Project Management Staff",
 ]);
 
 // Every other division: exactly one Head, then a Manager and a Staff per unit.
@@ -108,9 +108,9 @@ assert.equal(isValidRole("Controller", "pvpc"), false, "Controller retired");
 assert.equal(isValidRole("Legal Manager", "finance-legality"), true);
 assert.equal(isValidRole("Legal Staff", "finance-legality"), true);
 assert.equal(
-  isValidRole("Project & Event Manager", "project-event"),
+  isValidRole("Project Management", "project-event"),
   false,
-  "Project & Event has no manager tier",
+  "Project Management has no Management tier",
 );
 assert.equal(
   isValidRole("Investment Analyst", "research-development"),
@@ -167,9 +167,9 @@ assert.equal(
   "staff follow their own unit, not the first one",
 );
 assert.equal(
-  reportsTo("Project & Event Staff", "project-event"),
-  "Head of Project & Event",
-  "no manager tier: staff report to the head",
+  reportsTo("Project Management Staff", "project-event"),
+  "Head of Project Management",
+  "no Management tier: staff report to the head",
 );
 assert.equal(reportsTo("Member", null), null);
 

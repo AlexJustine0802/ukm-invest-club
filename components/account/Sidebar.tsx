@@ -110,13 +110,13 @@ export default function Sidebar({
   };
 
   const logo = (
-    <Link href="/account" className="flex items-center px-2 py-2">
+    <Link href="/account" className="flex items-center px-10 py-2">
       <Image
-        src="/images/logo-nobg.png"
+        src="/images/logo_new_notxt.png"
         alt="ICU"
         width={280}
         height={112}
-        className="h-16 w-auto object-contain lg:h-24"
+        className="h-16 w-auto object-contain lg:h-20"
       />
     </Link>
   );
@@ -141,7 +141,7 @@ export default function Sidebar({
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2 lg:hidden">
         <Link href="/account" className="flex items-center">
           <Image
-            src="/images/logo-nobg.png"
+            src="/images/logo_new_notxt.png"
             alt="ICU"
             width={280}
             height={112}

@@ -270,7 +270,7 @@ export default function ResearchPageContent({
               <TextAnimate
                 as="span"
                 animation="blurInUp"
-                by="character"
+                by="word"
                 once
                 className="block"
               >
@@ -280,7 +280,7 @@ export default function ResearchPageContent({
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
-                  by="character"
+                  by="word"
                   once
                   className="inline-block"
                 >
@@ -289,7 +289,7 @@ export default function ResearchPageContent({
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
-                  by="character"
+                  by="word"
                   once
                   className="inline-block text-primary"
                 >
@@ -298,11 +298,11 @@ export default function ResearchPageContent({
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
-                  by="character"
+                  by="word"
                   once
                   className="inline-block"
                 >
-                  {" Tomorrow"}
+                  {"Tomorrow"}
                 </TextAnimate>
               </span>
             </h1>

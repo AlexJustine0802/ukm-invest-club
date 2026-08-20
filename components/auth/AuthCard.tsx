@@ -16,7 +16,7 @@ export default function AuthCard({
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg sm:p-10">
         <Link href="/" className="mx-auto mb-6 flex justify-center">
           <Image
-            src="/images/logo-nobg.png"
+            src="/images/logo_new_notxt.png"
             alt={`${site.name} logo`}
             width={260}
             height={104}

@@ -35,3 +35,4 @@ next-env.d.ts.bak
 
 # prisma
 /prisma/migrations/dev.db
+.env*

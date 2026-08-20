@@ -18,9 +18,9 @@ export default function SignupPage() {
         className="scale-150 skew-y-12"
       />
       <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-8 shadow-lg sm:p-10">
-        <Link href="/" className="mx-auto mb-6 flex justify-center">
+        <Link href="/" className="mx-auto mb-2 flex justify-center">
           <Image
-            src="/images/logo-nobg.png"
+            src="/images/logo_new_notxt.png"
             alt={`${site.name} logo`}
             width={260}
             height={104}

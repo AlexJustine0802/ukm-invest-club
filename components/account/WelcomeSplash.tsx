@@ -90,7 +90,7 @@ export default function WelcomeSplash({ name }: { name: string }) {
             transition={{ duration: 1.1, ease: EASE }}
           >
             <Image
-              src="/images/logo-nobg.png"
+              src="/images/logo_new_notxt.png"
               alt={`${site.name} logo`}
               width={260}
               height={104}
