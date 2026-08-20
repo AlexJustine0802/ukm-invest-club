@@ -81,7 +81,13 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
           where: { published: true },
           orderBy: { createdAt: "desc" },
           take: 10,
-          select: { id: true, title: true, opensAt: true, dueDate: true },
+          select: {
+            id: true,
+            title: true,
+            opensAt: true,
+            dueDate: true,
+            createdAt: true,
+          },
         })
       : [],
     session
@@ -95,7 +101,13 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
           where: { published: true, eventDate: { gte: now } },
           orderBy: { createdAt: "desc" },
           take: 5,
-          select: { id: true, slug: true, title: true, eventDate: true },
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            eventDate: true,
+            createdAt: true,
+          },
         })
       : [],
     on("notifyMaterials")
@@ -134,7 +146,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
             AND: [{ OR: [{ closesAt: null }, { closesAt: { gte: now } }] }],
           },
           orderBy: { createdAt: "desc" },
-          select: { id: true, title: true, closesAt: true },
+          select: { id: true, title: true, closesAt: true, createdAt: true },
         })
       : null,
   ]);
@@ -155,7 +167,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       : [],
   );
 
-  const list: Omit<TopBarNotification, "read">[] = [
+  const list: (Omit<TopBarNotification, "read"> & { createdAt: Date })[] = [
     ...assignments.map((a) => {
       const state = memberState(
         a.opensAt,
@@ -182,6 +194,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
             ? "bg-violet-50 text-violet-600"
             : "bg-blue-50 text-primary",
         href: `/account/assignments/${a.id}`,
+        createdAt: a.createdAt,
       };
     }),
     ...marked.map((m) => ({
@@ -192,6 +205,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: "GraduationCap",
       color: "bg-blue-50 text-primary",
       href: `/account/assignments/${m.assignment.id}`,
+      createdAt: m.gradedAt!,
     })),
     ...(recruitment
       ? [
@@ -205,6 +219,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
             icon: "ClipboardList",
             color: "bg-amber-50 text-amber-600",
             href: "/account/recruitment",
+            createdAt: recruitment.createdAt,
           },
         ]
       : []),
@@ -216,6 +231,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: "CalendarDays",
       color: "bg-sky-50 text-sky-700",
       href: `/account/events`,
+      createdAt: e.createdAt,
     })),
     ...materials.map((m) => ({
       id: `material-${m.id}`,
@@ -225,6 +241,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: "FolderClosed",
       color: "bg-violet-50 text-violet-600",
       href: `/account/resources/${m.folder.id}`,
+      createdAt: m.createdAt,
     })),
     ...posts.map((p) => ({
       id: `post-${p.id}`,
@@ -234,6 +251,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: "MessageSquare",
       color: "bg-emerald-50 text-emerald-700",
       href: `/account/discussions/${p.channel.slug}`,
+      createdAt: p.createdAt,
     })),
     ...careerAlerts.map((c) => ({
       id: c.id,
@@ -243,6 +261,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: c.icon ?? "Briefcase",
       color: "bg-emerald-50 text-emerald-700",
       href: "/account/career",
+      createdAt: c.createdAt,
     })),
     ...announcements.slice(0, 8).map((a) => ({
       id: a.id,
@@ -252,8 +271,14 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       icon: a.icon,
       color: a.color ?? "bg-blue-50 text-primary",
       href: "/account/announcements",
+      createdAt: a.createdAt,
     })),
   ];
 
-  return list.map((n) => ({ ...n, read: readKeys.has(n.id) }));
+  return list
+    .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    .map(({ createdAt: _createdAt, ...n }) => ({
+      ...n,
+      read: readKeys.has(n.id),
+    }));
 });
