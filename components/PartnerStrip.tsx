@@ -12,17 +12,35 @@ export type PartnerView = {
   category?: string | null;
 };
 
+function isDuluin(partner: PartnerView): boolean {
+  return partner.name.toLowerCase().includes("duluin");
+}
+
+function isIndoHarvest(partner: PartnerView): boolean {
+  return partner.name.toLowerCase().includes("indo harvest");
+}
+
+function isCryptoWave(partner: PartnerView): boolean {
+  return partner.name.toLowerCase().includes("crypto wave");
+}
+
 function PartnerLogo({ partner }: { partner: PartnerView }) {
+  const featured = isDuluin(partner) || isIndoHarvest(partner);
+  const logoClassName =
+    featured || isCryptoWave(partner)
+      ? "max-h-14 max-w-[92%]"
+      : "max-h-12 max-w-full";
+
   return (
     // Fixed width and shrink-0: inside the marquee the row is `w-max`, so a
     // flexible card would collapse to its text and break the loop's spacing.
-    <div className="mx-3 flex h-16 w-44 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 px-3 text-center text-sm font-semibold text-slate-400 grayscale transition hover:text-primary hover:grayscale-0">
+    <div className="mx-3 flex h-16 w-44 shrink-0 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 px-3 text-center text-sm font-semibold text-slate-500 transition-transform duration-300 ease-out hover:scale-105 hover:text-primary">
       {partner.logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={partner.logoUrl}
           alt={partner.name}
-          className="max-h-12 max-w-full object-contain"
+          className={`object-contain ${logoClassName}`}
         />
       ) : (
         partner.name
@@ -92,9 +110,11 @@ export default function PartnerStrip({
   const grouped = PARTNER_CATEGORIES.map((c, index) => ({
     direction: (index % 2 === 0 ? "left" : "right") as "left" | "right",
     ...c,
-    items: partners.filter(
-      (p) => toPartnerCategory(p.category) === (c.value as PartnerCategory),
-    ),
+    items: partners
+      .filter(
+        (p) => toPartnerCategory(p.category) === (c.value as PartnerCategory),
+      )
+      .sort((a, b) => Number(isDuluin(b)) - Number(isDuluin(a))),
   }));
 
   return (
