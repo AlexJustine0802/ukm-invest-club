@@ -28,17 +28,28 @@ export default function ImageField({
     <div>
       <label className="label">{label}</label>
 
-      {uploadEnabled && (
-        <input
-          type="file"
-          name={fileName}
-          accept="image/*"
-          className="input mb-2 file:mr-3 file:rounded file:border-0 file:bg-navy file:px-3 file:py-1 file:text-white"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) setPreview(URL.createObjectURL(file));
-          }}
-        />
+      <input
+        type="file"
+        name={fileName}
+        accept="image/*"
+        disabled={!uploadEnabled}
+        className={`input mb-2 file:mr-3 file:rounded file:border-0 file:bg-navy file:px-3 file:py-1 file:text-white ${
+          !uploadEnabled ? "cursor-not-allowed opacity-60" : ""
+        }`}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) setPreview(URL.createObjectURL(file));
+        }}
+      />
+
+      {uploadEnabled ? (
+        <p className="mb-2 text-xs text-slate-400">
+          Or paste an image URL below.
+        </p>
+      ) : (
+        <p className="mb-2 text-xs text-amber-600">
+          Something wrong.
+        </p>
       )}
 
       <input
@@ -50,12 +61,6 @@ export default function ImageField({
         className="input"
         onChange={(e) => setPreview(e.target.value || null)}
       />
-
-      {!uploadEnabled && (
-        <p className="mt-1 text-xs text-slate-400">
-           
-        </p>
-      )}
 
       {preview && (
         <div className="relative mt-3 aspect-video w-full max-w-xs overflow-hidden rounded-lg border border-slate-200 bg-slate-50">

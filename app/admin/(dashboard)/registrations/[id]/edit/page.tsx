@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { isBlobConfigured } from "@/lib/upload";
 import RegistrationFormForm from "@/components/admin/RegistrationFormForm";
 import { updateRegistrationForm, createEventCategoryInline } from "../../actions";
 import { requirePage, can } from "@/lib/adminAccess";
@@ -38,6 +39,7 @@ export default async function EditRegistrationFormPage({
       <div className="mt-6 max-w-3xl">
         <RegistrationFormForm
           action={updateRegistrationForm}
+          uploadEnabled={isBlobConfigured()}
           form={form}
           categories={categories}
           event={form.event}

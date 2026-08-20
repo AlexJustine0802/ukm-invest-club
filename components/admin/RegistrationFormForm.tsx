@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 import SubmitButton from "@/components/admin/SubmitButton";
 import FormQuestionsEditor from "@/components/admin/FormQuestionsEditor";
 import CategorySelect from "@/components/admin/CategorySelect";
@@ -8,6 +9,8 @@ import { toDateTimeLocalValue } from "@/lib/utils";
 
 interface RegistrationFormFormProps {
   action: (formData: FormData) => void;
+  /** Whether cover image uploads are configured through Vercel Blob. */
+  uploadEnabled: boolean;
   form?: {
     id: string;
     title: string;
@@ -52,6 +55,7 @@ interface RegistrationFormFormProps {
 
 export default function RegistrationFormForm({
   action,
+  uploadEnabled,
   form,
   categories = [],
   event,
@@ -93,18 +97,13 @@ export default function RegistrationFormForm({
           />
         </div>
 
-        <div>
-          <label htmlFor="coverImage" className="label">
-            Cover image URL <span className="text-slate-400">(optional)</span>
-          </label>
-          <input
-            id="coverImage"
-            name="coverImage"
-            defaultValue={form?.coverImage ?? ""}
-            placeholder="https://..."
-            className="input"
-          />
-        </div>
+        <ImageField
+          label="Cover image (optional)"
+          defaultUrl={form?.coverImage}
+          uploadEnabled={uploadEnabled}
+          fileName="coverImageFile"
+          urlName="coverImage"
+        />
       </div>
 
       <div className="card space-y-5 p-5">

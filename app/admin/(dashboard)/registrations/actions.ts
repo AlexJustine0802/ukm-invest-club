@@ -10,6 +10,7 @@ import { slugify } from "@/lib/utils";
 import { uniqueSlug } from "@/lib/slugs";
 import { parseQuestions, isAudience } from "@/lib/forms";
 import { readEventDetails, syncEventForForm } from "@/lib/eventSync";
+import { resolveImage } from "@/lib/upload";
 
 function revalidateForms(slug?: string) {
   revalidatePath("/admin/registrations");
@@ -119,7 +120,13 @@ export async function createEventCategoryInline(
 
 export async function createRegistrationForm(formData: FormData) {
   await requirePermission("registrations", "create");
-  const data = dataFrom(formData);
+  const data = {
+    ...dataFrom(formData),
+    coverImage: await resolveImage(
+      formData.get("coverImageFile") as File | null,
+      formData.get("coverImage") as string | null,
+    ),
+  };
   const details = readEventDetails(formData);
 
   // Two forms called "Tes" would collide on the unique slug and throw P2002
@@ -145,7 +152,13 @@ export async function createRegistrationForm(formData: FormData) {
 export async function updateRegistrationForm(formData: FormData) {
   await requirePermission("registrations", "edit");
   const id = formData.get("id") as string;
-  const data = dataFrom(formData);
+  const data = {
+    ...dataFrom(formData),
+    coverImage: await resolveImage(
+      formData.get("coverImageFile") as File | null,
+      formData.get("coverImage") as string | null,
+    ),
+  };
   const details = readEventDetails(formData);
 
   const existing = await prisma.registrationForm.findUnique({
