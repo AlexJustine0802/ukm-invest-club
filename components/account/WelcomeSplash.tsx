@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { site } from "@/lib/site";
@@ -37,16 +37,8 @@ export default function WelcomeSplash({ name }: { name: string }) {
     Array.from(message).length * TYPE_MS +
     PAUSE_AFTER_TYPING_MS;
 
-  // Read inside a mount-only effect, so they cannot re-trigger it.
-  const holdRef = useRef(holdMs);
-  const reducedRef = useRef(reduced);
-  holdRef.current = holdMs;
-  reducedRef.current = reduced;
-
-  // Mount-only, and the flag is read from the URL rather than useSearchParams.
-  // With `params` in the dependency list this effect re-ran the moment the
-  // replace() below rewrote the URL; its cleanup cancelled the timer that hides
-  // the splash, and the curtain stayed up forever.
+  // The flag is read from the URL rather than useSearchParams. Replacing the
+  // URL does not change these dependencies, so the splash keeps its own timer.
   useEffect(() => {
     const isWelcome =
       new URLSearchParams(window.location.search).get("welcome") === "1";
@@ -56,13 +48,18 @@ export default function WelcomeSplash({ name }: { name: string }) {
     // here, and the URL should be clean if the member reloads mid-animation.
     router.replace(window.location.pathname, { scroll: false });
 
-    if (reducedRef.current) return;
+    if (reduced) return;
 
-    setShowing(true);
-    const id = window.setTimeout(() => setShowing(false), holdRef.current);
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Defer the first state update to the browser task queue. This keeps the
+    // effect focused on scheduling the splash lifecycle without triggering a
+    // cascading render during the effect itself.
+    const showId = window.setTimeout(() => setShowing(true), 0);
+    const hideId = window.setTimeout(() => setShowing(false), holdMs);
+    return () => {
+      window.clearTimeout(showId);
+      window.clearTimeout(hideId);
+    };
+  }, [holdMs, reduced, router]);
 
   return (
     <AnimatePresence>

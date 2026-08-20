@@ -56,8 +56,8 @@ export default function Sidebar({
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
 
-  // Navigating closes the drawer; Escape does too.
-  useEffect(() => setOpen(false), [pathname]);
+  // Escape closes the drawer too. Navigation links close it from their click
+  // handler, avoiding a state update directly inside an effect.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -86,6 +86,7 @@ export default function Sidebar({
       <Link
         key={item.label}
         href={item.href}
+        onClick={() => setOpen(false)}
         className={`group relative flex items-center gap-3 rounded-lg py-2.5 pl-3 pr-3 text-sm font-medium transition-colors duration-[--dur-hover] ${
           active
             ? "bg-blue-50 text-primary"

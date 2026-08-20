@@ -60,19 +60,19 @@ const socialLinks = [
     title: "@IC_Unpar",
     label: "Instagram",
     logo: "/images/instagram.png",
-    href: "https://instagram.com/",
+    href: "https://instagram.com/IC_Unpar",
   },
   {
     title: "Investment Club Unpar",
     label: "LinkedIn",
     logo: "/images/linkedin.png",
-    href: "https://linkedin.com/",
+    href: "https://linkedin.com/company/investment-club-unpar/",
   },
   {
     title: "IC_Unpar",
     label: "TikTok",
     logo: "/images/tiktok.png",
-    href: "https://tiktok.com/",
+    href: "https://tiktok.com/@ic_unpar",
   },
 ];
 
