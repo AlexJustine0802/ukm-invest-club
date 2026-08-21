@@ -545,13 +545,30 @@ model HeroSlide {
   id       String @id @default(cuid())
   location String // "home" | "about"
   imageUrl String
+  isActive Boolean @default(true)
 
   // home hero fields
+  heroStyle   String @default("split") // "split" | "full-background"
+  darkenVisual        Boolean @default(false)
+  softVisualOverlay   Boolean @default(true)
+  backgroundBlur      Boolean @default(false)
+  textShadow          Boolean @default(false)
+  darkenBackground    Boolean @default(false)
+  textBackground      Boolean @default(true)
+  strongTextBackground Boolean @default(false)
+  bottomGradient      Boolean @default(false)
+  topGradient         Boolean @default(false)
+  panelOpacity        Int     @default(40) // white panel opacity, 0-90
+  panelBlur           Int     @default(16) // backdrop blur in px, 0-24
   eyebrow     String?
   titleStart  String?
   highlight   String?
   titleEnd    String?
   description String? @db.Text
+  primaryButtonLabel   String?
+  primaryButtonHref    String?
+  secondaryButtonLabel String?
+  secondaryButtonHref  String?
 
   // about slideshow fields
   title    String?

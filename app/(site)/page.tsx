@@ -41,7 +41,7 @@ export default async function HomePage() {
       take: 3,
     }),
     prisma.heroSlide.findMany({
-      where: { location: "home" },
+      where: { location: "home", isActive: true },
       orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     }),
     prisma.impactStat.findMany({
@@ -67,11 +67,28 @@ export default async function HomePage() {
         });
 
   const slides = heroSlides.map((s) => ({
+    id: s.id,
     eyebrow: s.eyebrow,
     titleStart: s.titleStart,
     highlight: s.highlight,
     titleEnd: s.titleEnd,
     description: s.description,
+    primaryButtonLabel: s.primaryButtonLabel,
+    primaryButtonHref: s.primaryButtonHref,
+    secondaryButtonLabel: s.secondaryButtonLabel,
+    secondaryButtonHref: s.secondaryButtonHref,
+    heroStyle: s.heroStyle,
+    darkenVisual: s.darkenVisual,
+    softVisualOverlay: s.softVisualOverlay,
+    backgroundBlur: s.backgroundBlur,
+    textShadow: s.textShadow,
+    darkenBackground: s.darkenBackground,
+    textBackground: s.textBackground,
+    strongTextBackground: s.strongTextBackground,
+    bottomGradient: s.bottomGradient,
+    topGradient: s.topGradient,
+    panelOpacity: s.panelOpacity,
+    panelBlur: s.panelBlur,
     image: s.imageUrl,
   }));
 
@@ -138,7 +155,7 @@ export default async function HomePage() {
               once
               className="mt-3 text-3xl font-bold text-navy"
             >
-              Learn, Invest, Grow
+              Explore, Evaluate, Elevate
             </TextAnimate>
             <TextAnimate
               as="p"
@@ -147,7 +164,7 @@ export default async function HomePage() {
               once
               className="mt-4 text-slate-600"
             >
-              {`IC UNPAR is the sole official investment club at UNPAR, serving as a dynamic hub where students gather to learn, collaborate, and compete in financial challenges. By fostering a tight-knit community and providing comprehensive financial education through structured curricula and hands-on experiences, the club empowers members to make informed investment decisions.`}
+              {`Parahyangan Finance Club (PFC) is a collaborative community designed to empower members in the financial sector through hands-on learning, idea exchange, and skill development.`}
             </TextAnimate>
             <Link
               href="/about"

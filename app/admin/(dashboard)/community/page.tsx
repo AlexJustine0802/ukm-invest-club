@@ -18,7 +18,7 @@ export default async function AdminCommunityPage() {
 
   const moments = await prisma.moment.findMany({
     include: { _count: { select: { photos: true } } },
-    orderBy: [{ order: "asc" }, { date: "desc" }],
+    orderBy: { date: "desc" },
   });
 
   return (
@@ -66,7 +66,7 @@ export default async function AdminCommunityPage() {
                   {dateFormatter.format(m.date)}
                 </p>
                 <p className="text-xs text-slate-400">
-                  Order: {m.order} · {m._count.photos} extra photo
+                  {m._count.photos} extra photo
                   {m._count.photos === 1 ? "" : "s"}
                 </p>
                 <div className="mt-3 flex items-center gap-2">

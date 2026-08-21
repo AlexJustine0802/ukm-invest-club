@@ -219,7 +219,10 @@ export default function Sidebar() {
 
   // Mobile drawer. Navigating closes it; so does Escape.
   const [drawerOpen, setDrawerOpen] = useState(false);
-  useEffect(() => setDrawerOpen(false), [pathname, search]);
+  useEffect(() => {
+    const closeTimer = window.setTimeout(() => setDrawerOpen(false), 0);
+    return () => window.clearTimeout(closeTimer);
+  }, [pathname, search]);
   useEffect(() => {
     if (!drawerOpen) return;
     const onKey = (e: KeyboardEvent) =>
@@ -380,7 +383,7 @@ export default function Sidebar() {
     <>
       {/* Mobile: a bar with a hamburger, so the nav does not sit on top of
           every page pushing the content down a screenful. */}
-      <div className="flex items-center gap-2 bg-navy px-4 py-3 text-white md:hidden">
+      <div className="sticky top-0 z-40 flex items-center gap-2 bg-navy px-4 py-3 text-white md:hidden">
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}

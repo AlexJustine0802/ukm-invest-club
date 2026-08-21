@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import DeleteButton from "@/components/admin/DeleteButton";
 import SettingsForm from "@/components/admin/SettingsForm";
-import { deleteHeroSlide } from "./actions";
+import { deleteHeroSlide, toggleHeroSlide } from "./actions";
 import { updateSettings } from "../settings/actions";
 import Can from "@/components/admin/Can";
 import { requireView, requireSuperAdminPage } from "@/lib/adminAccess";
@@ -136,7 +136,23 @@ export default async function AdminImagesPage({
                 {location !== "home-about" && (
                   <p className="text-sm text-slate-500">{slide.eyebrow}</p>
                 )}
-                <p className="text-xs text-slate-400">Order: {slide.order}</p>
+                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                  <span className="text-slate-400">Order: {slide.order}</span>
+                  {location === "home" && (
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-500">
+                      {slide.heroStyle === "full-background" ? "Full background" : "Split"}
+                    </span>
+                  )}
+                  <span
+                    className={`rounded px-1.5 py-0.5 ${
+                      slide.isActive
+                        ? "bg-emerald-50 text-emerald-700"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    {slide.isActive ? "Active" : "Inactive"}
+                  </span>
+                </div>
                 <div className="mt-3 flex items-center gap-2">
                   <Can module="hero-slides" action="edit">
                     <Link
@@ -145,6 +161,17 @@ export default async function AdminImagesPage({
                     >
                       Edit
                     </Link>
+                  </Can>
+                  <Can module="hero-slides" action="edit">
+                    <form action={toggleHeroSlide}>
+                      <input type="hidden" name="id" value={slide.id} />
+                      <button
+                        type="submit"
+                        className="btn-secondary px-3 py-1.5 text-xs"
+                      >
+                        {slide.isActive ? "Deactivate" : "Activate"}
+                      </button>
+                    </form>
                   </Can>
                   <Can module="hero-slides" action="delete">
                     <DeleteButton

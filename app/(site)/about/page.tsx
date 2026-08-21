@@ -49,10 +49,10 @@ export const metadata: Metadata = {
 };
 
 const missions = [
-  "Improve investment literacy and understanding among students.",
-  "Produce quality research that is informative and objective.",
-  "Run activities that benefit members and the wider community.",
-  "Build strategic collaborations with various partners.",
+  "Deliver structured learning across key financial disciplines, including Corporate Finance, Personal Finance, Public Finance, and Investment & Financial Markets.",
+  "Equip members with actionable skills in financial statement analysis, business valuation, and capital market dynamics through fundamental and technical approaches.",
+  "Promote sound personal financial planning and early asset management, while fostering a deep understanding of fiscal policy and its macroeconomic impact.",
+  "Cultivate an inclusive environment for idea exchange, continuous learning, and building valuable professional connections within the financial sector.",
 ];
 
 const journey = [
@@ -155,7 +155,7 @@ export default async function AboutPage() {
       }),
       prisma.partner.findMany({ orderBy: { order: "asc" } }),
       prisma.moment.findMany({
-        orderBy: [{ order: "asc" }, { date: "desc" }],
+        orderBy: { date: "desc" },
         take: 4,
       }),
       prisma.siteSettings.findUnique({ where: { id: 1 } }),
@@ -292,7 +292,7 @@ export default async function AboutPage() {
               once
               className="mt-3 text-3xl font-bold text-navy"
             >
-              Learn, Invest, Grow
+              Explore, Evaluate, Elevate
             </TextAnimate>
             <TextAnimate
               as="p"
@@ -301,7 +301,7 @@ export default async function AboutPage() {
               once
               className="mt-4 text-slate-600"
             >
-              {`IC UNPAR is the sole official investment club at UNPAR, serving as a dynamic hub where students gather to learn, collaborate, and compete in financial challenges. By fostering a tight-knit community and providing comprehensive financial education through structured curricula and hands-on experiences, the club empowers members to make informed investment decisions. `}
+              {`Parahyangan Finance Club (PFC) is a collaborative community designed to empower members in the financial sector through hands-on learning, idea exchange, and skill development. Driven by the belief that strong financial literacy is vital for both personal life and professional success, PFC delivers comprehensive insights across four core pillars: Corporate Finance (strategy and valuation), Personal Finance (budgeting and asset management), Public Finance (fiscal policy and state economics), and Investment & Financial Markets (market dynamics and analysis).`}
             </TextAnimate>
             {/* <TextAnimate
               as="p"
@@ -335,7 +335,7 @@ export default async function AboutPage() {
               once
               className="mt-3 text-sm text-slate-600"
             >
-              To become a leading investment club that empowers UNPAR students to become financially literate, skilled investors, and responsible global citizens.
+              To be the leading collaborative hub in empowering future leaders with comprehensive financial literacy, strong analytical capabilities, and the resilience to navigate complex economic challenges.
             </TextAnimate>
           </div>
 
@@ -352,7 +352,7 @@ export default async function AboutPage() {
             >
               Our Mission
             </TextAnimate>
-            <TextAnimate
+            {/* <TextAnimate
               as="p"
               animation="blurInUp"
               by="word"
@@ -360,8 +360,8 @@ export default async function AboutPage() {
               className="mt-3 text-sm text-slate-600"
             >
               Through education, mentorship, and practical experience, UNPAR aims to cultivate a generation of financially educated individuals who can contribute positively to the investment landscape. We are dedicated to providing a dynamic platform for students to learn, grow. and excel in the field of investments.
-            </TextAnimate>
-            {/* <ul className="mt-3 space-y-2">
+            </TextAnimate> */}
+            <ul className="mt-3 space-y-2">
               {missions.map((m) => (
                 <li key={m} className="flex gap-2 text-sm text-slate-600">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -376,7 +376,7 @@ export default async function AboutPage() {
                   </TextAnimate>
                 </li>
               ))}
-            </ul> */}
+            </ul>
           </div>
         </div>
       </Reveal>

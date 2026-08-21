@@ -42,6 +42,35 @@ const navSecondary: { label: string; icon: LucideIcon; href: string }[] = [
 // content area changes  so it belongs in the nav, below its own divider.
 const navAdmin = { label: "Admin", icon: Settings, href: "/admin" };
 
+function AccountLogo({
+  className,
+  width = 280,
+  height = 112,
+}: {
+  className: string;
+  width?: number;
+  height?: number;
+}) {
+  return (
+    <>
+      <Image
+        src="/images/logo_new_txt.png"
+        alt="Parahyangan Finance Club"
+        width={width}
+        height={height}
+        className={`${className} dark:hidden`}
+      />
+      <Image
+        src="/images/logo_new_txt_white.png"
+        alt="Parahyangan Finance Club"
+        width={width}
+        height={height}
+        className={`${className} hidden dark:block`}
+      />
+    </>
+  );
+}
+
 export default function Sidebar({
   menus,
   profile,
@@ -112,13 +141,7 @@ export default function Sidebar({
 
   const logo = (
     <Link href="/account" className="flex items-center px-4 py-2">
-      <Image
-        src="/images/logo_new_txt.png"
-        alt="ICU"
-        width={280}
-        height={112}
-        className="h-16 w-auto object-contain lg:h-20"
-      />
+      <AccountLogo className="h-16 w-auto object-contain lg:h-20" />
     </Link>
   );
 
@@ -141,13 +164,7 @@ export default function Sidebar({
       {/* Mobile bar  the only way into the menu below lg. */}
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2 lg:hidden">
         <Link href="/account" className="flex items-center">
-          <Image
-            src="/images/logo_new_txt.png"
-            alt="ICU"
-            width={280}
-            height={112}
-            className="h-10 w-auto object-contain"
-          />
+          <AccountLogo className="h-10 w-auto object-contain" />
         </Link>
         <div className="flex items-center gap-1">
           {menus}

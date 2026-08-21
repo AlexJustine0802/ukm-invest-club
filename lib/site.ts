@@ -3,7 +3,7 @@ export const site = {
   fullName: "Investment Club Universitas Parahyangan",
   tagline: "Empowering students to invest with confidence.",
   description:
-    "IC UNPAR is the sole official investment club at UNPAR, serving as a dynamic hub where students gather to learn, collaborate, and compete in financial challenges. By fostering a tight-knit community and providing comprehensive financial education through structured curricula and hands-on experiences, the club empowers members to make informed investment decisions.",
+    "PFCspace' is an educational finance platform created by Parahyangan Finance Club, serving as a dynamic hub for club updates, in depth financial research, and comprehensive learning materials across corporate, personal, public, and market finance. Beyond resource sharing, PFCspace' offers an interactive discussion forum designed for members and enthusiasts to exchange ideas, analyze market trends, and build a solid financial foundation together in one collaborative space.",
   email: "icunpar@example.com",
   instagram: "https://instagram.com/",
   linkedin: "https://linkedin.com/",

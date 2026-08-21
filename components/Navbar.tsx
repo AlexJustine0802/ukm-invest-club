@@ -96,12 +96,14 @@ export default function Navbar({
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 md:flex">
-            <InteractiveHoverButton href="/login">Login</InteractiveHoverButton>
+            <InteractiveHoverButton href="/login" className="rounded-full">
+              Login
+            </InteractiveHoverButton>
             <InteractiveHoverButton
               href="/signup"
               // Filled variant: blue at rest, sweeps to white on hover, so the
               // label has to flip to blue with it.
-              className="bg-primary text-white"
+              className="rounded-full bg-primary text-white"
               fillClassName="bg-white"
               hoverTextClassName="text-primary"
             >
@@ -154,14 +156,14 @@ export default function Navbar({
                   <InteractiveHoverButton
                     href="/login"
                     onClick={() => setOpen(false)}
-                    className="flex-1"
+                    className="flex-1 rounded-full"
                   >
                     Login
                   </InteractiveHoverButton>
                   <InteractiveHoverButton
                     href="/signup"
                     onClick={() => setOpen(false)}
-                    className="flex-1 bg-primary text-white"
+                    className="flex-1 rounded-full bg-primary text-white"
                     fillClassName="bg-white"
                     hoverTextClassName="text-primary"
                   >

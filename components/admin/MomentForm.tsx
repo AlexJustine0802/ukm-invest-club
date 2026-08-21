@@ -83,26 +83,20 @@ export default function MomentForm({
             className="input"
           />
         </div>
-        <div>
-          <label htmlFor="order" className="label">
-            Display order
-          </label>
-          <input
-            id="order"
-            name="order"
-            type="number"
-            defaultValue={moment?.order ?? 0}
-            className="input"
-          />
-        </div>
       </div>
 
       <ImageField
-        label="Cover image"
+        label="Cover image and gallery photos"
         defaultUrl={moment?.coverImage}
         uploadEnabled={uploadEnabled}
         required={!moment}
+        multiple
       />
+
+      <p className="-mt-3 text-xs text-slate-400">
+        Select multiple files at once. The first image becomes the cover and
+        the remaining images are added to the gallery.
+      </p>
 
       {!moment && (
         <div>

@@ -35,7 +35,7 @@ export function InteractiveHoverButton({
       <span
         aria-hidden="true"
         className={cn(
-          "absolute inset-0 origin-left scale-x-0 rounded-full bg-primary transition-transform duration-300 ease-out group-hover:scale-x-100",
+          "absolute inset-0 origin-left scale-x-0 rounded-[inherit] bg-primary transition-transform duration-300 ease-out group-hover:scale-x-100",
           fillClassName
         )}
       />
@@ -57,7 +57,7 @@ export function InteractiveHoverButton({
   const classes = cn(
     // disabled:pointer-events-none, so a pending submit button cannot be
     // hovered into swapping its own label mid-request.
-    "group relative w-auto cursor-pointer overflow-hidden rounded-full border border-primary bg-white px-6 py-2.5 text-center text-sm font-semibold text-primary disabled:pointer-events-none disabled:opacity-60",
+    "group relative inline-flex h-10 w-auto cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-primary bg-white px-5 text-center text-sm font-semibold text-primary disabled:pointer-events-none disabled:opacity-60",
     className
   )
 

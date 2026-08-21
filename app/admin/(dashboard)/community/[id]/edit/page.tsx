@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import MomentForm from "@/components/admin/MomentForm";
+import ImageField from "@/components/admin/ImageField";
 import DeleteButton from "@/components/admin/DeleteButton";
 import SubmitButton from "@/components/admin/SubmitButton";
 import Can from "@/components/admin/Can";
@@ -77,21 +78,15 @@ export default async function EditMomentPage({
           </div>
         )}
 
-        <form action={addMomentPhoto} className="mt-5 flex items-end gap-3">
+        <form action={addMomentPhoto} className="mt-5 space-y-3">
           <input type="hidden" name="momentId" value={moment.id} />
-          <div className="flex-1">
-            <label htmlFor="imageUrl" className="label">
-              Add photo URL
-            </label>
-            <input
-              id="imageUrl"
-              name="imageUrl"
-              type="url"
-              required
-              placeholder="https://…"
-              className="input"
-            />
-          </div>
+          <ImageField
+            label="Add gallery photo"
+            uploadEnabled={isBlobConfigured()}
+            required
+            fileName="imageFile"
+            urlName="imageUrl"
+          />
           <SubmitButton label="Add photo" pendingLabel="Adding…" />
         </form>
       </div>

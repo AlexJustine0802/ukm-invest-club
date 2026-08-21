@@ -57,12 +57,43 @@ function assertSameProject(runtime?: string, direct?: string) {
   }
 }
 
+/**
+ * The production URL intentionally uses a small pool because a serverless
+ * deployment creates one Prisma client per function instance. Next's local
+ * development server renders several server components in parallel, though,
+ * so the same limit makes ordinary member pages queue until P2024 fires.
+ * Give development a little more room without changing the deployed app's
+ * connection budget or the values stored in .env. Local development still
+ * uses DATABASE_URL. DIRECT_URL is reserved for Prisma migrations and schema
+ * operations, so member pages continue using the runtime pooler.
+ */
+function developmentDatasourceUrl(
+  runtimeUrl: string | undefined,
+): string | undefined {
+  const url = runtimeUrl;
+  if (!url || process.env.NODE_ENV !== "development") return url;
+
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.set("connection_limit", "10");
+    parsed.searchParams.set("pool_timeout", "60");
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
 assertPoolerFlags(process.env.DATABASE_URL);
 assertSameProject(process.env.DATABASE_URL, process.env.DIRECT_URL);
+
+const datasourceUrl = developmentDatasourceUrl(
+  process.env.DATABASE_URL,
+);
 
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
+    ...(datasourceUrl ? { datasourceUrl } : {}),
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 

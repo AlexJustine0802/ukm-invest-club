@@ -31,16 +31,16 @@ export default async function AdminLayout({
     if (!(await hasAdminAccess())) redirect("/account");
     return (
       <MemberShell user={actor.user}>
-        <div className="mx-auto max-w-5xl">{children}</div>
+        <div className="mx-auto min-w-0 max-w-5xl">{children}</div>
       </MemberShell>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 md:flex-row">
+    <div className="flex min-h-screen min-w-0 flex-col bg-slate-50 md:flex-row">
       <Sidebar />
       <main className="min-w-0 flex-1 overflow-x-hidden">
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto min-w-0 max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
           <PageTransition>{children}</PageTransition>
         </div>
       </main>

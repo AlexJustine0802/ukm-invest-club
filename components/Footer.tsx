@@ -6,18 +6,18 @@ import Reveal from "@/components/Reveal";
 export default function Footer() {
   return (
     <Reveal as="footer" className="mt-20 bg-navy-dark text-slate-300">
-      <div className="container-page grid gap-8 py-12 md:grid-cols-3">
-        <div>
-          <div className="flex items-center gap-3">
+      <div className="container-page grid items-start gap-10 py-10 md:grid-cols-[1.45fr_0.8fr_0.8fr] lg:gap-16">
+        <div className="max-w-sm">
+          <div className="relative h-12 w-52 overflow-hidden">
             <Image
-              src="/images/logo_new_txt.png"
+              src="/images/pfcspace_logo.png"
               alt="Investment Club Unpar"
-              width={180}
-              height={60}
-              className="h-20 w-auto"
+              fill
+              sizes="160px"
+              className="object-cover object-center"
             />
           </div>
-          <p className="mt-3 max-w-xs text-sm text-slate-400">
+          <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
             {site.description}
           </p>
         </div>
