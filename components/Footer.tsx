@@ -8,13 +8,13 @@ export default function Footer() {
     <Reveal as="footer" className="mt-20 bg-navy-dark text-slate-300">
       <div className="container-page grid items-start gap-10 py-10 md:grid-cols-[1.45fr_0.8fr_0.8fr] lg:gap-16">
         <div className="max-w-sm">
-          <div className="relative h-12 w-52 overflow-hidden">
+          <div className="relative h-14 w-52 overflow-hidden">
             <Image
               src="/images/pfcspace_logo.png"
               alt="Investment Club Unpar"
               fill
               sizes="160px"
-              className="object-cover object-center"
+              className="object-cover object-[center_40%]"
             />
           </div>
           <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
