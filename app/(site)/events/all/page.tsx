@@ -99,7 +99,7 @@ export default async function AllEventsPage({
               animation="blurInUp"
               by="character"
               once
-              className="block text-sm font-semibold uppercase tracking-widest text-primary"
+              className="site-hero-eyebrow"
             >
               Events & Activities
             </TextAnimate>
@@ -108,7 +108,7 @@ export default async function AllEventsPage({
               animation="blurInUp"
               by="character"
               once
-              className="mt-3 text-4xl font-extrabold tracking-tight text-navy sm:text-5xl"
+              className="site-hero-title mt-3"
             >
               All Events
             </TextAnimate>
@@ -117,7 +117,7 @@ export default async function AllEventsPage({
               animation="blurInUp"
               by="word"
               once
-              className="mt-4 text-lg text-slate-600"
+              className="site-hero-copy mt-4"
             >
               Browse every event hosted by ICUnpar, upcoming and past, across
               all categories.

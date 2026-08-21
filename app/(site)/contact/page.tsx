@@ -91,7 +91,7 @@ export default function ContactPage() {
         <div className="container-page relative flex min-h-[460px] flex-col items-center justify-center py-16 text-center">
           {/* Split across three TextAnimate runs: it takes a plain string, so
               the line break and the coloured word each need their own. */}
-          <h1 className="mt-5 max-w-3xl text-4xl font-bold leading-tight text-navy sm:text-5xl lg:text-6xl">
+          <h1 className="site-hero-title mt-5 max-w-3xl">
             <TextAnimate
               as="span"
               animation="blurInUp"
@@ -127,12 +127,12 @@ export default function ContactPage() {
             animation="blurInUp"
             by="word"
             once
-            className="mt-7 max-w-2xl text-lg leading-8 text-slate-600"
+            className="site-hero-copy mt-7 max-w-2xl"
           >
             Have a question, collaboration idea, or want to learn more about our
             community? Feel free to reach out to us.
           </TextAnimate>
-          <div className="mt-9 flex flex-wrap justify-center gap-4">
+          <div className="site-hero-actions mt-9 justify-center">
             <InteractiveHoverButton
               href="#send-message"
               className="bg-primary text-white"

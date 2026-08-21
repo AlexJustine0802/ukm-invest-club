@@ -14,7 +14,7 @@ export default async function SiteLayout({
   const session = await getUserSession();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="site-shell flex min-h-screen flex-col">
       <Navbar homeHref={session ? "/account" : "/"} />
       {/* The wrapper sits below the navbar on purpose: animating a transform
           on an ancestor would break the navbar's sticky positioning. */}

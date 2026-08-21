@@ -100,7 +100,7 @@ export default async function CommunityPage({
               animation="blurInUp"
               by="character"
               once
-              className="block text-sm font-semibold uppercase tracking-widest text-primary"
+              className="site-hero-eyebrow"
             >
               Our Community
             </TextAnimate>
@@ -109,7 +109,7 @@ export default async function CommunityPage({
               animation="blurInUp"
               by="character"
               once
-              className="mt-3 text-4xl font-extrabold tracking-tight text-navy sm:text-5xl"
+              className="site-hero-title mt-3"
             >
               Community Moments
             </TextAnimate>
@@ -118,7 +118,7 @@ export default async function CommunityPage({
               animation="blurInUp"
               by="word"
               once
-              className="mt-4 text-lg text-slate-600"
+              className="site-hero-copy mt-4"
             >
               A collection of our precious moments in every event. Together, we
               learn, grow, and make an impact.

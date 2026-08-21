@@ -176,18 +176,28 @@ export default function HeroCarousel({ slides: slidesProp }: { slides?: HeroSlid
             style={panelStyle}
             className={`${fullBackground ? appearance.textBackground ? `mx-auto w-full rounded-2xl border p-6 shadow-2xl sm:p-8 ${appearance.strongTextBackground ? "border-white/35" : "border-white/30"}` : "mx-auto w-full" : "max-w-2xl"} ${fullBackground ? "text-center" : ""}`}
           >
-            <span className={`text-sm font-semibold uppercase tracking-widest text-primary ${textShadow}`}>
+            <span className={`site-hero-eyebrow ${textShadow}`}>
               {activeSlide.eyebrow}
             </span>
-            <h1 className={`mt-4 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl lg:text-6xl ${textShadow}`}>
+            <h1 className={`site-hero-title mt-4 ${textShadow}`}>
               {activeSlide.titleStart}
+              {activeSlide.titleStart &&
+              activeSlide.highlight &&
+              !/\s$/.test(activeSlide.titleStart)
+                ? " "
+                : null}
               <span className="text-primary">{activeSlide.highlight}</span>
+              {activeSlide.highlight &&
+              activeSlide.titleEnd &&
+              !/^\s/.test(activeSlide.titleEnd)
+                ? " "
+                : null}
               {activeSlide.titleEnd}
             </h1>
-            <p className={`mt-6 max-w-xl text-lg text-slate-600 ${fullBackground ? "mx-auto" : ""} ${textShadow}`}>
+            <p className={`site-hero-copy mt-6 max-w-xl ${fullBackground ? "mx-auto" : ""} ${textShadow}`}>
               {activeSlide.description}
             </p>
-            <div className={`mt-8 flex flex-wrap gap-4 ${fullBackground ? "justify-center" : ""}`}>
+            <div className={`site-hero-actions ${fullBackground ? "justify-center" : ""}`}>
               <InteractiveHoverButton href={buttons.primary.href} className="bg-primary text-white" fillClassName="bg-white" hoverTextClassName="text-primary">
                 {buttons.primary.label}
               </InteractiveHoverButton>

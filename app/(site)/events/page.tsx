@@ -443,7 +443,7 @@ export default async function EventsPage() {
 
         <div className="container-page relative grid min-h-[470px] items-center gap-10 py-14 lg:grid-cols-[0.88fr_1.12fr]">
           <div className="max-w-xl">
-            <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl">
+            <h1 className="site-hero-title mt-5">
               <TextAnimate
                 as="span"
                 animation="blurInUp"
@@ -468,13 +468,13 @@ export default async function EventsPage() {
               animation="blurInUp"
               by="word"
               once
-              className="mt-6 max-w-lg text-base font-medium leading-7 text-slate-600"
+              className="site-hero-copy mt-6 max-w-lg"
             >
               Bergabunglah dalam berbagai kegiatan dan event yang dirancang
               untuk memperluas wawasan, mengasah skill, dan membangun jaringan
               di dunia investasi.
             </TextAnimate>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="site-hero-actions">
               <Link href="#upcoming-events" className="btn-primary">
                 Upcoming Events
                 <ArrowRight className="ml-2 h-4 w-4" />

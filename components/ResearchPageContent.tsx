@@ -266,7 +266,7 @@ export default function ResearchPageContent({
 
         <div className="container-page relative grid min-h-[460px] items-center gap-10 py-14 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="max-w-2xl">
-            <h1 className="mt-5 text-4xl font-bold leading-tight text-navy sm:text-5xl">
+            <h1 className="site-hero-title mt-5">
               <TextAnimate
                 as="span"
                 animation="blurInUp"
@@ -277,7 +277,7 @@ export default function ResearchPageContent({
                 Insight Today,
               </TextAnimate>
               <span className="block">
-                <TextAnimate
+                {/* <TextAnimate
                   as="span"
                   animation="blurInUp"
                   by="word"
@@ -285,7 +285,7 @@ export default function ResearchPageContent({
                   className="inline-block"
                 >
                   {"Better "}
-                </TextAnimate>
+                </TextAnimate> */}
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
@@ -293,7 +293,7 @@ export default function ResearchPageContent({
                   once
                   className="inline-block text-primary"
                 >
-                  Investment
+                  Master Finance 
                 </TextAnimate>
                 <TextAnimate
                   as="span"
@@ -302,7 +302,25 @@ export default function ResearchPageContent({
                   once
                   className="inline-block"
                 >
-                  {"Tomorrow"}
+                  {"& "}
+                </TextAnimate>
+                <TextAnimate
+                  as="span"
+                  animation="blurInUp"
+                  by="word"
+                  once
+                  className="inline-block"
+                >
+                  {"Achieve Better "}
+                </TextAnimate>
+                <TextAnimate
+                  as="span"
+                  animation="blurInUp"
+                  by="word"
+                  once
+                  className="inline-block"
+                >
+                  {"Returns Tomorrow"}
                 </TextAnimate>
               </span>
             </h1>
@@ -311,12 +329,13 @@ export default function ResearchPageContent({
               animation="blurInUp"
               by="word"
               once
-              className="mt-6 max-w-xl text-base font-medium leading-7 text-slate-600"
+              className="site-hero-copy mt-6 max-w-xl"
             >
-              Our research provides in-depth analysis and valuable insights to
-              help you make smarter investment decisions.
+              Our collaborative research across Corporate, Personal, Public, and Market 
+              sectors provides in-depth analysis and valuable insight to help you build 
+              a solid financial foundation and make smarter investment decisions.
             </TextAnimate>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="site-hero-actions">
               <InteractiveHoverButton
                 href="#featured-research"
                 className="bg-primary text-white"

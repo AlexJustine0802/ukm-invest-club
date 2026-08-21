@@ -216,7 +216,7 @@ export default async function AboutPage() {
             length="100vh"
           />
           <div className="container-page relative z-10 flex min-h-[80vh] flex-col justify-center pb-24 pt-32 text-center lg:min-h-[85vh] lg:pb-32 lg:pt-40">
-            <h1 className="mx-auto mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">
+            <h1 className="site-hero-title mx-auto mt-3 max-w-3xl">
               <TextAnimate
                 as="span"
                 animation="blurInUp"
@@ -236,7 +236,7 @@ export default async function AboutPage() {
                 {site.name}
               </TextAnimate>
             </h1>
-            <p className="mx-auto mt-4 min-h-[3.5rem] max-w-2xl text-lg leading-7 text-slate-600">
+            <p className="site-hero-copy mx-auto mt-4 min-h-[3.5rem] max-w-2xl">
               <TypingAnimation
                 as="span"
                 className="leading-7 tracking-normal"

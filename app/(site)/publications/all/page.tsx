@@ -85,7 +85,7 @@ export default async function AllPublicationsPage({
               animation="blurInUp"
               by="character"
               once
-              className="block text-sm font-semibold uppercase tracking-widest text-primary"
+              className="site-hero-eyebrow"
             >
               Research Library
             </TextAnimate>
@@ -94,7 +94,7 @@ export default async function AllPublicationsPage({
               animation="blurInUp"
               by="character"
               once
-              className="mt-3 text-4xl font-extrabold tracking-tight text-navy sm:text-5xl"
+              className="site-hero-title mt-3"
             >
               All Publications
             </TextAnimate>
@@ -103,7 +103,7 @@ export default async function AllPublicationsPage({
               animation="blurInUp"
               by="word"
               once
-              className="mt-4 text-lg text-slate-600"
+              className="site-hero-copy mt-4"
             >
               Browse every research publication from ICUnpar, across all
               categories.
