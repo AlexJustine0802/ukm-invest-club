@@ -293,8 +293,9 @@ export default function ResearchPageContent({
                   once
                   className="inline-block text-primary"
                 >
-                  Master Finance 
+                  Master Finance
                 </TextAnimate>
+                {" "}
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
@@ -302,8 +303,9 @@ export default function ResearchPageContent({
                   once
                   className="inline-block"
                 >
-                  {"& "}
+                  {"&"}
                 </TextAnimate>
+                {" "}
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
@@ -311,8 +313,9 @@ export default function ResearchPageContent({
                   once
                   className="inline-block"
                 >
-                  {"Achieve Better "}
+                  {"Achieve Better"}
                 </TextAnimate>
+                {" "}
                 <TextAnimate
                   as="span"
                   animation="blurInUp"
