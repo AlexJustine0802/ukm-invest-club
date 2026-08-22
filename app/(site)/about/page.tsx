@@ -274,7 +274,7 @@ export default async function AboutPage() {
 
       {/* Who we are / Vision / Mission */}
       <Reveal as="section" className="container-page py-16">
-        <div className="grid gap-8">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
           <div>
             <TextAnimate
               as="span"
@@ -315,6 +315,7 @@ export default async function AboutPage() {
             </TextAnimate> */}
           </div>
               
+          <div className="space-y-8">
           <div className="card p-6">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
               <Eye className="h-5 w-5" />
@@ -377,6 +378,7 @@ export default async function AboutPage() {
                 </li>
               ))}
             </ul>
+          </div>
           </div>
         </div>
       </Reveal>
