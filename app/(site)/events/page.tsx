@@ -19,6 +19,7 @@ import EventHeroSlider, {
 import EventCategoriesInteractive, {
   type EventCategoryWithPreview,
 } from "@/components/EventCategoriesInteractive";
+import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { TextAnimate } from "@/components/ui/text-animate";
 
 export const dynamic = "force-dynamic";
@@ -470,21 +471,25 @@ export default async function EventsPage() {
               once
               className="site-hero-copy mt-6 max-w-lg"
             >
-              Bergabunglah dalam berbagai kegiatan dan event yang dirancang
-              untuk memperluas wawasan, mengasah skill, dan membangun jaringan
-              di dunia finance.
+              Join a range of activities and events designed to expand your
+              knowledge, sharpen your skills, and build your network in
+              finance.
             </TextAnimate>
             <div className="site-hero-actions">
-              <Link href="#upcoming-events" className="btn-primary">
+              <InteractiveHoverButton
+                href="#upcoming-events"
+                className="bg-primary text-white"
+                fillClassName="bg-white"
+                hoverTextClassName="text-primary"
+              >
                 Upcoming Events
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-              <Link
+              </InteractiveHoverButton>
+              <InteractiveHoverButton
                 href="#past-events"
-                className="btn-secondary border-slate-300 text-navy hover:border-primary hover:text-primary"
+                className="border-primary bg-transparent text-primary"
               >
                 Past Events
-              </Link>
+              </InteractiveHoverButton>
             </div>
           </div>
 

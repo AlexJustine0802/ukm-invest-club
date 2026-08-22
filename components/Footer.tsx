@@ -82,9 +82,6 @@ export default function Footer() {
           <p>
             © {new Date().getFullYear()} {site.fullName}. All rights reserved.
           </p>
-          <Link href="/admin" className="hover:text-primary-light">
-            Admin
-          </Link>
         </div>
       </div>
     </Reveal>

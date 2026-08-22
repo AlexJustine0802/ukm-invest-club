@@ -349,7 +349,6 @@ export default function ResearchPageContent({
               </InteractiveHoverButton>
               <InteractiveHoverButton href="/publications/all">
                 View All Publications
-                <FileText className="ml-2 inline h-4 w-4" />
               </InteractiveHoverButton>
             </div>
           </div>

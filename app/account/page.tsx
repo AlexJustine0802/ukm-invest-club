@@ -265,7 +265,7 @@ export default async function AccountPage() {
                     <div className="mt-6">
                       <Link
                         href={highlight.buttonHref || "#"}
-                        className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-primary"
+                        className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-primary dark:bg-white dark:text-primary"
                       >
                         {highlight.buttonLabel}{" "}
                         <ChevronRight className="h-4 w-4" />

@@ -274,7 +274,7 @@ export default async function AboutPage() {
 
       {/* Who we are / Vision / Mission */}
       <Reveal as="section" className="container-page py-16">
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-8">
           <div>
             <TextAnimate
               as="span"
