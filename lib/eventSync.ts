@@ -28,6 +28,13 @@ export interface FormSource {
   published: boolean;
 }
 
+function parseEventDateTime(value: string): Date {
+  // datetime-local has no timezone suffix. Event fields are stored in the
+  // same canonical timezone used by every event page, rather than whichever
+  // timezone happens to be configured on the server.
+  return new Date(`${value}:00.000Z`);
+}
+
 type Db = Prisma.TransactionClient;
 
 /**
@@ -47,8 +54,8 @@ export function readEventDetails(formData: FormData): EventDetails | null {
 
   const end = (formData.get("endDate") as string)?.trim();
   return {
-    eventDate: new Date(start),
-    endDate: end ? new Date(end) : null,
+    eventDate: parseEventDateTime(start),
+    endDate: end ? parseEventDateTime(end) : null,
     location: (formData.get("location") as string)?.trim() || null,
     categoryId: (formData.get("categoryId") as string)?.trim() || null,
     seatUnit: (formData.get("seatUnit") as string)?.trim() || "seats",

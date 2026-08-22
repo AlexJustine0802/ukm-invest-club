@@ -69,7 +69,7 @@ Copy the printed `ADMIN_PASSWORD_HASH="..."` line into `.env`.
 npm run db:push     # create tables
 
 
-
+# gausah dipake!
 npm run db:seed     # add sample events, publications, team, gallery
 ```
 

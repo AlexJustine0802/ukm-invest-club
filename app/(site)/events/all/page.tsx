@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, CalendarDays, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarDays, Clock, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import EmptyState from "@/components/EmptyState";
 import SearchBar from "@/components/SearchBar";
-import { formatDate } from "@/lib/utils";
+import { eventDateLabel, timeRange } from "@/lib/eventStyles";
 import { TextAnimate } from "@/components/ui/text-animate";
 
 export const dynamic = "force-dynamic";
@@ -223,7 +223,11 @@ export default async function AllEventsPage({
                   <div className="mt-2 space-y-1 text-xs text-slate-500">
                     <p className="flex items-center gap-1.5">
                       <CalendarDays className="h-3.5 w-3.5" />
-                      {formatDate(event.eventDate)}
+                      {eventDateLabel(event.eventDate)}
+                    </p>
+                    <p className="flex items-center gap-1.5">
+                      <Clock className="h-3.5 w-3.5" />
+                      {timeRange(event.eventDate, event.endDate)}
                     </p>
                     {event.location && (
                       <p className="flex items-center gap-1.5">

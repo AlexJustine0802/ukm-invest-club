@@ -6,6 +6,7 @@ import CategorySelect from "@/components/admin/CategorySelect";
 import EventDatesFields from "@/components/admin/EventDatesFields";
 import { AUDIENCES, parseQuestions } from "@/lib/forms";
 import { toDateTimeLocalValue } from "@/lib/utils";
+import { eventDateTimeLocalValue } from "@/lib/eventStyles";
 
 interface RegistrationFormFormProps {
   action: (formData: FormData) => void;
@@ -270,10 +271,10 @@ export default function RegistrationFormForm({
         <EventDatesFields
           defaultChecked={Boolean(event) || startAsEvent}
           defaultEventDate={
-            event ? toDateTimeLocalValue(event.eventDate) : undefined
+            event ? eventDateTimeLocalValue(event.eventDate) : undefined
           }
           defaultEndDate={
-            event?.endDate ? toDateTimeLocalValue(event.endDate) : undefined
+            event?.endDate ? eventDateTimeLocalValue(event.endDate) : undefined
           }
         />
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatDate, isUpcoming } from "@/lib/utils";
+import { isUpcoming } from "@/lib/utils";
+import { eventDateLabel, timeRange } from "@/lib/eventStyles";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
 
@@ -53,7 +54,7 @@ export default async function AdminEventsPage() {
               <tr>
                 <th className="px-4 py-3 font-medium">Title</th>
                 <th className="px-4 py-3 font-medium">Category</th>
-                <th className="px-4 py-3 font-medium">Date</th>
+                <th className="px-4 py-3 font-medium">Date &amp; time</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
@@ -71,7 +72,10 @@ export default async function AdminEventsPage() {
                     {event.category?.title ?? ""}
                   </td>
                   <td className="px-4 py-3 text-slate-600">
-                    {formatDate(event.eventDate)}
+                    <p>{eventDateLabel(event.eventDate)}</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {timeRange(event.eventDate, event.endDate)}
+                    </p>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">

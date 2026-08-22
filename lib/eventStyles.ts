@@ -32,6 +32,10 @@ export const EVENT_PALETTES: Record<string, EventPalette> = {
 
 export const EVENT_COLOR_KEYS = Object.keys(EVENT_PALETTES);
 
+// Event datetime fields are stored as the wall-clock values entered in the
+// admin form. Every event surface uses this same timezone when reading them.
+export const EVENT_TIME_ZONE = "UTC";
+
 /** Stable fallback so a category without a colour still looks deliberate. */
 function fallbackKey(seed: string): string {
   let hash = 0;
@@ -51,7 +55,11 @@ export function eventPalette(
 export function timeRange(start: Date, end: Date | null): string {
   const fmt = (d: Date) =>
     d
-      .toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+      .toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        timeZone: EVENT_TIME_ZONE,
+      })
       .replace(":", ".");
   return end ? `${fmt(start)} – ${fmt(end)} WIB` : `${fmt(start)} WIB`;
 }
@@ -108,7 +116,16 @@ export function eventDateLabel(date: Date): string {
     day: "numeric",
     month: "long",
     year: "numeric",
+    timeZone: EVENT_TIME_ZONE,
   });
-  const weekday = date.toLocaleDateString("en-GB", { weekday: "long" });
+  const weekday = date.toLocaleDateString("en-GB", {
+    weekday: "long",
+    timeZone: EVENT_TIME_ZONE,
+  });
   return `${day} (${weekday})`;
+}
+
+/** Value for an event's datetime-local admin input in the event timezone. */
+export function eventDateTimeLocalValue(date: Date): string {
+  return date.toISOString().slice(0, 16);
 }

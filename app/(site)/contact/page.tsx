@@ -31,16 +31,16 @@ const contactCards = [
     title: "Email Us",
     icon: Mail,
     lines: [
-      "info@investmentclubunpar.com",
+      "icparahyangan@gmail.com",
       "We'll respond within",
       "1-2 business days.",
     ],
-    href: "mailto:info@investmentclubunpar.com",
+    href: "mailto:icparahyangan@gmail.com",
   },
   {
     title: "Call Us",
     icon: Phone,
-    lines: ["+62 812 3456 7890", "Mon - Fri, 09.00 - 17.00 WIB"],
+    lines: ["+62 812 3456 7890", "Mon - Fri, 09.00 - 16.00 WIB"],
     href: "tel:+6281234567890",
   },
   {
@@ -48,7 +48,7 @@ const contactCards = [
     icon: Clock,
     lines: [
       "Monday - Friday",
-      "09.00 - 17.00 WIB",
+      "09.00 - 16.00 WIB",
       "Saturday - Sunday",
       "Closed",
     ],

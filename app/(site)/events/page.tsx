@@ -21,6 +21,7 @@ import EventCategoriesInteractive, {
 } from "@/components/EventCategoriesInteractive";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { TextAnimate } from "@/components/ui/text-animate";
+import { EVENT_TIME_ZONE, timeRange } from "@/lib/eventStyles";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +36,7 @@ type EventDisplay = {
   description: string;
   type: string;
   date: Date;
-  endDate: Date;
+  endDate: Date | null;
   location: string;
   image: string;
   participants?: string;
@@ -50,6 +51,7 @@ type DbEvent = {
   title: string;
   description: string;
   eventDate: Date;
+  endDate: Date | null;
   location: string | null;
   coverImage: string | null;
   registrationForm?: {
@@ -88,10 +90,6 @@ function inferEventType(title: string, index: number) {
   ];
 }
 
-function addHours(date: Date, hours: number) {
-  return new Date(date.getTime() + hours * 60 * 60 * 1000);
-}
-
 function normalizeEvent(event: DbEvent, index: number): EventDisplay {
   return {
     slug: event.slug,
@@ -99,7 +97,7 @@ function normalizeEvent(event: DbEvent, index: number): EventDisplay {
     description: cleanDescription(event.description),
     type: inferEventType(event.title, index),
     date: event.eventDate,
-    endDate: addHours(event.eventDate, 3),
+    endDate: event.endDate,
     location: event.location ?? "Universitas Katolik Parahyangan",
     image: event.coverImage ?? eventImages[index % eventImages.length],
     registrationSlug:
@@ -116,14 +114,14 @@ function normalizeEvent(event: DbEvent, index: number): EventDisplay {
 function formatDay(date: Date) {
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
-    timeZone: "Asia/Jakarta",
+    timeZone: EVENT_TIME_ZONE,
   }).format(date);
 }
 
 function formatMonth(date: Date) {
   return new Intl.DateTimeFormat("en-GB", {
     month: "short",
-    timeZone: "Asia/Jakarta",
+    timeZone: EVENT_TIME_ZONE,
   })
     .format(date)
     .toUpperCase();
@@ -134,21 +132,8 @@ function formatFullDate(date: Date) {
     day: "2-digit",
     month: "short",
     year: "numeric",
-    timeZone: "Asia/Jakarta",
+    timeZone: EVENT_TIME_ZONE,
   }).format(date);
-}
-
-function formatTimeRange(start: Date, end: Date) {
-  const formatter = new Intl.DateTimeFormat("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Jakarta",
-  });
-
-  return `${formatter.format(start).replace(":", ".")} - ${formatter
-    .format(end)
-    .replace(":", ".")} WIB`;
 }
 
 // Every event on this page now comes from the database, so its detail page
@@ -235,7 +220,7 @@ function UpcomingCard({ event }: { event: EventDisplay }) {
           <div className="mt-6 space-y-2 text-xs font-semibold text-slate-600">
             <p className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-navy" />
-              {formatTimeRange(event.date, event.endDate)}
+              {timeRange(event.date, event.endDate)}
             </p>
             <p className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-navy" />
@@ -276,7 +261,7 @@ function CalendarRow({ event }: { event: EventDisplay }) {
       <div className="space-y-2 text-sm font-semibold text-slate-600">
         <p className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-slate-500" />
-          {formatTimeRange(event.date, event.endDate)}
+          {timeRange(event.date, event.endDate)}
         </p>
         <p className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-slate-500" />
@@ -426,7 +411,7 @@ export default async function EventsPage() {
     title: event.title,
     image: event.image,
     dateLabel: formatFullDate(event.date),
-    timeLabel: formatTimeRange(event.date, event.endDate),
+    timeLabel: timeRange(event.date, event.endDate),
     location: event.location,
     href: eventHref(event),
     badge: featuredRows.length > 0 ? "Featured" : "Next Event",

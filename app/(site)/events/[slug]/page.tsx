@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, isUpcoming } from "@/lib/utils";
 import { formStatus } from "@/lib/forms";
+import { eventDateLabel, timeRange } from "@/lib/eventStyles";
 import Markdown from "@/components/Markdown";
 import { TextAnimate } from "@/components/ui/text-animate";
 
@@ -92,7 +93,7 @@ export default async function EventDetailPage({ params }: Props) {
             {upcoming ? "Upcoming" : "Past event"}
           </span>
           <span className="text-sm text-slate-500">
-            {formatDateTime(event.eventDate)}
+            {eventDateLabel(event.eventDate)} · {timeRange(event.eventDate, event.endDate)}
           </span>
         </div>
 
