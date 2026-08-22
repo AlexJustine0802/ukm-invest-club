@@ -32,8 +32,7 @@ export default function SignupPage() {
           Create Your Account
         </h1>
         <p className="mx-auto mt-2 max-w-xs text-center text-sm text-slate-500">
-          Join {site.fullName} and start your journey to learn, invest, and make
-          an impact.
+          Join Parahyangan Finance Club and start your journey to Explore, Evaluate, and Elevate your Knowledge.
         </p>
         <div className="mt-8">
           <SignupForm />

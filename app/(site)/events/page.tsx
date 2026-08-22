@@ -472,7 +472,7 @@ export default async function EventsPage() {
             >
               Bergabunglah dalam berbagai kegiatan dan event yang dirancang
               untuk memperluas wawasan, mengasah skill, dan membangun jaringan
-              di dunia investasi.
+              di dunia finance.
             </TextAnimate>
             <div className="site-hero-actions">
               <Link href="#upcoming-events" className="btn-primary">
