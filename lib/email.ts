@@ -1,5 +1,18 @@
 import { Resend } from "resend";
 
+const DEFAULT_FROM =
+  "Parahyangan Finance Club Website <onboarding@resend.dev>";
+
+function senderAddress(): string {
+  const configured = process.env.CONTACT_EMAIL_FROM?.trim();
+  if (!configured) return DEFAULT_FROM;
+
+  const match = configured.match(
+    /^(?:.+\s+)?<([^<>\s]+@[^<>\s]+)>$|^([^<>\s]+@[^<>\s]+)$/,
+  );
+  return match ? configured : DEFAULT_FROM;
+}
+
 export interface ContactMessage {
   name: string;
   email: string;
@@ -15,8 +28,7 @@ export interface ContactMessage {
 export async function sendContactEmail(msg: ContactMessage): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_EMAIL_TO;
-  const from =
-    process.env.CONTACT_EMAIL_FROM || "Parahyangan Finance Club Website <onboarding@resend.dev>";
+  const from = senderAddress();
 
   if (!apiKey || !to) {
     console.log("[contact] Resend not configured  message logged instead:");
@@ -68,8 +80,7 @@ export async function sendAuthEmail(
   const cta = verify ? "Confirm Email" : "Reset Password";
 
   const apiKey = process.env.RESEND_API_KEY;
-  const from =
-    process.env.CONTACT_EMAIL_FROM || "Parahyangan Finance Club Website <onboarding@resend.dev>";
+  const from = senderAddress();
 
   if (!apiKey) {
     console.log(`[auth] Resend not configured  ${kind} link for ${to}:`);

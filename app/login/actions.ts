@@ -7,9 +7,8 @@ import {
   setUserSessionCookie,
   verifyPassword,
 } from "@/lib/userAuth";
-// TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED
-// import { issueAuthToken, siteUrl } from "@/lib/authTokens";
-// import { sendAuthEmail } from "@/lib/email";
+import { issueAuthToken, siteUrl } from "@/lib/authTokens";
+import { sendAuthEmail } from "@/lib/email";
 import type { AuthState } from "@/app/signup/actions";
 
 export async function loginUser(
@@ -24,22 +23,18 @@ export async function loginUser(
     return { error: "Invalid email or password." };
   }
 
-  // TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED
-  // Signup no longer sends a link, and the resend below would go out from the
-  // Resend test domain, so gating login here would lock out any account whose
-  // emailVerified is still null. Re-enable together with the signup block.
-  // if (!user.emailVerified) {
-  //   const verifyToken = await issueAuthToken(user.id, "VERIFY");
-  //   await sendAuthEmail(
-  //     user.email,
-  //     "verify",
-  //     `${siteUrl()}/verify-email?token=${verifyToken}`,
-  //   );
-  //   return {
-  //     error:
-  //       "Please verify your email first. We just sent a new verification link to your inbox.",
-  //   };
-  // }
+  if (!user.emailVerified) {
+    const verifyToken = await issueAuthToken(user.id, "VERIFY");
+    await sendAuthEmail(
+      user.email,
+      "verify",
+      `${siteUrl()}/verify-email?token=${verifyToken}`,
+    );
+    return {
+      error:
+        "Please verify your email first. We just sent a new verification link to your inbox.",
+    };
+  }
 
   const token = await createUserSessionToken(user.id, user.email);
   await setUserSessionCookie(token);

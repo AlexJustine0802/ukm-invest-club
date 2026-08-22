@@ -52,7 +52,7 @@ Then edit `.env`:
 - `AUTH_SECRET`  a long random string (`openssl rand -base64 32`)
 - `ADMIN_USERNAME`  the admin login username
 - `ADMIN_PASSWORD_HASH`  generate it (see below)
-- `RESEND_API_KEY`, `CONTACT_EMAIL_TO`, `CONTACT_EMAIL_FROM`  for the contact form (optional locally)
+ - `RESEND_API_KEY`, `CONTACT_EMAIL_TO`, `CONTACT_EMAIL_FROM`  for contact, verification, and password-reset email (optional locally)
 
 Generate the admin password hash:
 

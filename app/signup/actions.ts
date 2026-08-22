@@ -1,12 +1,10 @@
 "use server";
 
-// TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED  restore these
-// imports together with the send block below.
-// import { issueAuthToken, siteUrl } from "@/lib/authTokens";
-// import { sendAuthEmail } from "@/lib/email";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/userAuth";
+import { issueAuthToken, siteUrl } from "@/lib/authTokens";
+import { sendAuthEmail } from "@/lib/email";
 
 export interface AuthState {
   error?: string;
@@ -41,31 +39,32 @@ export async function signupUser(
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: "An account with this email already exists." };
 
-  // TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED
-  // Resend still sends from the onboarding@resend.dev test domain, which can
-  // only deliver to the account owner. Until our own domain is verified the
-  // address is trusted as given and the account is usable straight away.
-  // To re-enable: drop `emailVerified: new Date()` below and send the link
-  // again (see the commented-out block after the create call).
   const user = await prisma.user.create({
     data: {
       name,
       email,
       phone,
       passwordHash: await hashPassword(password),
-      emailVerified: new Date(),
     },
   });
 
-  // TEMPORARILY DISABLED UNTIL PRODUCTION DOMAIN IS VERIFIED
-  // const verifyToken = await issueAuthToken(user.id, "VERIFY");
-  // await sendAuthEmail(
-  //   user.email,
-  //   "verify",
-  //   `${siteUrl()}/verify-email?token=${verifyToken}`,
-  // );
+  try {
+    const verifyToken = await issueAuthToken(user.id, "VERIFY");
+    await sendAuthEmail(
+      user.email,
+      "verify",
+      `${siteUrl()}/verify-email?token=${verifyToken}`,
+    );
+  } catch (error) {
+    await prisma.user.delete({ where: { id: user.id } });
+    console.error("Unable to send signup verification email.", error);
+    return {
+      error:
+        "We could not send the verification email. Check the email setup and try again.",
+    };
+  }
 
   // No auto-login: signing up and signing in stay separate steps, so the new
   // member enters their credentials once before reaching the dashboard.
-  redirect("/login?registered=1");
+  redirect("/verify-email?pending=1");
 }

@@ -16,10 +16,11 @@ export const dynamic = "force-dynamic";
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; pending?: string }>;
 }) {
-  const { token } = await searchParams;
+  const { token, pending } = await searchParams;
   const userId = token ? await consumeAuthToken(token, "VERIFY") : null;
+  const isPending = !token && pending === "1";
 
   if (userId) {
     await prisma.user.update({
@@ -39,6 +40,16 @@ export default async function VerifyEmailPage({
               Thanks  your address is verified.
             </p>
           </>
+        ) : isPending ? (
+          <>
+            <h1 className="mt-4 text-xl font-bold text-navy">
+              Check your email
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              We sent you a verification link. Open it within 24 hours to
+              activate your account.
+            </p>
+          </>
         ) : (
           <>
             <XCircle className="mx-auto h-12 w-12 text-slate-300" />
@@ -53,10 +64,10 @@ export default async function VerifyEmailPage({
         )}
 
         <Link
-          href="/account/settings"
+          href="/login"
           className="mt-6 inline-block rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
         >
-          Back to Settings
+          Back to login
         </Link>
       </div>
     </div>

@@ -61,8 +61,18 @@ export async function consumeAuthToken(
 }
 
 export function siteUrl(): string {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-    "http://localhost:3000"
-  );
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
+  if (!configured) return "http://localhost:3000";
+
+  try {
+    const url = new URL(configured);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return configured;
+    }
+  } catch {
+    // Fall back below so a malformed environment value cannot create a dead
+    // verification link.
+  }
+
+  return "http://localhost:3000";
 }
