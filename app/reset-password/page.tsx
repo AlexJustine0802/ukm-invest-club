@@ -33,7 +33,7 @@ export default async function ResetPasswordPage({
   }
 
   return (
-    <AuthCard title="Set a New Password" subtitle="Choose a new password for your ICU account.">
+    <AuthCard title="Set a New Password" subtitle="Choose a new password for your PFC account.">
       <ResetPasswordForm token={token} />
     </AuthCard>
   );

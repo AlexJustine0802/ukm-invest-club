@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "All Publications",
-  description: "Browse all research publications from ICUnpar by category.",
+  description: "Browse all research publications from Parahyangan Finance Club by category.",
 };
 
 const PAGE_SIZE = 9;
@@ -105,7 +105,7 @@ export default async function AllPublicationsPage({
               once
               className="site-hero-copy mt-4"
             >
-              Browse every research publication from ICUnpar, across all
+              Browse every research publication from Parahyangan Finance Club, across all
               categories.
             </TextAnimate>
           </div>

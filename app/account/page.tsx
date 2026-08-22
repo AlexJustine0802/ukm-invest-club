@@ -290,7 +290,7 @@ export default async function AccountPage() {
                   Welcome back
                 </p>
                 <h2 className="mt-2 break-words text-3xl font-extrabold">
-                  Investment Club Unpar
+                  Parahyangan Finance Club
                 </h2>
                 <p className="mt-2 text-sm text-blue-100">
                   No featured announcement available.
@@ -557,7 +557,7 @@ export default async function AccountPage() {
           </Reveal>
 
           <p className="pt-2 text-center text-xs text-slate-400">
-            © {now.getFullYear()} Investment Club Unpar. All rights reserved.
+            © {now.getFullYear()} Parahyangan Finance Club. All rights reserved.
           </p>
         </div>
 

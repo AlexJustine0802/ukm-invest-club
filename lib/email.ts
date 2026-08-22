@@ -16,7 +16,7 @@ export async function sendContactEmail(msg: ContactMessage): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   const to = process.env.CONTACT_EMAIL_TO;
   const from =
-    process.env.CONTACT_EMAIL_FROM || "ICUnpar Website <onboarding@resend.dev>";
+    process.env.CONTACT_EMAIL_FROM || "Parahyangan Finance Club Website <onboarding@resend.dev>";
 
   if (!apiKey || !to) {
     console.log("[contact] Resend not configured  message logged instead:");
@@ -29,10 +29,10 @@ export async function sendContactEmail(msg: ContactMessage): Promise<void> {
     from,
     to,
     replyTo: msg.email,
-    subject: `[ICUnpar Contact] ${msg.subject}`,
-    text: `New message from the ICUnpar website contact form:\n\nName: ${msg.name}\nEmail: ${msg.email}\nSubject: ${msg.subject}\n\n${msg.message}`,
+    subject: `[Parahyangan Finance Club Contact] ${msg.subject}`,
+    text: `New message from the Parahyangan Finance Club website contact form:\n\nName: ${msg.name}\nEmail: ${msg.email}\nSubject: ${msg.subject}\n\n${msg.message}`,
     html: `
-      <h2>New contact message  ICUnpar website</h2>
+      <h2>New contact message  Parahyangan Finance Club website</h2>
       <p><strong>Name:</strong> ${escapeHtml(msg.name)}</p>
       <p><strong>Email:</strong> ${escapeHtml(msg.email)}</p>
       <p><strong>Subject:</strong> ${escapeHtml(msg.subject)}</p>
@@ -59,17 +59,17 @@ export async function sendAuthEmail(
 ): Promise<void> {
   const verify = kind === "verify";
   const subject = verify
-    ? "Confirm your ICUnpar email"
-    : "Reset your ICUnpar password";
+    ? "Confirm your Parahyangan Finance Club email"
+    : "Reset your Parahyangan Finance Club password";
   const heading = verify ? "Confirm your email" : "Reset your password";
   const body = verify
     ? "Confirm this address so we know club email reaches you. This link expires in 24 hours. If you did not ask for it, you can safely ignore this email."
-    : "We received a request to reset your ICUnpar password. This link expires in 1 hour. If you did not request it, you can safely ignore this email.";
+    : "We received a request to reset your Parahyangan Finance Club password. This link expires in 1 hour. If you did not request it, you can safely ignore this email.";
   const cta = verify ? "Confirm Email" : "Reset Password";
 
   const apiKey = process.env.RESEND_API_KEY;
   const from =
-    process.env.CONTACT_EMAIL_FROM || "ICUnpar Website <onboarding@resend.dev>";
+    process.env.CONTACT_EMAIL_FROM || "Parahyangan Finance Club Website <onboarding@resend.dev>";
 
   if (!apiKey) {
     console.log(`[auth] Resend not configured  ${kind} link for ${to}:`);

@@ -60,7 +60,7 @@ export default async function AnnouncementsPage({
 
       <AccountTopBar
         title="Announcements"
-        subtitle="Everything happening across ICU, newest first."
+        subtitle="Everything happening across PFC, newest first."
         searchPlaceholder="Search announcements..."
         name={user.name}
         initial={user.name.charAt(0).toUpperCase()}

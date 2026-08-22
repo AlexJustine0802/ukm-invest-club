@@ -1,6 +1,6 @@
-# ICUnpar  Investment Club UKM Website
+# Parahyangan Finance Club Website
 
-A modern website for **ICUnpar** (Investment Club Universitas Parahyangan) with a
+A modern website for **PFC** (Parahyangan Finance Club) with a
 public site (events, publications, team, gallery, contact) and a password-protected
 **admin dashboard** for managing all content.
 
@@ -67,6 +67,9 @@ Copy the printed `ADMIN_PASSWORD_HASH="..."` line into `.env`.
 
 ```bash
 npm run db:push     # create tables
+
+
+
 npm run db:seed     # add sample events, publications, team, gallery
 ```
 
@@ -134,4 +137,4 @@ Log in at `/admin` and use the sidebar to manage:
 ---
 
 > Placeholder branding is in `lib/site.ts` (name, socials, email)  update it and
-> drop in the real ICUnpar logo when ready.
+> drop in the real Parahyangan Finance Club logo when ready.

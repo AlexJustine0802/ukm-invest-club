@@ -1,4 +1,4 @@
-# Palet Warna Website  Investment Club
+# Palet Warna Website Parahyangan Finance Club
 
 Palet warna profesional, terpercaya, dan modern yang mencerminkan pertumbuhan, analisis, dan kolaborasi.
 

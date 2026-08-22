@@ -44,7 +44,7 @@ export default function HighlightForm({ action, highlight }: HighlightFormProps)
           name="title"
           required
           defaultValue={highlight?.title}
-          placeholder="e.g. ICU Staff Recruitment 2025"
+          placeholder="e.g. PFC Staff Recruitment 2025"
           className="input"
         />
       </div>

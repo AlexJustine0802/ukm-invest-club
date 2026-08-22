@@ -16,7 +16,7 @@ import { TextAnimate } from "@/components/ui/text-animate";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get in touch with Investment Club Unpar.",
+  description: "Get in touch with Parahyangan Finance Club.",
 };
 
 const contactCards = [
@@ -63,7 +63,7 @@ const socialLinks = [
     href: "https://instagram.com/IC_Unpar",
   },
   {
-    title: "Investment Club Unpar",
+    title: "Parahyangan Finance Club",
     label: "LinkedIn",
     logo: "/images/linkedin.png",
     href: "https://linkedin.com/company/investment-club-unpar/",

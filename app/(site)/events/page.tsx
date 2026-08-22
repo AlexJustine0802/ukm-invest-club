@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Events",
-  description: "Upcoming and past events hosted by ICUnpar.",
+  description: "Upcoming and past events hosted by Parahyangan Finance Club.",
 };
 
 type EventDisplay = {

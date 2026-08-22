@@ -12,7 +12,7 @@ const items = [
   { section: "overview", title: "Career Alerts", subtitle: "5", note: "New opportunities", icon: "Briefcase", color: "bg-amber-50 text-amber-600", order: 3 },
 
   // Announcements
-  { section: "announcement", title: "ICU Stock Pitch Competition 2025", subtitle: "Registrations are now open!", meta: "Deadline: 30 July 2025", badge: "Competitions", note: "2h ago", icon: "Trophy", color: "bg-blue-50 text-primary", order: 0 },
+  { section: "announcement", title: "PFC Stock Pitch Competition 2025", subtitle: "Registrations are now open!", meta: "Deadline: 30 July 2025", badge: "Competitions", note: "2h ago", icon: "Trophy", color: "bg-blue-50 text-primary", order: 0 },
   { section: "announcement", title: "New Material Added", subtitle: "Valuation: DCF Method", meta: "Check it out in Resources", badge: "Materials", note: "1d ago", icon: "FileText", color: "bg-emerald-50 text-emerald-600", order: 1 },
   { section: "announcement", title: "Member Gathering", subtitle: "Let's connect and grow together!", meta: "20 July 2025", badge: "Members", note: "2d ago", icon: "Users", color: "bg-violet-50 text-violet-600", order: 2 },
   { section: "announcement", title: "Equity Research Workshop", subtitle: "Hands-on session on building research reports.", meta: "18 July 2025, 19:00 WIB", badge: "Events", note: "3d ago", icon: "CalendarDays", color: "bg-amber-50 text-amber-600", order: 3 },

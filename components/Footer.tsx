@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="relative h-14 w-52 overflow-hidden">
             <Image
               src="/images/pfcspace_logo.png"
-              alt="Investment Club Unpar"
+              alt="Parahyangan Finance Club"
               fill
               sizes="160px"
               className="object-cover object-[center_40%]"

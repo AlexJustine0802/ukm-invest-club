@@ -73,7 +73,7 @@ export default function PublicationForm({
             id="author"
             name="author"
             defaultValue={publication?.author ?? ""}
-            placeholder="e.g. ICUnpar Research Team"
+            placeholder="e.g. Parahyangan Finance Club Research Team"
             className="input"
           />
         </div>

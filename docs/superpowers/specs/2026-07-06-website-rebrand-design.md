@@ -1,4 +1,4 @@
-# ICUnpar Website Rebrand  Design
+# Parahyangan Finance Club Website Rebrand  Design
 
 **Date:** 2026-07-06
 **Goal:** Restyle the public site to match the two attached mockups (Home + About) and the `color.jpeg` palette. Switch from dark navy/gold to light blue/white. Public site only  admin dashboard untouched.

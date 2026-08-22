@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Research",
   description:
-    "Investment research, publications, and market insights from ICUnpar.",
+    "Investment research, publications, and market insights from Parahyangan Finance Club.",
 };
 
 const publicationSummarySelect = {

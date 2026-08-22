@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "All Events",
-  description: "Browse all upcoming and past events hosted by ICUnpar.",
+  description: "Browse all upcoming and past events hosted by Parahyangan Finance Club.",
 };
 
 const PAGE_SIZE = 9;
@@ -119,7 +119,7 @@ export default async function AllEventsPage({
               once
               className="site-hero-copy mt-4"
             >
-              Browse every event hosted by ICUnpar, upcoming and past, across
+              Browse every event hosted by Parahyangan Finance Club, upcoming and past, across
               all categories.
             </TextAnimate>
           </div>

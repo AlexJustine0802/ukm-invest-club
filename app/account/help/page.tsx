@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: "How is my position (Member, Committee) decided?",
-    a: "Positions are assigned by ICU administrators. If your position looks wrong, contact us and we will correct it.",
+    a: "Positions are assigned by PFC administrators. If your position looks wrong, contact us and we will correct it.",
   },
 ];
 

@@ -100,7 +100,7 @@ export default function LoginForm() {
       <p className="text-center text-sm text-slate-500">
         Don&apos;t have an account?{" "}
         <Link href="/signup" className="font-semibold text-primary">
-          Join ICU
+          Join PFC
         </Link>
       </p>
     </form>
