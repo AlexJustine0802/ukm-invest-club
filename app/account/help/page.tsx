@@ -42,7 +42,7 @@ export default async function HelpPage() {
 
   const channels = [
     { label: "Email us", value: site.email, href: `mailto:${site.email}`, icon: Mail },
-    { label: "Instagram", value: "@icunpar", href: site.instagram, icon: AtSign },
+    { label: "Instagram", value: "@IC_Unpar", href: site.instagram, icon: AtSign },
     { label: "Contact form", value: "Send us a message", href: "/contact", icon: MessageSquare },
   ];
 
