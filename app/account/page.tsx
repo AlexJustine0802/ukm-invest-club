@@ -246,7 +246,7 @@ export default async function AccountPage() {
         <div className="min-w-0 space-y-6">
           {/* Highlight  managed in /admin/highlights. Always rendered at a
               fixed height; with no active highlight it shows a placeholder. */}
-          <Reveal className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-6 text-white sm:p-8">
+          <Reveal className="relative flex min-h-[216px] flex-col justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-navy to-primary-dark p-6 text-white sm:p-8 xl:pr-72">
             {highlight ? (
               <>
                 <div className="relative max-w-lg">
