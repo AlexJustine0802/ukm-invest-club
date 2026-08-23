@@ -45,6 +45,10 @@ export async function signupUser(
       email,
       phone,
       passwordHash: await hashPassword(password),
+      notifyAnnouncements: true,
+      notifyEvents: true,
+      notifyAssignments: true,
+      notifyCareer: true,
     },
   });
 

@@ -149,7 +149,7 @@ model User {
   notifyAnnouncements Boolean @default(true)
   notifyEvents        Boolean @default(true)
   notifyAssignments   Boolean @default(true)
-  notifyCareer        Boolean @default(false)
+  notifyCareer        Boolean @default(true)
   showPhoto           Boolean @default(true)
   showSocials         Boolean @default(true)
   emailVerified DateTime?
