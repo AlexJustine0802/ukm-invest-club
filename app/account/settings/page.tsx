@@ -110,9 +110,6 @@ export default async function SettingsPage() {
               </div>
             ))}
           </div>
-          <p className="mt-4 text-xs text-slate-400">
-            Preference saving is not wired up yet  these show your defaults.
-          </p>
         </section>
       </div>
     </>

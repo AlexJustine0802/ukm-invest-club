@@ -6,23 +6,30 @@ import { CheckCircle2 } from "lucide-react";
 import { Confetti, type ConfettiRef } from "@/components/ui/confetti";
 
 /**
- * Fires once when signup lands here with `?registered=1`.
+ * Fires once when email verification returns here with `?verified=1`.
  *
- * The parameter is stripped straight away, so a reload or a back-navigation
- * does not replay the burst  the same trick the member WelcomeSplash uses.
+ * The parameter is stripped after the burst, so a refresh or a back-navigation
+ * does not replay the celebration.
  */
 export default function SignupCelebration() {
   const router = useRouter();
   const params = useSearchParams();
   const confettiRef = useRef<ConfettiRef>(null);
+  const hasCelebrated = useRef(false);
   const [celebrating, setCelebrating] = useState(false);
+  const verified = params.get("verified") === "1";
 
   useEffect(() => {
-    if (params.get("registered") !== "1") return;
+    if (!verified || hasCelebrated.current) return;
 
+    hasCelebrated.current = true;
     setCelebrating(true);
-    router.replace("/login", { scroll: false });
-    // Two bursts from the bottom corners read better than one from the middle.
+  }, [verified]);
+
+  useEffect(() => {
+    if (!celebrating) return;
+
+    // Fire after the celebrating state renders so the canvas ref is ready.
     confettiRef.current?.fire({
       particleCount: 90,
       spread: 70,
@@ -33,8 +40,15 @@ export default function SignupCelebration() {
       spread: 70,
       origin: { x: 0.8, y: 0.9 },
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    // Keep the verification query long enough for the animation to be seen,
+    // then clean it up so a refresh cannot replay the celebration.
+    const cleanupTimer = window.setTimeout(() => {
+      router.replace("/login", { scroll: false });
+    }, 1600);
+
+    return () => window.clearTimeout(cleanupTimer);
+  }, [celebrating, router]);
 
   return (
     <>
@@ -49,7 +63,7 @@ export default function SignupCelebration() {
       {celebrating && (
         <p className="mb-4 flex items-center justify-center gap-2 rounded-lg bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-700">
           <CheckCircle2 className="h-4 w-4 shrink-0" />
-          Account created  thanks for signing up! Log in to get started.
+          Email verified  welcome to Parahyangan Finance Club! Log in to get started.
         </p>
       )}
     </>

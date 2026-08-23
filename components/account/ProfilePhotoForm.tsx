@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { AlertCircle, Camera, Check, Trash2 } from "lucide-react";
 import {
   updateMyPhoto,
   type ProfileState,
 } from "@/app/account/profile/actions";
+import ProfilePhotoCropper from "@/components/account/ProfilePhotoCropper";
 
 function Save({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -56,7 +57,6 @@ export default function ProfilePhotoForm({
     {},
   );
   const [preview, setPreview] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const shown = preview ?? photo;
 
@@ -76,21 +76,7 @@ export default function ProfilePhotoForm({
       </span>
 
       <div className="min-w-0 flex-1 space-y-3">
-        <input
-          ref={inputRef}
-          id="photoFile"
-          name="photoFile"
-          type="file"
-          accept="image/*"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            setPreview(file ? URL.createObjectURL(file) : null);
-          }}
-          className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-navy hover:file:bg-slate-200"
-        />
-        <p className="text-xs text-slate-400">
-          JPG or PNG, up to 5 MB. Square images look best.
-        </p>
+        <ProfilePhotoCropper onPreview={setPreview} />
 
         <div className="flex flex-wrap items-center gap-2">
           <Save label={photo ? "Update photo" : "Upload photo"} />

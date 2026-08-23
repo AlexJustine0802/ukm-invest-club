@@ -64,7 +64,7 @@ export default async function VerifyEmailPage({
         )}
 
         <Link
-          href="/login"
+          href={userId ? "/login?verified=1" : "/login"}
           className="mt-6 inline-block rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
         >
           Back to login

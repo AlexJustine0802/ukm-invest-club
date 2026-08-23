@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowRight, BarChart3, CalendarDays, FileText } from "lucide-react";
+import { ArrowRight, BarChart3, BookOpen, CalendarDays, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { getResearchIcon } from "@/lib/researchIcons";
 import EmptyState from "@/components/EmptyState";
@@ -345,9 +345,11 @@ export default function ResearchPageContent({
                 fillClassName="bg-white"
                 hoverTextClassName="text-primary"
               >
+                <BookOpen className="mr-2 inline h-4 w-4" />
                 Explore Research
               </InteractiveHoverButton>
               <InteractiveHoverButton href="/publications/all">
+                <FileText className="mr-2 inline h-4 w-4" />
                 View All Publications
               </InteractiveHoverButton>
             </div>

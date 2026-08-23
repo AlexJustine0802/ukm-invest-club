@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Calendar } from "lucide-react";
+import { BookOpen, Calendar } from "lucide-react";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { heroAppearanceFrom, normalizeHeroStyle } from "@/lib/hero";
 
@@ -199,6 +199,7 @@ export default function HeroCarousel({ slides: slidesProp }: { slides?: HeroSlid
             </p>
             <div className={`site-hero-actions ${fullBackground ? "justify-center" : ""}`}>
               <InteractiveHoverButton href={buttons.primary.href} className="bg-primary text-white" fillClassName="bg-white" hoverTextClassName="text-primary">
+                <BookOpen className="mr-2 inline h-4 w-4" />
                 {buttons.primary.label}
               </InteractiveHoverButton>
               <InteractiveHoverButton href={buttons.secondary.href} className="border-primary bg-transparent text-primary">

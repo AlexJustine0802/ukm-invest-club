@@ -6,6 +6,7 @@ import {
   CalendarDays,
   ChevronDown,
   Clock,
+  History,
   MapPin,
   Users,
 } from "lucide-react";
@@ -467,12 +468,14 @@ export default async function EventsPage() {
                 fillClassName="bg-white"
                 hoverTextClassName="text-primary"
               >
+                <CalendarDays className="mr-2 inline h-4 w-4" />
                 Upcoming Events
               </InteractiveHoverButton>
               <InteractiveHoverButton
                 href="#past-events"
                 className="border-primary bg-transparent text-primary"
               >
+                <History className="mr-2 inline h-4 w-4" />
                 Past Events
               </InteractiveHoverButton>
             </div>

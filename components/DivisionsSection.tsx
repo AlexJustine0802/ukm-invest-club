@@ -2,9 +2,11 @@
 
 import { Fragment, useEffect, useState } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
 import { Users, X } from "lucide-react";
 import { InstagramIcon, LinkedInIcon } from "@/components/BrandIcons";
 import { TextAnimate } from "@/components/ui/text-animate";
+import { DUR, EASE } from "@/lib/motion";
 
 const DIVISION_LOGOS: Record<string, string> = {
   pvpc: "/images/divisions/PVP.png",
@@ -238,11 +240,17 @@ export default function DivisionsSection({
                 </span>
               </button>
 
-              {open && index === panelAfterIndex && (
-                <div
-                  style={{ gridColumn: "1 / -1" }}
-                  className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8"
-                >
+              <AnimatePresence initial={false}>
+                {open && index === panelAfterIndex && (
+                  <motion.div
+                    key={open.id}
+                    initial={{ opacity: 0, y: -16, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.99 }}
+                    transition={{ duration: DUR.ui, ease: EASE }}
+                    style={{ gridColumn: "1 / -1" }}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-6 sm:p-8"
+                  >
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <h3 className="text-2xl font-bold text-navy">
@@ -301,8 +309,9 @@ export default function DivisionsSection({
                       )}
                     </div>
                   )}
-                </div>
-              )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Fragment>
           );
         })}

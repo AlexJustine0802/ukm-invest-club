@@ -12,7 +12,7 @@ export default async function AccountTopBar({
   initial,
   role,
 }: {
-  title: React.ReactNode;
+  title?: React.ReactNode;
   subtitle?: React.ReactNode;
   searchPlaceholder?: string;
   /** Off on pages with nothing to filter. */
@@ -25,11 +25,13 @@ export default async function AccountTopBar({
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-      <div>
-        <h1 className="text-2xl font-bold text-navy">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
-      </div>
-      <div className="flex items-center gap-3">
+      {(title || subtitle) && (
+        <div>
+          {title && <h1 className="text-2xl font-bold text-navy">{title}</h1>}
+          {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+        </div>
+      )}
+      <div className="flex items-center gap-3 lg:ml-auto">
         {showSearch && (
           <Suspense
             fallback={<div className="h-11 w-full rounded-full border border-slate-200 bg-white lg:w-96" />}
