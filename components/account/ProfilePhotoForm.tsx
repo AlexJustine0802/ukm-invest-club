@@ -22,18 +22,19 @@ function Save({ label }: { label: string }) {
   );
 }
 
-function Remove() {
+function Remove({ onRemove }: { onRemove: () => void }) {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
       name="remove"
       value="1"
+      onClick={onRemove}
       disabled={pending}
       className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-500 hover:bg-slate-50 hover:text-rose-600 disabled:opacity-60"
     >
       <Trash2 className="h-4 w-4" />
-      Remove
+      Remove photo
     </button>
   );
 }
@@ -57,6 +58,7 @@ export default function ProfilePhotoForm({
     {},
   );
   const [preview, setPreview] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
 
   const shown = preview ?? photo;
 
@@ -76,11 +78,23 @@ export default function ProfilePhotoForm({
       </span>
 
       <div className="min-w-0 flex-1 space-y-3">
-        <ProfilePhotoCropper onPreview={setPreview} />
+        <ProfilePhotoCropper
+          onPreview={(value) => {
+            setRemoving(false);
+            setPreview(value);
+          }}
+        />
 
         <div className="flex flex-wrap items-center gap-2">
           <Save label={photo ? "Update photo" : "Upload photo"} />
-          {photo && <Remove />}
+          {photo && (
+            <Remove
+              onRemove={() => {
+                setRemoving(true);
+                setPreview(null);
+              }}
+            />
+          )}
         </div>
 
         {state.error && (
@@ -92,7 +106,7 @@ export default function ProfilePhotoForm({
         {state.saved && !state.error && (
           <p className="flex items-center gap-2 text-sm font-semibold text-emerald-600">
             <Check className="h-4 w-4" />
-            Photo updated.
+            {removing ? "Photo removed." : "Photo updated."}
           </p>
         )}
       </div>
