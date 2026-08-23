@@ -83,6 +83,9 @@ export async function sendAuthEmail(
   const from = senderAddress();
 
   if (!apiKey) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("RESEND_API_KEY is not configured in production.");
+    }
     console.log(`[auth] Resend not configured  ${kind} link for ${to}:`);
     console.log(link);
     return;
