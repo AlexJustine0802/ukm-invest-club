@@ -3,12 +3,84 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
-import { clearUserSessionCookie, getUserSession } from "@/lib/userAuth";
+import {
+  clearUserSessionCookie,
+  getUserSession,
+  verifyPassword,
+} from "@/lib/userAuth";
 import { getTopBarNotifications } from "@/lib/notifications";
+
+export type SettingsActionState = {
+  error?: string;
+  saved?: boolean;
+};
 
 export async function logoutUser() {
   await clearUserSessionCookie();
   redirect("/login");
+}
+
+function checked(formData: FormData, name: string) {
+  return formData.get(name) === "on";
+}
+
+export async function updateUserPreferences(
+  _previousState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  const session = await getUserSession();
+  if (!session) return { error: "Your session has expired. Please log in again." };
+
+  await prisma.user.update({
+    where: { id: session.userId },
+    data: {
+      notifyAnnouncements: checked(formData, "notifyAnnouncements"),
+      notifyEvents: checked(formData, "notifyEvents"),
+      notifyAssignments: checked(formData, "notifyAssignments"),
+      notifyCareer: checked(formData, "notifyCareer"),
+      showPhoto: checked(formData, "showPhoto"),
+      showSocials: checked(formData, "showSocials"),
+    },
+  });
+
+  revalidatePath("/account/settings");
+  revalidatePath("/account", "layout");
+  revalidatePath("/account/members");
+  revalidatePath("/about");
+  return { saved: true };
+}
+
+export async function deleteMyAccount(
+  _previousState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  const session = await getUserSession();
+  if (!session) return { error: "Your session has expired. Please log in again." };
+
+  const password = String(formData.get("currentPassword") ?? "");
+  if (!password) return { error: "Enter your current password to continue." };
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { passwordHash: true },
+  });
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    return { error: "The password is incorrect." };
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.authToken.deleteMany({ where: { userId: session.userId } });
+    await tx.notificationRead.deleteMany({ where: { userId: session.userId } });
+    await tx.eventRegistration.deleteMany({ where: { userId: session.userId } });
+    await tx.channelMember.deleteMany({ where: { userId: session.userId } });
+    await tx.discussionPost.deleteMany({ where: { userId: session.userId } });
+    await tx.assignmentSubmission.deleteMany({ where: { userId: session.userId } });
+    await tx.formResponse.deleteMany({ where: { userId: session.userId } });
+    await tx.user.delete({ where: { id: session.userId } });
+  });
+
+  await clearUserSessionCookie();
+  redirect("/login?deleted=1");
 }
 
 /**

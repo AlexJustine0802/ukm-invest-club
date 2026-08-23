@@ -1,21 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { KeyRound, Mail, Shield, ChevronRight } from "lucide-react";
+import { KeyRound, Mail, Shield, UserRound, ChevronRight } from "lucide-react";
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { VerifyEmailButton } from "@/components/account/AccountSettingsForms";
+import SettingsPreferencesForm from "@/components/account/SettingsPreferencesForm";
+import DeleteAccountForm from "@/components/account/DeleteAccountForm";
 
 export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
-
-const notificationPrefs = [
-  { label: "Email announcements", desc: "New club announcements and updates.", on: true },
-  { label: "Event reminders", desc: "Reminders before events you registered for.", on: true },
-  { label: "Assignment deadlines", desc: "Alerts when a deadline is approaching.", on: true },
-  { label: "Career alerts", desc: "New internship and job opportunities.", on: false },
-];
 
 export default async function SettingsPage() {
   const session = await getUserSession();
@@ -41,6 +36,18 @@ export default async function SettingsPage() {
           <h3 className="font-bold text-navy">Account</h3>
 
           <div className="mt-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500">
+                <UserRound className="h-5 w-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs text-slate-400">Name</p>
+                <p className="truncate text-sm font-semibold text-navy">{user.name}</p>
+              </div>
+              <Link href="/account/profile" className="shrink-0 text-xs font-semibold text-primary hover:text-primary-dark">
+                Edit profile
+              </Link>
+            </div>
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500">
                 <Mail className="h-5 w-5" />
@@ -90,25 +97,23 @@ export default async function SettingsPage() {
           </Link>
         </section>
 
-        {/* Notifications */}
+        <SettingsPreferencesForm
+          notifyAnnouncements={user.notifyAnnouncements}
+          notifyEvents={user.notifyEvents}
+          notifyAssignments={user.notifyAssignments}
+          notifyCareer={user.notifyCareer}
+          showPhoto={user.showPhoto}
+          showSocials={user.showSocials}
+        />
+
+        {/* Data & account */}
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="font-bold text-navy">Notifications</h3>
-          <div className="mt-4 space-y-4">
-            {notificationPrefs.map((p) => (
-              <div key={p.label} className="flex items-center gap-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-navy">{p.label}</p>
-                  <p className="text-xs text-slate-500">{p.desc}</p>
-                </div>
-                <span
-                  className={`flex h-6 w-11 shrink-0 items-center rounded-full px-0.5 ${
-                    p.on ? "justify-end bg-primary" : "justify-start bg-slate-200"
-                  }`}
-                >
-                  <span className="h-5 w-5 rounded-full bg-white" />
-                </span>
-              </div>
-            ))}
+          <h3 className="font-bold text-navy">Data &amp; Account</h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Permanently remove your membership and the data connected to it.
+          </p>
+          <div className="mt-5">
+            <DeleteAccountForm />
           </div>
         </section>
       </div>

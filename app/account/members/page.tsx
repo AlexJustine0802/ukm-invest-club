@@ -40,6 +40,7 @@ export default async function MembersPage({
       createdAt: true,
       instagram: true,
       linkedin: true,
+      showSocials: true,
     },
     orderBy: [{ division: "asc" }, { role: "asc" }, { name: "asc" }],
   });
@@ -175,7 +176,7 @@ export default async function MembersPage({
                 </div>
 
                 {/* Socials, when the member has filled them in. */}
-                {(m.instagram || m.linkedin) && (
+                {m.showSocials && (m.instagram || m.linkedin) && (
                   <div className="mt-3 flex items-center gap-2">
                     {m.instagram && (
                       <a

@@ -27,9 +27,24 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
 
   // Each source can be switched off in /admin/notifications. Missing row = all
   // on, which is what a site that has never opened that page expects.
-  const settings = await prisma.siteSettings.findUnique({ where: { id: 1 } });
+  const [settings, preferences] = await Promise.all([
+    prisma.siteSettings.findUnique({ where: { id: 1 } }),
+    session
+      ? prisma.user.findUnique({
+          where: { id: session.userId },
+          select: {
+            notifyAnnouncements: true,
+            notifyEvents: true,
+            notifyAssignments: true,
+            notifyCareer: true,
+          },
+        })
+      : null,
+  ]);
   const on = (key: keyof NonNullable<typeof settings>) =>
     settings ? Boolean(settings[key]) : true;
+  const userOn = (key: keyof NonNullable<typeof preferences>) =>
+    preferences ? Boolean(preferences[key]) : true;
 
   const [
     announcements,
@@ -42,8 +57,10 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
     posts,
     recruitment,
   ] = await Promise.all([
-    getSection("announcement"),
-    on("notifyCareer")
+    userOn("notifyAnnouncements")
+      ? getSection("announcement")
+      : [],
+    userOn("notifyCareer") && on("notifyCareer")
       ? prisma.careerAlert.findMany({
           where: {
             published: true,
@@ -60,7 +77,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
     // Marking does not move an assignment out of Completed  the score arrives
     // here instead, so the member hears about it without the list changing
     // underneath them.
-    session && on("notifyAssignments")
+    session && userOn("notifyAssignments") && on("notifyAssignments")
       ? prisma.assignmentSubmission.findMany({
           where: { userId: session.userId, gradedAt: { not: null } },
           orderBy: { gradedAt: "desc" },
@@ -76,7 +93,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
     // Every published assignment, so one that has just opened or fallen due
     // announces itself. Unread state is what keeps the list short, not a date
     // window  a member who never looked still sees it waiting.
-    on("notifyAssignments")
+    userOn("notifyAssignments") && on("notifyAssignments")
       ? prisma.assignment.findMany({
           where: { published: true },
           orderBy: { createdAt: "desc" },
@@ -96,7 +113,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
           select: { assignmentId: true, gradedAt: true },
         })
       : [],
-    on("notifyEvents")
+    userOn("notifyEvents") && on("notifyEvents")
       ? prisma.event.findMany({
           where: { published: true, eventDate: { gte: now } },
           orderBy: { createdAt: "desc" },
@@ -137,7 +154,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
         })
       : [],
     // The open recruitment, if the window is running.
-    on("notifyRecruitment")
+    userOn("notifyCareer") && on("notifyRecruitment")
       ? prisma.registrationForm.findFirst({
           where: {
             isRecruitment: true,

@@ -147,6 +147,8 @@ export default async function AboutPage() {
           bio: true,
           instagram: true,
           linkedin: true,
+          showPhoto: true,
+          showSocials: true,
         },
       }),
       prisma.impactStat.findMany({
@@ -178,10 +180,10 @@ export default async function AboutPage() {
       name: p.name,
       role: p.role,
       isHead: isHead(p.role),
-      photo: p.photo,
+      photo: p.showPhoto ? p.photo : null,
       bio: p.bio,
-      instagram: p.instagram,
-      linkedin: p.linkedin,
+      instagram: p.showSocials ? p.instagram : null,
+      linkedin: p.showSocials ? p.linkedin : null,
     })),
   }));
 
