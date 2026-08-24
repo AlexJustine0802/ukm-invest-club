@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
+import { slugify } from "@/lib/utils";
 import { uniqueSlug as sharedUniqueSlug } from "@/lib/slugs";
 
 const lookup = (slug: string) =>
@@ -19,6 +20,40 @@ function revalidatePublications() {
   revalidatePath("/publications/all");
   revalidatePath("/");
   revalidatePath("/admin/publications");
+}
+
+/** Add a research category from the publication form without losing draft data. */
+export async function createResearchCategoryInline(
+  title: string,
+): Promise<{ value: string; label: string } | { error: string }> {
+  await requirePermission("research-categories", "create");
+
+  const clean = title.trim();
+  if (!clean) return { error: "Give the category a name." };
+
+  const existing = await prisma.researchCategory.findFirst({
+    where: { title: clean },
+    select: { id: true, title: true },
+  });
+  const category =
+    existing ??
+    (await prisma.researchCategory.create({
+      data: {
+        title: clean,
+        slug: await sharedUniqueSlug(
+          (slug) => prisma.researchCategory.findUnique({ where: { slug } }),
+          slugify(clean),
+          "category",
+        ),
+      },
+      select: { id: true, title: true },
+    }));
+
+  revalidatePath("/publications");
+  revalidatePath("/publications/all");
+  revalidatePath("/admin/publications");
+  revalidatePath("/admin/research-categories");
+  return { value: category.id, label: category.title };
 }
 
 function parseFields(formData: FormData) {

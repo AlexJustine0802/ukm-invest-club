@@ -2,8 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import PublicationForm from "@/components/admin/PublicationForm";
-import { createPublication } from "../actions";
-import { requirePage } from "@/lib/adminAccess";
+import { createPublication, createResearchCategoryInline } from "../actions";
+import { can, requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +14,7 @@ export default async function NewPublicationPage() {
     orderBy: { order: "asc" },
     select: { id: true, title: true },
   });
+  const mayAddCategory = await can("research-categories", "create");
 
   return (
     <div>
@@ -29,6 +30,9 @@ export default async function NewPublicationPage() {
           action={createPublication}
           uploadEnabled={isBlobConfigured()}
           categories={categories}
+          createCategory={
+            mayAddCategory ? createResearchCategoryInline : undefined
+          }
         />
       </div>
     </div>

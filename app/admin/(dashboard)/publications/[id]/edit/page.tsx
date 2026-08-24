@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isBlobConfigured } from "@/lib/upload";
 import PublicationForm from "@/components/admin/PublicationForm";
-import { updatePublication } from "../../actions";
-import { requirePage } from "@/lib/adminAccess";
+import {
+  createResearchCategoryInline,
+  updatePublication,
+} from "../../actions";
+import { can, requirePage } from "@/lib/adminAccess";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +27,7 @@ export default async function EditPublicationPage({
     }),
   ]);
   if (!publication) notFound();
+  const mayAddCategory = await can("research-categories", "create");
 
   return (
     <div>
@@ -39,6 +43,9 @@ export default async function EditPublicationPage({
           action={updatePublication}
           uploadEnabled={isBlobConfigured()}
           categories={categories}
+          createCategory={
+            mayAddCategory ? createResearchCategoryInline : undefined
+          }
           publication={publication}
         />
       </div>

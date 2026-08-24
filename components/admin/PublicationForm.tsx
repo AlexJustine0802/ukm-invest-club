@@ -3,11 +3,17 @@
 import Link from "next/link";
 import ImageField from "@/components/admin/ImageField";
 import SubmitButton from "@/components/admin/SubmitButton";
+import CategorySelect, {
+  type CategoryOption,
+} from "@/components/admin/CategorySelect";
 
 interface PublicationFormProps {
   action: (formData: FormData) => void;
   uploadEnabled: boolean;
   categories: { id: string; title: string }[];
+  createCategory?: (
+    title: string,
+  ) => Promise<CategoryOption | { error: string }>;
   publication?: {
     id: string;
     title: string;
@@ -31,6 +37,7 @@ export default function PublicationForm({
   action,
   uploadEnabled,
   categories,
+  createCategory,
   publication,
 }: PublicationFormProps) {
   return (
@@ -95,24 +102,14 @@ export default function PublicationForm({
         </div>
       </div>
 
-      <div>
-        <label htmlFor="categoryId" className="label">
-          Category
-        </label>
-        <select
-          id="categoryId"
-          name="categoryId"
-          defaultValue={publication?.categoryId ?? ""}
-          className="input"
-        >
-          <option value="">None</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.title}
-            </option>
-          ))}
-        </select>
-      </div>
+      <CategorySelect
+        name="categoryId"
+        label="Category"
+        defaultValue={publication?.categoryId}
+        options={categories.map((c) => ({ value: c.id, label: c.title }))}
+        createAction={createCategory}
+        hint="This category will also be available in Research Categories."
+      />
 
       <div>
         <label htmlFor="content" className="label">
