@@ -6,6 +6,7 @@ import DrawerProfile from "@/components/account/DrawerProfile";
 import PageTransition from "@/components/PageTransition";
 import { getTopBarNotifications } from "@/lib/notifications";
 import { hasAdminAccess } from "@/lib/adminAccess";
+import { isWaGroupsEnabled } from "@/lib/waGroups";
 
 /**
  * The member portal frame: sidebar, mobile bar and drawer, page transition.
@@ -25,6 +26,7 @@ export default async function MemberShell({
 }) {
   const notifications = await getTopBarNotifications();
   const showAdmin = await hasAdminAccess();
+  const showWhatsAppGroups = await isWaGroupsEnabled();
   const initial = user.name.charAt(0).toUpperCase();
 
   return (
@@ -40,6 +42,7 @@ export default async function MemberShell({
           top bar shows them from lg up. */}
       <Sidebar
         showAdmin={showAdmin}
+        showWhatsAppGroups={showWhatsAppGroups}
         menus={
           <TopBarMenus
             name={user.name}

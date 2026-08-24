@@ -226,6 +226,15 @@ export const ADMIN_MODULES: AdminModule[] = [
     description: "Job and internship postings for members.",
   },
   {
+    id: "wa-groups",
+    label: "WA Group",
+    href: "/admin/wa-groups",
+    icon: "MessageSquare",
+    workspace: "dashboard",
+    actions: CRUD,
+    description: "WhatsApp group cards and their member-facing links.",
+  },
+  {
     id: "announcements",
     label: "Announcements",
     href: "/admin/announcements",

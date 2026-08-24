@@ -533,6 +533,7 @@ model SiteSettings {
   id             Int     @id @default(1) // singleton row
   homeAboutImage String? // home "About Us" strip picture
   aboutHeroImage String? // about page hero image
+  whatsappGroupsEnabled Boolean @default(false)
 
   // Which automatic bell notifications members receive. Announcements are not
   // listed: those are written by hand and are the whole point of the bell.
@@ -545,6 +546,22 @@ model SiteSettings {
   notifyCareer      Boolean @default(true)
 
   updatedAt DateTime @updatedAt
+}
+
+// Cards shown on the member WA GROUP page. The page itself is controlled by
+// SiteSettings.whatsappGroupsEnabled so admins can hide it without deleting
+// the cards and their links.
+model WaGroupCard {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  imageUrl    String?
+  href        String
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order, createdAt])
 }
 
 model HeroSlide {

@@ -37,6 +37,12 @@ const navSecondary: { label: string; icon: LucideIcon; href: string }[] = [
   { label: "Career Alert", icon: Briefcase, href: "/account/career" },
 ];
 
+const navWhatsAppGroup = {
+  label: "WA GROUP",
+  icon: MessageSquare,
+  href: "/account/wa-group",
+};
+
 // Shown only to members whose role has admin permissions. It opens the admin
 // workspace inside this same chrome  the sidebar stays put and only the
 // content area changes  so it belongs in the nav, below its own divider.
@@ -75,11 +81,13 @@ export default function Sidebar({
   menus,
   profile,
   showAdmin = false,
+  showWhatsAppGroups = false,
 }: {
   menus?: React.ReactNode;
   profile?: React.ReactNode;
   /** True when this member's role has been granted admin permissions. */
   showAdmin?: boolean;
+  showWhatsAppGroups?: boolean;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -145,19 +153,25 @@ export default function Sidebar({
     </Link>
   );
 
-  const links = (scope: string) => (
-    <nav className="mt-4 space-y-1 lg:mt-6">
-      {nav.map((item) => navLink(scope, item))}
-      <div className="my-3 border-t border-slate-100" />
-      {navSecondary.map((item) => navLink(scope, item))}
-      {showAdmin && (
-        <>
-          <div className="my-3 border-t border-slate-100" />
-          {navLink(scope, navAdmin)}
-        </>
-      )}
-    </nav>
-  );
+  const links = (scope: string) => {
+    const secondary = showWhatsAppGroups
+      ? [...navSecondary, navWhatsAppGroup]
+      : navSecondary;
+
+    return (
+      <nav className="mt-4 space-y-1 lg:mt-6">
+        {nav.map((item) => navLink(scope, item))}
+        <div className="my-3 border-t border-slate-100" />
+        {secondary.map((item) => navLink(scope, item))}
+        {showAdmin && (
+          <>
+            <div className="my-3 border-t border-slate-100" />
+            {navLink(scope, navAdmin)}
+          </>
+        )}
+      </nav>
+    );
+  };
 
   return (
     <>

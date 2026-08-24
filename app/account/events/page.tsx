@@ -284,7 +284,9 @@ export default async function EventsPage({
                   <h2 className="mt-2 text-lg font-bold text-navy">
                     {e.title}
                   </h2>
-                  <p className="mt-1 text-sm text-slate-500">{e.description}</p>
+                  <p className="mt-1 line-clamp-3 text-sm leading-5 text-slate-500">
+                    {e.description}
+                  </p>
 
                   <div className="mt-3 space-y-1.5 text-sm text-slate-600">
                     <p className="flex items-center gap-2">

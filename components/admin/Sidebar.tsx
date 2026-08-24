@@ -102,6 +102,12 @@ const dashboardGroups: Group[] = [
     children: [{ label: "Job Postings", href: "/admin/career" }],
   },
   {
+    label: "WA Group",
+    icon: "WA",
+    href: "/admin/wa-groups",
+    children: [{ label: "WA Group", href: "/admin/wa-groups" }],
+  },
+  {
     label: "Announcements",
     icon: "📣",
     href: "/admin/announcements",
@@ -152,6 +158,7 @@ const dashboardPrefixes = [
   "/admin/assignments",
   "/admin/discussions",
   "/admin/career",
+  "/admin/wa-groups",
   "/admin/registrations",
   "/admin/recruitment",
   "/admin/members",

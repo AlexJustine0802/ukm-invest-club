@@ -40,8 +40,8 @@ const contactCards = [
   {
     title: "Call Us",
     icon: Phone,
-    lines: ["+62 812 3456 7890", "Mon - Fri, 09.00 - 16.00 WIB"],
-    href: "tel:+6281234567890",
+    lines: ["-", "Mon - Fri, 09.00 - 16.00 WIB"],
+    href: "tel:-",
   },
   {
     title: "Office Hours",
