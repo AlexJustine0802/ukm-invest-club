@@ -55,54 +55,53 @@ export default function EventHeroSlider({
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white shadow-xl">
-        <div className="relative aspect-[16/9] w-full bg-navy">
+      <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
+        <div className="relative h-[300px] sm:h-[390px]">
           <Image
             src={slide.image}
             alt=""
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 650px"
-            className="object-contain object-center"
+            className="object-cover object-center"
           />
-        </div>
-
-        <div className="relative p-5 sm:p-6">
-          <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
-            {slide.badge ?? "Next Event"}
-          </span>
-          <h2 className="mt-3 pr-14 text-lg font-bold leading-6 text-navy sm:text-xl">
-            {slide.title}
-          </h2>
-          {(slide.dateLabel || slide.timeLabel || slide.location) && (
-            <div className="mt-4 space-y-2 text-sm font-semibold text-slate-600">
-              {slide.dateLabel && (
-                <p className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 shrink-0 text-primary" />
-                  {slide.dateLabel}
-                </p>
-              )}
-              {slide.timeLabel && (
-                <p className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 shrink-0 text-primary" />
-                  {slide.timeLabel}
-                </p>
-              )}
-              {slide.location && (
-                <p className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 shrink-0 text-primary" />
-                  {slide.location}
-                </p>
-              )}
-            </div>
-          )}
-          <Link
-            href={slide.href}
-            aria-label={`Open ${slide.title}`}
-            className="absolute bottom-5 right-5 flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-lg ring-1 ring-primary-light transition-transform hover:scale-105 sm:bottom-6 sm:right-6"
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+          <div className="absolute inset-x-3 bottom-3 max-w-none rounded-lg bg-white p-4 pr-16 shadow-xl sm:inset-x-7 sm:bottom-7 sm:max-w-sm sm:p-6 sm:pr-16">
+            <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
+              {slide.badge ?? "Next Event"}
+            </span>
+            <h2 className="mt-3 text-base font-bold leading-5 text-navy sm:text-lg sm:leading-6">
+              {slide.title}
+            </h2>
+            {(slide.dateLabel || slide.timeLabel || slide.location) && (
+              <div className="mt-3 space-y-2 text-sm font-semibold text-slate-600 sm:mt-4">
+                {slide.dateLabel && (
+                  <p className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-primary" />
+                    {slide.dateLabel}
+                  </p>
+                )}
+                {slide.timeLabel && (
+                  <p className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-primary" />
+                    {slide.timeLabel}
+                  </p>
+                )}
+                {slide.location && (
+                  <p className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    {slide.location}
+                  </p>
+                )}
+              </div>
+            )}
+            <Link
+              href={slide.href}
+              aria-label={`Open ${slide.title}`}
+              className="absolute bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-lg ring-1 ring-primary-light transition-transform hover:scale-105"
+            >
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
       </div>
       {slides.length > 1 && (

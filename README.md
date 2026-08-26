@@ -70,7 +70,7 @@ npm run db:push     # create tables
 npm run db:generate
 
 
-git add -- "app/(site)/register/[slug]/actions.ts" "app/admin/(dashboard)/registrations/[id]/responses/page.tsx" "components/RegistrationFormFill.tsx" "components/RegistrationPanel.tsx" "components/admin/FormQuestionsEditor.tsx"
+git add -- ""
 git commit -m "Update registration responses to cards"
 git push
 
