@@ -22,6 +22,21 @@ export interface SubmitState {
   error?: string;
 }
 
+function registrationError(stage: string, formId: string, error: unknown) {
+  const details =
+    error instanceof Error
+      ? { name: error.name, message: error.message, stack: error.stack }
+      : { message: String(error) };
+
+  // Do not include FormData or answers here: submissions can contain personal
+  // information. The stage and form id are enough to find the failing query in
+  // Vercel's function logs.
+  console.error("[registration] submit failed", { stage, formId, ...details });
+}
+
+const databaseError =
+  "The registration could not be saved right now. Please wait a moment and try again.";
+
 /**
  * Handle one registration submission. Everything the page checked before
  * rendering is re-checked here  the page is UI, this is the trust boundary.
@@ -33,10 +48,16 @@ export async function submitRegistration(
   const formId = formData.get("formId") as string;
   if (!formId) return { error: "Something went wrong. Please reload the page." };
 
-  const form = await prisma.registrationForm.findUnique({
-    where: { id: formId },
-    include: { _count: { select: { responses: true } } },
-  });
+  let form;
+  try {
+    form = await prisma.registrationForm.findUnique({
+      where: { id: formId },
+      include: { _count: { select: { responses: true } } },
+    });
+  } catch (error) {
+    registrationError("load-form", formId, error);
+    return { error: databaseError };
+  }
   if (!form) return { error: "This registration no longer exists." };
 
   const status = formStatus(form);
@@ -48,7 +69,13 @@ export async function submitRegistration(
     return { error: "This registration is already full." };
   }
 
-  const session = await getUserSession();
+  let session;
+  try {
+    session = await getUserSession();
+  } catch (error) {
+    registrationError("load-session", formId, error);
+    return { error: databaseError };
+  }
   if (session && !allowsMembers(form.audience)) {
     return { error: "This registration is not open to member accounts." };
   }
@@ -72,12 +99,18 @@ export async function submitRegistration(
 
   // One response per person unless the admin allowed repeats.
   if (!form.multipleResponses) {
-    const existing = await prisma.formResponse.findFirst({
-      where: session
-        ? { formId, userId: session.userId }
-        : { formId, guestEmail },
-      select: { id: true },
-    });
+    let existing;
+    try {
+      existing = await prisma.formResponse.findFirst({
+        where: session
+          ? { formId, userId: session.userId }
+          : { formId, guestEmail },
+        select: { id: true },
+      });
+    } catch (error) {
+      registrationError("check-duplicate", formId, error);
+      return { error: databaseError };
+    }
     if (existing) return { error: "You have already submitted this form." };
   }
 
@@ -152,33 +185,45 @@ export async function submitRegistration(
   const invalid = await collect(questions);
   if (invalid) return invalid;
 
-  await prisma.formResponse.create({
-    data: {
-      formId,
-      userId: session?.userId ?? null,
-      guestName,
-      guestEmail,
-      // Prisma types Json columns structurally; FormAnswers needs the cast.
-      answers: answers as unknown as Prisma.InputJsonValue,
-    },
-  });
+  try {
+    await prisma.formResponse.create({
+      data: {
+        formId,
+        userId: session?.userId ?? null,
+        guestName,
+        guestEmail,
+        // Prisma types Json columns structurally; FormAnswers needs the cast.
+        answers: answers as unknown as Prisma.InputJsonValue,
+      },
+    });
+  } catch (error) {
+    registrationError("save-response", formId, error);
+    return { error: databaseError };
+  }
 
   // A signed-in member filling an event's form is registering for that event,
   // so record it too  that is what the seat counter and the "Registration"
   // tab on /account/events read.
   if (session) {
-    const events = await prisma.event.findMany({
-      where: { registrationFormId: formId },
-      select: { id: true },
-    });
-    for (const event of events) {
-      await prisma.eventRegistration
-        .create({ data: { eventId: event.id, userId: session.userId } })
-        .catch(() => {
-          // Unique constraint  already registered, nothing to do.
-        });
+    try {
+      const events = await prisma.event.findMany({
+        where: { registrationFormId: formId },
+        select: { id: true },
+      });
+      for (const event of events) {
+        await prisma.eventRegistration
+          .create({ data: { eventId: event.id, userId: session.userId } })
+          .catch((error) => {
+            // A duplicate is harmless; other failures still need to be visible.
+            registrationError("save-event-registration", formId, error);
+          });
+      }
+      if (events.length) revalidatePath("/account/events");
+    } catch (error) {
+      // The form response is already safely stored. Do not turn an auxiliary
+      // event-sync failure into a failed registration.
+      registrationError("sync-event-registration", formId, error);
     }
-    if (events.length) revalidatePath("/account/events");
 
   }
 
