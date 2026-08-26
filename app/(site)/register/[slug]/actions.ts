@@ -4,7 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { getUserSession } from "@/lib/userAuth";
+import {
+  clearUserSessionCookie,
+  getUserSession,
+  type UserSession,
+} from "@/lib/userAuth";
 import { uploadFile } from "@/lib/upload";
 import { sendRegistrationConfirmationEmail } from "@/lib/email";
 import {
@@ -69,12 +73,40 @@ export async function submitRegistration(
     return { error: "This registration is already full." };
   }
 
-  let session;
+  let session: UserSession | null;
   try {
     session = await getUserSession();
   } catch (error) {
     registrationError("load-session", formId, error);
     return { error: databaseError };
+  }
+
+  // A JWT can outlive the database row it refers to (for example after a
+  // database was replaced or a member was removed). Never pass that stale id
+  // into FormResponse.userId: Postgres correctly rejects it with a foreign-key
+  // error. Treat it as a logged-out visitor for public forms and clear the
+  // cookie so the next request cannot repeat the failure.
+  let staleSession = false;
+  if (session) {
+    try {
+      const member = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { id: true },
+      });
+      if (!member) {
+        await clearUserSessionCookie();
+        session = null;
+        staleSession = true;
+      }
+    } catch (error) {
+      registrationError("validate-session-user", formId, error);
+      return { error: databaseError };
+    }
+  }
+  if (staleSession) {
+    return {
+      error: "Your login session expired. Please reload the page and sign in again.",
+    };
   }
   if (session && !allowsMembers(form.audience)) {
     return { error: "This registration is not open to member accounts." };
