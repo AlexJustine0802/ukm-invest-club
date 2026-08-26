@@ -7,6 +7,7 @@ import {
   DEFAULT_MAX_MB,
   MAX_MB_LIMIT,
   MAX_BRANCH_DEPTH,
+  containsEmailQuestion,
   type FormQuestion,
   type QuestionType,
 } from "@/lib/forms";
@@ -19,16 +20,64 @@ import {
 export default function FormQuestionsEditor({
   name,
   initial,
+  emailSubject,
+  emailBody,
 }: {
   name: string;
   initial: FormQuestion[];
+  emailSubject?: string | null;
+  emailBody?: string | null;
 }) {
   const [questions, setQuestions] = useState<FormQuestion[]>(initial);
+  const hasEmailQuestion = containsEmailQuestion(questions);
 
   return (
     <div className="space-y-3">
       <input type="hidden" name={name} value={JSON.stringify(questions)} />
       <QuestionList questions={questions} onChange={setQuestions} depth={0} />
+      {hasEmailQuestion && (
+        <div className="card space-y-5 border-primary/20 bg-blue-50/30 p-5">
+          <div>
+            <p className="font-bold text-navy">Email notification</p>
+            <p className="mt-1 text-sm text-slate-500">
+              An email will be sent to every valid address entered in the Email
+              question above. This works for both member and public
+              submissions. Leave either field empty to disable the email.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="emailSubject" className="label">
+              Email subject <span className="text-slate-400">(optional)</span>
+            </label>
+            <input
+              id="emailSubject"
+              name="emailSubject"
+              defaultValue={emailSubject ?? ""}
+              placeholder="Registration received: {{form}}"
+              className="input"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="emailBody" className="label">
+              Email content <span className="text-slate-400">(optional)</span>
+            </label>
+            <textarea
+              id="emailBody"
+              name="emailBody"
+              rows={8}
+              defaultValue={emailBody ?? ""}
+              placeholder={"Hi {{name}},\n\nWe received your registration for {{form}}.\n\nThank you."}
+              className="input"
+            />
+            <p className="mt-1 text-xs text-slate-500">
+              Available placeholders: <code>{"{{name}}"}</code>,{" "}
+              <code>{"{{email}}"}</code>, and <code>{"{{form}}"}</code>.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -214,6 +263,7 @@ function QuestionRow({
         <div className="min-w-0 flex-1 space-y-3">
           <input
             value={q.label}
+            readOnly={q.type === "EMAIL"}
             onChange={(e) => patch({ label: e.target.value })}
             placeholder="Question, e.g. Why do you want to join?"
             className="input"
@@ -229,7 +279,10 @@ function QuestionRow({
                 // where nothing will ever show them.
                 patch({
                   type,
+                  label: type === "EMAIL" ? "Email" : q.label,
                   branches: type === "DROPDOWN" ? q.branches : undefined,
+                  options: CHOICE_TYPES.includes(type) ? q.options : undefined,
+                  maxMb: type === "FILE" ? q.maxMb : undefined,
                 });
               }}
               className="input"

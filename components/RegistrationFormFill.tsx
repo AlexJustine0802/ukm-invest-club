@@ -86,6 +86,16 @@ function Question({
             />
           )}
 
+          {q.type === "EMAIL" && (
+            <input
+              id={key}
+              name={key}
+              type="email"
+              required={required}
+              className={fieldClass}
+            />
+          )}
+
           {q.type === "DROPDOWN" && (
             <select
               id={key}

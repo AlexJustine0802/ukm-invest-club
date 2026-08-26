@@ -12,6 +12,7 @@ export const QUESTION_TYPES = [
   { id: "CHECKBOX", label: "Checkboxes (pick many)" },
   { id: "DROPDOWN", label: "Dropdown" },
   { id: "DATE", label: "Date" },
+  { id: "EMAIL", label: "Email" },
   { id: "FILE", label: "File or picture upload" },
   // Not a question: everything after it is the next section of the form.
   { id: "PAGE_BREAK", label: "── Section break ──" },
@@ -127,7 +128,7 @@ export function parseQuestions(
     out.push({
       id: q.id,
       type: q.type,
-      label: q.label,
+      label: q.type === "EMAIL" ? "Email" : q.label,
       helpText: typeof q.helpText === "string" ? q.helpText : undefined,
       required: q.required !== false,
       // A blank option is one the admin started and never named: it would
@@ -146,6 +147,13 @@ export function parseQuestions(
     });
   }
   return out;
+}
+
+/** Whether this question or any dropdown branch contains an email field. */
+export function containsEmailQuestion(questions: FormQuestion[]): boolean {
+  return questions.some(
+    (q) => q.type === "EMAIL" || Object.values(q.branches ?? {}).some(containsEmailQuestion),
+  );
 }
 
 /**

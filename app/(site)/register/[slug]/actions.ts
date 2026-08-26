@@ -49,8 +49,6 @@ export async function submitRegistration(
   }
 
   const session = await getUserSession();
-  const submittedFromMemberArea =
-    formData.get("basePath") === "/account/register";
   if (session && !allowsMembers(form.audience)) {
     return { error: "This registration is not open to member accounts." };
   }
@@ -136,6 +134,9 @@ export async function submitRegistration(
       if (CHOICE_TYPES.includes(q.type) && !(q.options ?? []).includes(value)) {
         return { error: `“${q.label}”: pick one of the given options.` };
       }
+      if (q.type === "EMAIL" && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+        return { error: `“${q.label}” must be a valid email address.` };
+      }
       answers[q.id] = value;
 
       // Only the branch belonging to the answer given is asked for.
@@ -179,31 +180,41 @@ export async function submitRegistration(
     }
     if (events.length) revalidatePath("/account/events");
 
-    // Only submissions from the member area may trigger email. A member who
-    // happens to be signed in but submits through the public URL is treated as
-    // a public-web submission and does not receive this confirmation.
-    const emailSubject = form.confirmationEmailSubject?.trim();
-    const emailBody = form.confirmationEmailBody?.trim();
-    if (submittedFromMemberArea && emailSubject && emailBody) {
-      const member = await prisma.user.findUnique({
-        where: { id: session.userId },
-        select: { name: true, email: true, emailVerified: true },
-      });
+  }
 
-      if (member?.emailVerified && member.email) {
-        try {
-          await sendRegistrationConfirmationEmail({
-            to: member.email,
-            recipientName: member.name,
-            formTitle: form.title,
-            subject: emailSubject,
-            body: emailBody,
-          });
-        } catch (error) {
-          // The registration is already saved. Do not make a member submit
-          // twice because an external email provider is temporarily down.
-          console.error("[registration] confirmation email failed", error);
-        }
+  // Email questions are the source of truth for notification recipients. This
+  // runs for both public and member submissions, and supports email questions
+  // inside dropdown branches as well.
+  const recipientEmails = new Set<string>();
+  const collectEmailQuestions = (list: FormQuestion[]) => {
+    for (const q of list) {
+      if (q.type === "EMAIL") {
+        const answer = answers[q.id];
+        if (typeof answer === "string") recipientEmails.add(answer.toLowerCase());
+      }
+      for (const branch of Object.values(q.branches ?? {})) {
+        collectEmailQuestions(branch);
+      }
+    }
+  };
+  collectEmailQuestions(questions);
+
+  const emailSubject = form.emailSubject?.trim();
+  const emailBody = form.emailBody?.trim();
+  if (emailSubject && emailBody && recipientEmails.size > 0) {
+    for (const email of recipientEmails) {
+      try {
+        await sendRegistrationConfirmationEmail({
+          to: email,
+          recipientName: session?.email === email ? "Member" : guestName ?? "Participant",
+          formTitle: form.title,
+          subject: emailSubject,
+          body: emailBody,
+        });
+      } catch (error) {
+        // The registration is already saved. Do not make a user submit twice
+        // because an external email provider is temporarily unavailable.
+        console.error("[registration] confirmation email failed", error);
       }
     }
   }
