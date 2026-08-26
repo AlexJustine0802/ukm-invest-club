@@ -47,12 +47,14 @@ export default function TopBarMenus({
   name,
   initial,
   role,
+  photo,
   notifications,
   showProfile = true,
 }: {
   name: string;
   initial: string;
   role: string;
+  photo: string | null;
   notifications: TopBarNotification[];
   /** Off in the mobile nav bar  the profile lives inside the drawer there. */
   showProfile?: boolean;
@@ -247,8 +249,13 @@ export default function TopBarMenus({
           aria-expanded={open === "profile"}
           className="flex items-center gap-2 rounded-full hover:opacity-90"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-            {initial}
+          <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary text-sm font-bold text-white">
+            {photo ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photo} alt="" className="h-full w-full object-cover" />
+            ) : (
+              initial
+            )}
           </span>
           <motion.span
             animate={{ rotate: open === "profile" ? 180 : 0 }}
@@ -268,8 +275,13 @@ export default function TopBarMenus({
             >
               {/* Head */}
               <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-white">
-                  {initial}
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-base font-bold text-white">
+                  {photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={photo} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    initial
+                  )}
                 </span>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-bold text-navy">{name}</p>

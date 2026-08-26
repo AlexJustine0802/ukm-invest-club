@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import TopBarMenus from "./TopBarMenus";
 import TopBarSearch from "./TopBarSearch";
 import { getTopBarNotifications } from "@/lib/notifications";
+import { getCurrentMember } from "@/lib/currentUser";
 
 export default async function AccountTopBar({
   title,
@@ -22,6 +23,7 @@ export default async function AccountTopBar({
   role: string;
 }) {
   const notifications = await getTopBarNotifications();
+  const member = await getCurrentMember();
 
   return (
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -46,6 +48,7 @@ export default async function AccountTopBar({
             name={name}
             initial={initial}
             role={role}
+            photo={member?.photo ?? null}
             notifications={notifications}
           />
         </div>

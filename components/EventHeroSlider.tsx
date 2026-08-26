@@ -98,7 +98,7 @@ export default function EventHeroSlider({
             </Link>
           </div>
 
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border-4 border-white/90 bg-navy/60 shadow-2xl">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-white/70 bg-navy/60 shadow-2xl">
           <Image
             src={slide.image}
             alt={slide.title}

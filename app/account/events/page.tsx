@@ -262,7 +262,7 @@ export default async function EventsPage({
                       src={e.coverImage}
                       alt={e.title}
                       fill
-                      className="object-cover"
+                      className="object-contain object-center"
                       sizes="(min-width: 1024px) 256px, 100vw"
                     />
                   ) : (

@@ -21,7 +21,7 @@ export default async function MemberShell({
   user,
   children,
 }: {
-  user: { name: string; role: string };
+  user: { name: string; role: string; photo: string | null };
   children: React.ReactNode;
 }) {
   const notifications = await getTopBarNotifications();
@@ -48,12 +48,18 @@ export default async function MemberShell({
             name={user.name}
             initial={initial}
             role={user.role}
+            photo={user.photo}
             notifications={notifications}
             showProfile={false}
           />
         }
         profile={
-          <DrawerProfile name={user.name} initial={initial} role={user.role} />
+          <DrawerProfile
+            name={user.name}
+            initial={initial}
+            role={user.role}
+            photo={user.photo}
+          />
         }
       />
       <div className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">

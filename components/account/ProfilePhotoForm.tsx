@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFormStatus } from "react-dom";
 import { AlertCircle, Camera, Check, Trash2 } from "lucide-react";
 import {
@@ -57,8 +58,13 @@ export default function ProfilePhotoForm({
     updateMyPhoto,
     {},
   );
+  const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
+
+  useEffect(() => {
+    if (state.saved) router.refresh();
+  }, [router, state.saved]);
 
   const shown = preview ?? photo;
 

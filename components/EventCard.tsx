@@ -23,7 +23,7 @@ export default function EventCard({ event }: EventCardProps) {
             src={event.coverImage}
             alt={event.title}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-contain object-center"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         ) : (

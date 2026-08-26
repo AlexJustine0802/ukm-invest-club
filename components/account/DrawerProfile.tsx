@@ -17,16 +17,23 @@ export default function DrawerProfile({
   name,
   initial,
   role,
+  photo,
 }: {
   name: string;
   initial: string;
   role: string;
+  photo: string | null;
 }) {
   return (
     <div className="mt-3 border-t border-slate-100 pt-3">
       <div className="flex items-center gap-3 px-3 py-2">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
-          {initial}
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-sm font-bold text-white">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photo} alt="" className="h-full w-full object-cover" />
+          ) : (
+            initial
+          )}
         </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold text-navy">{name}</p>

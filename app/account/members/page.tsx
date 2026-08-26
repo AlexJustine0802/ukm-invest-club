@@ -35,6 +35,8 @@ export default async function MembersPage({
       id: true,
       name: true,
       email: true,
+      photo: true,
+      showPhoto: true,
       role: true,
       division: true,
       createdAt: true,
@@ -131,9 +133,18 @@ export default async function MembersPage({
               >
                 <div className="flex items-center gap-3">
                   <span
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-lg font-bold ${palette.badge}`}
+                    className={`flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full text-lg font-bold ${palette.badge}`}
                   >
-                    {m.name.charAt(0).toUpperCase()}
+                    {m.showPhoto && m.photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={m.photo}
+                        alt={m.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      m.name.charAt(0).toUpperCase()
+                    )}
                   </span>
                   <div className="min-w-0 flex-1">
                     {/* truncate belongs on the text itself  on the flex row it

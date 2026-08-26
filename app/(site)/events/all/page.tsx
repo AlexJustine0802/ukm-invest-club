@@ -209,7 +209,7 @@ export default async function AllEventsPage({
                     src={event.coverImage || "/images/research-seminar.png"}
                     alt={event.title}
                     fill
-                    className="object-cover"
+                    className="object-contain object-center"
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                   />
                 </div>
