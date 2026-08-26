@@ -249,6 +249,8 @@ model RegistrationForm {
   opensAt   DateTime?
   closesAt  DateTime?
   capacity  Int? // null = unlimited
+  confirmationEmailSubject String?
+  confirmationEmailBody    String? @db.Text
   published Boolean   @default(true)
   order     Int       @default(0)
   icon      String? // key from lib/uiIcons

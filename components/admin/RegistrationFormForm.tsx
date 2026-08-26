@@ -28,6 +28,8 @@ interface RegistrationFormFormProps {
     opensAt: Date | null;
     closesAt: Date | null;
     capacity: number | null;
+    confirmationEmailSubject: string | null;
+    confirmationEmailBody: string | null;
     published: boolean;
     order: number;
     icon: string | null;
@@ -348,6 +350,48 @@ export default function RegistrationFormForm({
             </span>
           </span>
         </label>
+      </div>
+
+      <div className="card space-y-5 p-5">
+        <div>
+          <p className="font-bold text-navy">Member confirmation email</p>
+          <p className="mt-1 text-sm text-slate-500">
+            Optional. This email is sent only after a verified member submits
+            this form while signed in. Public submissions do not receive it.
+            Leave either field empty to disable it.
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="confirmationEmailSubject" className="label">
+            Email subject <span className="text-slate-400">(optional)</span>
+          </label>
+          <input
+            id="confirmationEmailSubject"
+            name="confirmationEmailSubject"
+            defaultValue={form?.confirmationEmailSubject ?? ""}
+            placeholder="Registration received: {{form}}"
+            className="input"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="confirmationEmailBody" className="label">
+            Email content <span className="text-slate-400">(optional)</span>
+          </label>
+          <textarea
+            id="confirmationEmailBody"
+            name="confirmationEmailBody"
+            rows={8}
+            defaultValue={form?.confirmationEmailBody ?? ""}
+            placeholder={"Hi {{name}},\n\nWe received your registration for {{form}}.\n\nThank you."}
+            className="input"
+          />
+          <p className="mt-1 text-xs text-slate-500">
+            Available placeholders: <code>{"{{name}}"}</code>,{" "}
+            <code>{"{{email}}"}</code>, and <code>{"{{form}}"}</code>.
+          </p>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

@@ -46,6 +46,8 @@ function dataFrom(formData: FormData) {
   const opensAt = str("opensAt");
   const closesAt = str("closesAt");
   const capacity = str("capacity");
+  const confirmationEmailSubject = str("confirmationEmailSubject");
+  const confirmationEmailBody = str("confirmationEmailBody");
 
   // The builder posts its state as JSON; parseQuestions drops anything malformed.
   let questions: unknown = [];
@@ -77,6 +79,8 @@ function dataFrom(formData: FormData) {
     opensAt: opensAt ? parseWallClockDateTime(opensAt) : null,
     closesAt: closesAt ? parseWallClockDateTime(closesAt) : null,
     capacity: capacity ? Number(capacity) || null : null,
+    confirmationEmailSubject,
+    confirmationEmailBody,
     published: formData.get("published") === "on",
     ...styleFor(isRecruitment, Boolean(formData.get("showOnEvents"))),
   };

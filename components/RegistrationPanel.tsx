@@ -13,7 +13,7 @@ import {
   allowsGuests,
   allowsMembers,
 } from "@/lib/forms";
-import { formatWallClockDateTime } from "@/lib/utils";
+import { formatDateTime, formatWallClockDateTime } from "@/lib/utils";
 
 /**
  * One registration form, ready to fill in.

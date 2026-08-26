@@ -110,6 +110,58 @@ export async function sendAuthEmail(
   }
 }
 
+export interface RegistrationConfirmationEmail {
+  to: string;
+  recipientName: string;
+  formTitle: string;
+  subject: string;
+  body: string;
+}
+
+/**
+ * Send the confirmation configured on a registration form. The caller is
+ * responsible for ensuring the recipient is a verified member; this helper
+ * only handles delivery and placeholder rendering.
+ */
+export async function sendRegistrationConfirmationEmail(
+  message: RegistrationConfirmationEmail,
+): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = senderAddress();
+  const subject = renderRegistrationTemplate(message.subject, message);
+  const body = renderRegistrationTemplate(message.body, message);
+
+  if (!apiKey) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("RESEND_API_KEY is not configured in production.");
+    }
+    console.log(`[registration] Resend not configured; email for ${message.to}:`);
+    console.log(JSON.stringify({ subject, body }, null, 2));
+    return;
+  }
+
+  const resend = new Resend(apiKey);
+  const { error } = await resend.emails.send({
+    from,
+    to: message.to,
+    subject,
+    text: body,
+    html: `<div style="white-space: pre-wrap; font-family: Arial, sans-serif;">${escapeHtml(body)}</div>`,
+  });
+
+  if (error) throw new Error(`Failed to send registration email: ${error.message}`);
+}
+
+function renderRegistrationTemplate(
+  value: string,
+  message: RegistrationConfirmationEmail,
+): string {
+  return value
+    .replace(/\{\{\s*name\s*\}\}/gi, message.recipientName)
+    .replace(/\{\{\s*email\s*\}\}/gi, message.to)
+    .replace(/\{\{\s*form\s*\}\}/gi, message.formTitle);
+}
+
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")

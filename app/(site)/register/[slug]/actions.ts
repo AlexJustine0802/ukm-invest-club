@@ -6,6 +6,7 @@ import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
 import { uploadFile } from "@/lib/upload";
+import { sendRegistrationConfirmationEmail } from "@/lib/email";
 import {
   parseQuestions,
   formStatus,
@@ -48,6 +49,8 @@ export async function submitRegistration(
   }
 
   const session = await getUserSession();
+  const submittedFromMemberArea =
+    formData.get("basePath") === "/account/register";
   if (session && !allowsMembers(form.audience)) {
     return { error: "This registration is not open to member accounts." };
   }
@@ -175,6 +178,34 @@ export async function submitRegistration(
         });
     }
     if (events.length) revalidatePath("/account/events");
+
+    // Only submissions from the member area may trigger email. A member who
+    // happens to be signed in but submits through the public URL is treated as
+    // a public-web submission and does not receive this confirmation.
+    const emailSubject = form.confirmationEmailSubject?.trim();
+    const emailBody = form.confirmationEmailBody?.trim();
+    if (submittedFromMemberArea && emailSubject && emailBody) {
+      const member = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { name: true, email: true, emailVerified: true },
+      });
+
+      if (member?.emailVerified && member.email) {
+        try {
+          await sendRegistrationConfirmationEmail({
+            to: member.email,
+            recipientName: member.name,
+            formTitle: form.title,
+            subject: emailSubject,
+            body: emailBody,
+          });
+        } catch (error) {
+          // The registration is already saved. Do not make a member submit
+          // twice because an external email provider is temporarily down.
+          console.error("[registration] confirmation email failed", error);
+        }
+      }
+    }
   }
 
   // Members fill the form inside the member area; sending them back to the
