@@ -199,44 +199,47 @@ function TypeBadge({ type }: { type: string }) {
 
 function UpcomingCard({ event }: { event: EventDisplay }) {
   return (
-    <article className="relative min-h-[285px] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-      <Image
-        src={event.image}
-        alt=""
-        fill
-        sizes="(max-width: 1024px) 100vw, 360px"
-        className="object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-white via-white/92 to-white/10" />
-      <div className="relative flex h-full gap-4 p-5">
-        <DateBadge event={event} />
-        <div className="min-w-0 pr-3">
-          <TypeBadge type={event.type} />
-          <h3 className="mt-3 text-base font-extrabold leading-6 text-navy">
-            {event.title}
-          </h3>
-          <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">
-            {event.description}
-          </p>
-          <div className="mt-6 space-y-2 text-xs font-semibold text-slate-600">
-            <p className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-navy" />
-              {timeRange(event.date, event.endDate)}
-            </p>
-            <p className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-navy" />
-              {event.location}
-            </p>
-          </div>
-          {/* Always the detail page: what the event is comes before signing
-              up for it, and the sign-up button lives at the bottom there. */}
-          <Link
-            href={eventHref(event)}
-            className="btn-primary mt-6 px-5 py-2 text-xs"
-          >
-            View details
-          </Link>
+    <article className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+      <div className="relative h-44 overflow-hidden bg-navy sm:h-52 lg:h-56">
+        <Image
+          src={event.image}
+          alt={event.title}
+          fill
+          sizes="(max-width: 1024px) 100vw, 360px"
+          className="object-cover object-center transition-transform duration-300 hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+        <div className="absolute bottom-4 left-4">
+          <DateBadge event={event} />
         </div>
+      </div>
+
+      <div className="p-5">
+        <TypeBadge type={event.type} />
+        <h3 className="mt-3 text-base font-extrabold leading-6 text-navy">
+          {event.title}
+        </h3>
+        <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">
+          {event.description}
+        </p>
+        <div className="mt-5 space-y-2 text-xs font-semibold text-slate-600">
+          <p className="flex items-center gap-2">
+            <Clock className="h-4 w-4 shrink-0 text-navy" />
+            {timeRange(event.date, event.endDate)}
+          </p>
+          <p className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 shrink-0 text-navy" />
+            {event.location}
+          </p>
+        </div>
+        {/* Always the detail page: what the event is comes before signing
+            up for it, and the sign-up button lives at the bottom there. */}
+        <Link
+          href={eventHref(event)}
+          className="btn-primary mt-5 inline-flex px-5 py-2 text-xs"
+        >
+          View details
+        </Link>
       </div>
     </article>
   );
