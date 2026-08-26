@@ -204,13 +204,10 @@ function expand(
 export default function RegistrationFormFill({
   formId,
   questions,
-  askGuestDetails,
   basePath,
 }: {
   formId: string;
   questions: FormQuestion[];
-  /** True when nobody is signed in  we need a name and email on the row. */
-  askGuestDetails: boolean;
   /** Which area is showing the form; the submit returns to the same one. */
   basePath: "/register" | "/account/register";
 }) {
@@ -259,45 +256,6 @@ export default function RegistrationFormFill({
         <p className="text-sm font-semibold text-slate-500">
           Section {stepIndex + 1} of {sections.length}
         </p>
-      )}
-
-      {askGuestDetails && (
-        <div className={stepIndex === 0 ? undefined : "hidden"}>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5">
-            <p className="font-semibold text-navy">Your details</p>
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <div>
-                <label
-                  htmlFor="guestName"
-                  className="text-sm font-medium text-slate-600"
-                >
-                  Full name <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  id="guestName"
-                  name="guestName"
-                  required={stepIndex === 0}
-                  className={`mt-1 ${fieldClass}`}
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="guestEmail"
-                  className="text-sm font-medium text-slate-600"
-                >
-                  Email <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  id="guestEmail"
-                  name="guestEmail"
-                  type="email"
-                  required={stepIndex === 0}
-                  className={`mt-1 ${fieldClass}`}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Every section stays mounted: leaving one must not throw away what was

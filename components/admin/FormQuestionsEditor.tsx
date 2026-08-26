@@ -71,10 +71,6 @@ export default function FormQuestionsEditor({
               placeholder={"Hi {{name}},\n\nWe received your registration for {{form}}.\n\nThank you."}
               className="input"
             />
-            <p className="mt-1 text-xs text-slate-500">
-              Available placeholders: <code>{"{{name}}"}</code>,{" "}
-              <code>{"{{email}}"}</code>, and <code>{"{{form}}"}</code>.
-            </p>
           </div>
         </div>
       )}

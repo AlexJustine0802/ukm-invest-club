@@ -105,8 +105,8 @@ export async function submitRegistration(
   }
   if (staleSession) {
     // The cookie has already been removed. Reload the same form so a public
-    // form immediately shows its guest fields; a members-only form will show
-    // its normal sign-in prompt instead of an error banner.
+    // form can be submitted normally; a members-only form will show its
+    // normal sign-in prompt instead of an error banner.
     const basePath =
       formData.get("basePath") === "/account/register"
         ? "/account/register"
@@ -120,37 +120,10 @@ export async function submitRegistration(
     return { error: "Please sign in to your member account to register." };
   }
 
-  // Guests identify themselves; members are already identified.
+  // The email question is the only contact field for both public and member
+  // forms. Public submissions no longer have a separate guest-details block.
   let guestName: string | null = null;
   let guestEmail: string | null = null;
-  if (!session) {
-    guestName = ((formData.get("guestName") as string) ?? "").trim() || null;
-    guestEmail = ((formData.get("guestEmail") as string) ?? "").trim() || null;
-    if (!guestName || !guestEmail) {
-      return { error: "Please fill in your name and email." };
-    }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(guestEmail)) {
-      return { error: "Please enter a valid email address." };
-    }
-  }
-
-  // One response per person unless the admin allowed repeats.
-  if (!form.multipleResponses) {
-    let existing;
-    try {
-      existing = await prisma.formResponse.findFirst({
-        where: session
-          ? { formId, userId: session.userId }
-          : { formId, guestEmail },
-        select: { id: true },
-      });
-    } catch (error) {
-      registrationError("check-duplicate", formId, error);
-      return { error: databaseError };
-    }
-    if (existing) return { error: "You have already submitted this form." };
-  }
-
   const questions = parseQuestions(form.questions);
   const answers: FormAnswers = {};
 
@@ -222,6 +195,42 @@ export async function submitRegistration(
   const invalid = await collect(questions);
   if (invalid) return invalid;
 
+  // The first Email question identifies a public responder for duplicate
+  // checks and for the response row. All Email questions are still sent the
+  // configured confirmation below.
+  const recipientEmails = new Set<string>();
+  const collectEmailQuestions = (list: FormQuestion[]) => {
+    for (const q of list) {
+      if (q.type === "EMAIL") {
+        const answer = answers[q.id];
+        if (typeof answer === "string") recipientEmails.add(answer.toLowerCase());
+      }
+      for (const branch of Object.values(q.branches ?? {})) {
+        collectEmailQuestions(branch);
+      }
+    }
+  };
+  collectEmailQuestions(questions);
+  guestEmail = [...recipientEmails][0] ?? null;
+
+  // One response per person unless the admin allowed repeats. Public forms
+  // can only use this check when they contain an Email question.
+  if (!form.multipleResponses && (session || guestEmail)) {
+    let existing;
+    try {
+      existing = await prisma.formResponse.findFirst({
+        where: session
+          ? { formId, userId: session.userId }
+          : { formId, guestEmail },
+        select: { id: true },
+      });
+    } catch (error) {
+      registrationError("check-duplicate", formId, error);
+      return { error: databaseError };
+    }
+    if (existing) return { error: "You have already submitted this form." };
+  }
+
   try {
     await prisma.formResponse.create({
       data: {
@@ -267,20 +276,6 @@ export async function submitRegistration(
   // Email questions are the source of truth for notification recipients. This
   // runs for both public and member submissions, and supports email questions
   // inside dropdown branches as well.
-  const recipientEmails = new Set<string>();
-  const collectEmailQuestions = (list: FormQuestion[]) => {
-    for (const q of list) {
-      if (q.type === "EMAIL") {
-        const answer = answers[q.id];
-        if (typeof answer === "string") recipientEmails.add(answer.toLowerCase());
-      }
-      for (const branch of Object.values(q.branches ?? {})) {
-        collectEmailQuestions(branch);
-      }
-    }
-  };
-  collectEmailQuestions(questions);
-
   const emailSubject = form.emailSubject?.trim();
   const emailBody = form.emailBody?.trim();
   if (emailSubject && emailBody && recipientEmails.size > 0) {

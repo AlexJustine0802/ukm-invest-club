@@ -238,7 +238,6 @@ export default async function RegistrationPanel({
         <RegistrationFormFill
           formId={form.id}
           questions={questions}
-          askGuestDetails={!session}
           basePath={basePath}
         />
       </div>
