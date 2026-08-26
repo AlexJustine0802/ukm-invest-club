@@ -51,57 +51,59 @@ export default function EventHeroSlider({
 
   return (
     <div
-      className="relative mx-auto w-full max-w-[600px] lg:ml-auto lg:mr-0"
+      className="relative mx-auto w-full max-w-[540px] lg:ml-auto lg:mr-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
-        <div className="relative h-[270px] sm:h-[330px] lg:h-[360px]">
+      <div className="relative h-[330px] overflow-hidden rounded-lg bg-gradient-to-br from-[#07152e] via-[#102e68] to-[#1555c8] shadow-xl sm:h-[360px]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(96,165,250,0.28),transparent_36%)]" />
+
+        <div className="relative z-10 h-full p-5 pb-36 sm:p-7 sm:pr-56 sm:pb-7">
+          <span className="inline-flex rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
+            {slide.badge ?? "Next Event"}
+          </span>
+          <h2 className="mt-3 max-w-sm text-xl font-bold leading-6 text-white sm:text-2xl sm:leading-7">
+            {slide.title}
+          </h2>
+          {(slide.dateLabel || slide.timeLabel || slide.location) && (
+            <div className="mt-4 space-y-2 text-sm font-semibold text-white/85">
+              {slide.dateLabel && (
+                <p className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 shrink-0 text-blue-200" />
+                  {slide.dateLabel}
+                </p>
+              )}
+              {slide.timeLabel && (
+                <p className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 shrink-0 text-blue-200" />
+                  {slide.timeLabel}
+                </p>
+              )}
+              {slide.location && (
+                <p className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 shrink-0 text-blue-200" />
+                  {slide.location}
+                </p>
+              )}
+            </div>
+          )}
+          <Link
+            href={slide.href}
+            aria-label={`Open ${slide.title}`}
+            className="absolute bottom-5 right-5 flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-transform hover:scale-105 sm:bottom-7 sm:right-7"
+          >
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+        </div>
+
+        <div className="absolute bottom-4 left-4 h-28 w-48 overflow-hidden rounded-lg border-4 border-white bg-navy shadow-xl sm:bottom-5 sm:left-5 sm:h-32 sm:w-56">
           <Image
             src={slide.image}
-            alt=""
+            alt={slide.title}
             fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 650px"
+            sizes="(max-width: 640px) 192px, 224px"
             className="object-contain object-center"
           />
-          <div className="absolute inset-x-3 bottom-3 max-w-[390px] rounded-lg bg-white p-4 pr-14 shadow-xl sm:inset-x-5 sm:bottom-5 sm:p-5 sm:pr-16">
-            <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
-              {slide.badge ?? "Next Event"}
-            </span>
-            <h2 className="mt-2 text-base font-bold leading-5 text-navy sm:mt-3 sm:text-lg sm:leading-6">
-              {slide.title}
-            </h2>
-            {(slide.dateLabel || slide.timeLabel || slide.location) && (
-              <div className="mt-3 space-y-1.5 text-sm font-semibold text-slate-600 sm:mt-4 sm:space-y-2">
-                {slide.dateLabel && (
-                  <p className="flex items-center gap-2">
-                    <CalendarDays className="h-4 w-4 text-primary" />
-                    {slide.dateLabel}
-                  </p>
-                )}
-                {slide.timeLabel && (
-                  <p className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-primary" />
-                    {slide.timeLabel}
-                  </p>
-                )}
-                {slide.location && (
-                  <p className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    {slide.location}
-                  </p>
-                )}
-              </div>
-            )}
-            <Link
-              href={slide.href}
-              aria-label={`Open ${slide.title}`}
-              className="absolute bottom-6 right-6 flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-lg ring-1 ring-primary-light transition-transform hover:scale-105"
-            >
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
         </div>
       </div>
       {slides.length > 1 && (
