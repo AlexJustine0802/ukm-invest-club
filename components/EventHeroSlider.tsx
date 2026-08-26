@@ -51,29 +51,29 @@ export default function EventHeroSlider({
 
   return (
     <div
-      className="relative"
+      className="relative mx-auto w-full max-w-[600px] lg:ml-auto lg:mr-0"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
       <div className="relative overflow-hidden rounded-lg bg-navy shadow-xl">
-        <div className="relative h-[300px] sm:h-[390px]">
+        <div className="relative h-[270px] sm:h-[330px] lg:h-[360px]">
           <Image
             src={slide.image}
             alt=""
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 650px"
-            className="object-cover object-center"
+            className="object-contain object-center"
           />
-          <div className="absolute inset-x-3 bottom-3 max-w-none rounded-lg bg-white p-4 pr-16 shadow-xl sm:inset-x-7 sm:bottom-7 sm:max-w-sm sm:p-6 sm:pr-16">
+          <div className="absolute inset-x-3 bottom-3 max-w-[390px] rounded-lg bg-white p-4 pr-14 shadow-xl sm:inset-x-5 sm:bottom-5 sm:p-5 sm:pr-16">
             <span className="w-fit rounded-md bg-blue-100 px-2 py-0.5 text-[11px] font-bold uppercase text-primary">
               {slide.badge ?? "Next Event"}
             </span>
-            <h2 className="mt-3 text-base font-bold leading-5 text-navy sm:text-lg sm:leading-6">
+            <h2 className="mt-2 text-base font-bold leading-5 text-navy sm:mt-3 sm:text-lg sm:leading-6">
               {slide.title}
             </h2>
             {(slide.dateLabel || slide.timeLabel || slide.location) && (
-              <div className="mt-3 space-y-2 text-sm font-semibold text-slate-600 sm:mt-4">
+              <div className="mt-3 space-y-1.5 text-sm font-semibold text-slate-600 sm:mt-4 sm:space-y-2">
                 {slide.dateLabel && (
                   <p className="flex items-center gap-2">
                     <CalendarDays className="h-4 w-4 text-primary" />
