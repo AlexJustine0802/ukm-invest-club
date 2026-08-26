@@ -104,9 +104,14 @@ export async function submitRegistration(
     }
   }
   if (staleSession) {
-    return {
-      error: "Your login session expired. Please reload the page and sign in again.",
-    };
+    // The cookie has already been removed. Reload the same form so a public
+    // form immediately shows its guest fields; a members-only form will show
+    // its normal sign-in prompt instead of an error banner.
+    const basePath =
+      formData.get("basePath") === "/account/register"
+        ? "/account/register"
+        : "/register";
+    redirect(`${basePath}/${form.slug}`);
   }
   if (session && !allowsMembers(form.audience)) {
     return { error: "This registration is not open to member accounts." };
