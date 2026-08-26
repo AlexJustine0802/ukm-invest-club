@@ -29,12 +29,39 @@ export async function buildSheet(
     width: c.width ?? Math.max(14, c.header.length + 2),
   }));
 
-  sheet.getRow(1).font = { bold: true };
-  sheet.getRow(1).alignment = { vertical: "middle" };
+  const header = sheet.getRow(1);
+  header.height = 28;
+  header.font = { bold: true, color: { argb: "FFFFFFFF" } };
+  header.alignment = { vertical: "middle", horizontal: "left" };
+  header.fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FF144DC8" },
+  };
+  header.eachCell((cell) => {
+    cell.border = {
+      bottom: { style: "medium", color: { argb: "FF0F3B9D" } },
+    };
+  });
   // The header stays put while scrolling a long directory.
   sheet.views = [{ state: "frozen", ySplit: 1 }];
 
-  for (const row of rows) sheet.addRow(row);
+  for (const [index, row] of rows.entries()) {
+    const added = sheet.addRow(row);
+    added.alignment = { vertical: "top", wrapText: true };
+    added.eachCell((cell) => {
+      cell.border = {
+        bottom: { style: "hair", color: { argb: "FFE2E8F0" } },
+      };
+      if (index % 2 === 1) {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF8FAFC" },
+        };
+      }
+    });
+  }
 
   // Click-to-filter on every column, which is what makes a directory usable.
   sheet.autoFilter = {
