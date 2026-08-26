@@ -9,7 +9,7 @@ import {
   Users,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { formatDateTime, isUpcoming } from "@/lib/utils";
+import { formatWallClockDateTime, isUpcoming } from "@/lib/utils";
 import { formStatus } from "@/lib/forms";
 import { eventDateLabel, timeRange } from "@/lib/eventStyles";
 import Markdown from "@/components/Markdown";
@@ -180,7 +180,7 @@ export default async function EventDetailPage({ params }: Props) {
                   <p className="font-bold text-navy">Registration opens soon</p>
                   <p className="mt-1 text-sm leading-6 text-slate-500">
                     {form?.opensAt
-                      ? `Opens ${formatDateTime(form.opensAt)}.`
+                      ? `Opens ${formatWallClockDateTime(form.opensAt)} WIB.`
                       : "Check back shortly."}
                   </p>
                   <button
@@ -194,7 +194,9 @@ export default async function EventDetailPage({ params }: Props) {
               ) : formState === "closed" ? (
                 <p className="font-semibold leading-6 text-slate-500">
                   Registration has closed
-                  {form?.closesAt ? ` (${formatDateTime(form.closesAt)})` : ""}.
+                  {form?.closesAt
+                    ? ` (${formatWallClockDateTime(form.closesAt)} WIB)`
+                    : ""}.
                 </p>
               ) : left === 0 ? (
                 <p className="font-semibold text-slate-500">

@@ -3,6 +3,8 @@
 // the single place that knows the format  admin editor, member form, CSV
 // export and validation all read it from here.
 
+import { currentWallClockAsUtc } from "@/lib/wallClock";
+
 export const QUESTION_TYPES = [
   { id: "SHORT_TEXT", label: "Short answer" },
   { id: "LONG_TEXT", label: "Long answer / essay" },
@@ -210,11 +212,12 @@ export function formStatus(
   },
   now: Date = new Date(),
 ): "open" | "closed" | "not-yet" | "hidden" {
+  const wallClockNow = currentWallClockAsUtc(now);
   // Registration switched off entirely: not open, and not "opening later".
   if (form.registrationEnabled === false) return "hidden";
   if (!form.published) return "hidden";
-  if (form.opensAt && form.opensAt > now) return "not-yet";
-  if (form.closesAt && form.closesAt < now) return "closed";
+  if (form.opensAt && form.opensAt > wallClockNow) return "not-yet";
+  if (form.closesAt && form.closesAt < wallClockNow) return "closed";
   return "open";
 }
 

@@ -13,7 +13,7 @@ import {
   allowsGuests,
   allowsMembers,
 } from "@/lib/forms";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
 
 /**
  * One registration form, ready to fill in.
@@ -187,16 +187,16 @@ export default async function RegistrationPanel({
     body = notice(
       <CalendarClock className="h-10 w-10 text-slate-300" />,
       "Not open yet",
-      form.opensAt
-        ? `Opens ${formatDateTime(form.opensAt)}.`
+        form.opensAt
+        ? `Opens ${formatWallClockDateTime(form.opensAt)} WIB.`
         : "Check back soon.",
     );
   } else if (status === "closed") {
     body = notice(
       <Lock className="h-10 w-10 text-slate-300" />,
       "Registration closed",
-      form.closesAt
-        ? `Closed on ${formatDateTime(form.closesAt)}.`
+        form.closesAt
+        ? `Closed on ${formatWallClockDateTime(form.closesAt)} WIB.`
         : "This form is no longer accepting responses.",
     );
   } else if (full) {

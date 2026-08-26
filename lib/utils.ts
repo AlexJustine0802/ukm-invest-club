@@ -26,13 +26,26 @@ export function formatDateTime(date: Date | string): string {
   });
 }
 
+/** Format a datetime-local value stored as a UTC wall-clock value in WIB. */
+export function formatWallClockDateTime(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleString("en-US", {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 /** For a datetime-local input value (yyyy-MM-ddTHH:mm). */
 export function toDateTimeLocalValue(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(
+    d.getUTCHours(),
+  )}:${pad(d.getUTCMinutes())}`;
 }
 
 export function isUpcoming(date: Date | string): boolean {

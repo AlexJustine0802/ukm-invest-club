@@ -11,6 +11,7 @@ import { uniqueSlug } from "@/lib/slugs";
 import { parseQuestions, isAudience } from "@/lib/forms";
 import { readEventDetails, syncEventForForm } from "@/lib/eventSync";
 import { resolveImage } from "@/lib/upload";
+import { parseWallClockDateTime } from "@/lib/wallClock";
 
 function revalidateForms(slug?: string) {
   revalidatePath("/admin/registrations");
@@ -73,8 +74,8 @@ function dataFrom(formData: FormData) {
     questions: parseQuestions(questions).filter(
       (q) => q.label.trim() !== "",
     ) as unknown as Prisma.InputJsonValue,
-    opensAt: opensAt ? new Date(opensAt) : null,
-    closesAt: closesAt ? new Date(closesAt) : null,
+    opensAt: opensAt ? parseWallClockDateTime(opensAt) : null,
+    closesAt: closesAt ? parseWallClockDateTime(closesAt) : null,
     capacity: capacity ? Number(capacity) || null : null,
     published: formData.get("published") === "on",
     ...styleFor(isRecruitment, Boolean(formData.get("showOnEvents"))),

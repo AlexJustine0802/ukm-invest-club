@@ -1,4 +1,5 @@
 import type { Prisma } from "@prisma/client";
+import { parseWallClockDateTime } from "@/lib/wallClock";
 
 /**
  * A registration form and its public event are one record split across two
@@ -29,10 +30,7 @@ export interface FormSource {
 }
 
 function parseEventDateTime(value: string): Date {
-  // datetime-local has no timezone suffix. Event fields are stored in the
-  // same canonical timezone used by every event page, rather than whichever
-  // timezone happens to be configured on the server.
-  return new Date(`${value}:00.000Z`);
+  return parseWallClockDateTime(value);
 }
 
 type Db = Prisma.TransactionClient;
