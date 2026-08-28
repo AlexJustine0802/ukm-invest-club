@@ -83,7 +83,7 @@ export default async function EventDetailPage({ params }: Props) {
                   src={event.coverImage}
                   alt={event.title}
                   fill
-                  className="object-cover"
+                  className="object-contain object-center"
                   sizes="(min-width: 1024px) calc(100vw - 440px), 100vw"
                   priority
                 />

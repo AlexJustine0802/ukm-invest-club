@@ -103,7 +103,7 @@ export default async function MemberEventPage({
               src={event.coverImage}
               alt={event.title}
               fill
-              className="object-cover"
+              className="object-contain object-center"
               sizes="(min-width: 1024px) 768px, 100vw"
               priority
             />

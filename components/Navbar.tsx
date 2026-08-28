@@ -23,6 +23,11 @@ export default function Navbar({
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
 
+  // Registration forms are public pages, even when a signed-in member opens
+  // one. Keep the logo in that flow on the public site instead of sending the
+  // member to their dashboard.
+  const logoHref = pathname.startsWith("/register") ? "/" : homeHref;
+
   // Flat and transparent while the page is at the top, solid once it moves.
   // Initialised from the current offset so a reload part-way down the page
   // does not flash the transparent state.
@@ -47,7 +52,7 @@ export default function Navbar({
     >
       <nav className="container-page flex h-16 items-center justify-between">
         <Link
-          href={homeHref}
+          href={logoHref}
           className="group relative left-0 flex shrink-0 items-center text-navy md:-left-12"
         >
           <Image

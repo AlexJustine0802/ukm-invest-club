@@ -321,9 +321,6 @@ export default function RegistrationFormFill({
           </button>
         )}
 
-        <p className="text-xs text-slate-400">
-          Your answers are sent to the Invest Club admin team.
-        </p>
       </div>
     </form>
   );

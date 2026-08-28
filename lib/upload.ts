@@ -16,7 +16,7 @@ export async function uploadImage(file: File): Promise<string> {
 export async function uploadFile(file: File, folder = "uploads"): Promise<string> {
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     throw new Error(
-      "ERRORs",
+      "File upload is not configured (BLOB_READ_WRITE_TOKEN is missing).",
     );
   }
   const ext = file.name.split(".").pop() || "bin";

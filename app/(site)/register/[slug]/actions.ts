@@ -151,8 +151,12 @@ export async function submitRegistration(
         }
         try {
           answers[q.id] = await uploadFile(file, "form-uploads");
-        } catch {
-          return { error: "ERROR" };
+        } catch (error) {
+          registrationError("upload-file", formId, error);
+          return {
+            error:
+              "The file could not be uploaded. Please try again or contact the administrator.",
+          };
         }
         continue;
       }
