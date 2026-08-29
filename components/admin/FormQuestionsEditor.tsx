@@ -80,10 +80,34 @@ export default function FormQuestionsEditor({
 
 function newQuestion(): FormQuestion {
   return {
-    id: `q${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+    id: newQuestionId(),
     type: "SHORT_TEXT",
     label: "",
     required: true,
+  };
+}
+
+function newQuestionId(): string {
+  return `q${Date.now().toString(36)}${Math.random().toString(36).slice(2, 9)}`;
+}
+
+/**
+ * Copy the complete question tree while giving every copied question a new
+ * id. This keeps answers for the original and duplicate completely separate.
+ */
+function duplicateQuestion(question: FormQuestion): FormQuestion {
+  return {
+    ...question,
+    id: newQuestionId(),
+    options: question.options ? [...question.options] : undefined,
+    branches: question.branches
+      ? Object.fromEntries(
+          Object.entries(question.branches).map(([option, questions]) => [
+            option,
+            questions.map(duplicateQuestion),
+          ]),
+        )
+      : undefined,
   };
 }
 
@@ -104,6 +128,15 @@ function QuestionList({
     onChange(questions.map((q) => (q.id === id ? { ...q, ...changes } : q)));
 
   const add = () => onChange([...questions, newQuestion()]);
+
+  const duplicate = (index: number) => {
+    const copy = duplicateQuestion(questions[index]);
+    onChange([
+      ...questions.slice(0, index + 1),
+      copy,
+      ...questions.slice(index + 1),
+    ]);
+  };
 
   const remove = (id: string) => onChange(questions.filter((q) => q.id !== id));
 
@@ -133,6 +166,7 @@ function QuestionList({
           patch={(changes) => patch(q.id, changes)}
           remove={() => remove(q.id)}
           move={(delta) => move(i, delta)}
+          duplicate={() => duplicate(i)}
         />
       ))}
 
@@ -151,6 +185,7 @@ function QuestionRow({
   patch,
   remove,
   move,
+  duplicate,
 }: {
   question: FormQuestion;
   index: number;
@@ -159,6 +194,7 @@ function QuestionRow({
   patch: (changes: Partial<FormQuestion>) => void;
   remove: () => void;
   move: (delta: number) => void;
+  duplicate: () => void;
 }) {
   const options = q.options ?? [];
   const branches = q.branches ?? {};
@@ -245,7 +281,13 @@ function QuestionRow({
             className="input mt-2"
           />
         </div>
-        <RowButtons index={index} total={total} move={move} remove={remove} />
+        <RowButtons
+          index={index}
+          total={total}
+          move={move}
+          remove={remove}
+          duplicate={duplicate}
+        />
       </div>
     );
   }
@@ -380,7 +422,13 @@ function QuestionRow({
               )}
             </div>
 
-            <RowButtons index={index} total={total} move={move} remove={remove} />
+            <RowButtons
+              index={index}
+              total={total}
+              move={move}
+              remove={remove}
+              duplicate={duplicate}
+            />
           </div>
 
           {branchable && branchOn && (
@@ -443,11 +491,13 @@ function RowButtons({
   total,
   move,
   remove,
+  duplicate,
 }: {
   index: number;
   total: number;
   move: (delta: number) => void;
   remove: () => void;
+  duplicate: () => void;
 }) {
   return (
     <div className="flex items-center gap-1">
@@ -473,6 +523,13 @@ function RowButtons({
         className="rounded-lg border border-rose-200 px-2.5 py-1 text-xs font-semibold text-rose-600 hover:bg-rose-50"
       >
         Remove
+      </button>
+      <button
+        type="button"
+        onClick={duplicate}
+        className="rounded-lg border border-primary/30 px-2.5 py-1 text-xs font-semibold text-primary hover:bg-blue-50"
+      >
+        Duplicate
       </button>
     </div>
   );
