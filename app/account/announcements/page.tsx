@@ -7,6 +7,7 @@ import { getCurrentMember } from "@/lib/currentUser";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { getAnnouncements } from "@/lib/announcements";
 import { getUiIcon } from "@/lib/uiIcons";
+import MarkUpdateLink from "@/components/account/MarkUpdateLink";
 
 export const metadata: Metadata = { title: "Announcements" };
 export const dynamic = "force-dynamic";
@@ -142,9 +143,14 @@ export default async function AnnouncementsPage({
             // Announced events / recruitment / career alerts link to the thing
             // they announce; a hand-written notice has nowhere to go.
             return a.href ? (
-              <Link key={a.id} href={a.href} className="block">
+              <MarkUpdateLink
+                key={a.id}
+                href={a.href}
+                notificationKey={a.id}
+                className="block"
+              >
                 {card}
-              </Link>
+              </MarkUpdateLink>
             ) : (
               <div key={a.id}>{card}</div>
             );

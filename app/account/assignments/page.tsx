@@ -17,6 +17,7 @@ import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import TabBar from "@/components/account/TabBar";
 import MarkSeen from "@/components/account/MarkSeen";
+import MarkUpdateLink from "@/components/account/MarkUpdateLink";
 import { getUiIcon } from "@/lib/uiIcons";
 import {
   ASSIGNMENT_TABS,
@@ -243,9 +244,10 @@ export default async function AssignmentsPage({
                       : { text: "Active", cls: "bg-emerald-50 text-emerald-600" };
 
             return (
-              <Link
+              <MarkUpdateLink
                 key={a.id}
                 href={`/account/assignments/${a.id}`}
+                notificationKey={assignmentKey(a.id)}
                 className="flex flex-col gap-4 p-5 hover:bg-slate-50 lg:flex-row lg:items-center"
               >
                 {/* One icon for every assignment  there is nothing to pick. */}
@@ -293,7 +295,7 @@ export default async function AssignmentsPage({
                   </span>
                   <ChevronRight className="h-5 w-5 text-slate-300" />
                 </div>
-              </Link>
+              </MarkUpdateLink>
             );
           })}
         </div>

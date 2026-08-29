@@ -10,6 +10,7 @@ import InlineSearch from "@/components/account/InlineSearch";
 import CompanyLogo from "@/components/account/CompanyLogo";
 import { eventPalette } from "@/lib/eventStyles";
 import { isNewAlert, deadlineLabel, postedLabel } from "@/lib/career";
+import MarkUpdateLink from "@/components/account/MarkUpdateLink";
 
 export const metadata: Metadata = { title: "Career Alert" };
 export const dynamic = "force-dynamic";
@@ -107,9 +108,10 @@ export default async function CareerPage({
             const closed = a.deadline !== null && a.deadline < now;
 
             return (
-              <Link
+              <MarkUpdateLink
                 key={a.id}
                 href={`/account/career/${a.id}`}
+                notificationKey={`career-${a.id}`}
                 // min-w-0: a grid item defaults to min-width:auto, so one long
                 // unbroken word in the description widens the whole card past
                 // the screen instead of wrapping inside it.
@@ -182,7 +184,7 @@ export default async function CareerPage({
                     </span>
                   )}
                 </div>
-              </Link>
+              </MarkUpdateLink>
             );
           })}
         </div>

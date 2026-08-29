@@ -19,6 +19,7 @@ import { eventPalette } from "@/lib/eventStyles";
 import { dueLabel, isDueSoon } from "@/lib/assignments";
 import { isNewAlert } from "@/lib/career";
 import { quoteOfTheDay } from "@/lib/quotes";
+import { assignmentKey } from "@/lib/assignments";
 
 export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
@@ -97,6 +98,7 @@ export default async function AccountPage() {
     deadlines,
     channels,
     announcements,
+    notificationReads,
   ] = await Promise.all([
     // Newest banner: a written highlight, or whatever is switched on in
     // /admin/highlights (an event, recruitment round or career alert).
@@ -164,6 +166,10 @@ export default async function AccountPage() {
     }),
     // Hand-written notices plus anything switched on in /admin/announcements.
     getAnnouncements(),
+    prisma.notificationRead.findMany({
+      where: { userId: user.id },
+      select: { key: true },
+    }),
   ]);
 
   const displayName = user.name;
@@ -182,6 +188,7 @@ export default async function AccountPage() {
   );
 
   const railAnnouncements = announcements.slice(0, 3);
+  const readKeys = new Set(notificationReads.map((r) => r.key));
 
   // The four live counters, always the same four. They are counted here, not
   // typed in the admin, so the row cannot end up with a stale hand-written card
@@ -198,7 +205,7 @@ export default async function AccountPage() {
     {
       id: "announcements",
       label: "Announcements",
-      count: announcements.length,
+      count: announcements.filter((a) => !readKeys.has(a.id)).length,
       href: "/account/announcements",
       icon: "Megaphone",
       color: "bg-blue-50 text-primary",
@@ -206,7 +213,7 @@ export default async function AccountPage() {
     {
       id: "deadlines",
       label: "Assignment Deadlines",
-      count: deadlines.length,
+      count: deadlines.filter((a) => !readKeys.has(assignmentKey(a.id))).length,
       href: "/account/assignments",
       icon: "ClipboardList",
       color: "bg-violet-50 text-violet-600",
@@ -214,7 +221,7 @@ export default async function AccountPage() {
     {
       id: "career",
       label: "Career Alerts",
-      count: careerAlerts.length,
+      count: careerAlerts.filter((a) => !readKeys.has(`career-${a.id}`)).length,
       href: "/account/career",
       icon: "Briefcase",
       color: "bg-amber-50 text-amber-600",

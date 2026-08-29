@@ -9,6 +9,8 @@ import {
   verifyPassword,
 } from "@/lib/userAuth";
 import { getTopBarNotifications } from "@/lib/notifications";
+import { getAnnouncements } from "@/lib/announcements";
+import { assignmentKey } from "@/lib/assignments";
 
 export type SettingsActionState = {
   error?: string;
@@ -120,6 +122,35 @@ export async function markNotificationsRead(keys: string[]) {
 /** One row clicked. */
 export async function markNotificationRead(key: string) {
   await markNotificationsRead([key]);
+}
+
+/** Mark an item from one of the mobile update lists as read. */
+export async function markUpdateRead(key: string) {
+  const session = await getUserSession();
+  if (!session || !key) return;
+
+  const [notifications, announcements, assignments, careerAlerts] =
+    await Promise.all([
+      getTopBarNotifications(),
+      getAnnouncements(),
+      prisma.assignment.findMany({
+        where: { published: true },
+        select: { id: true },
+      }),
+      prisma.careerAlert.findMany({
+        where: { published: true },
+        select: { id: true },
+      }),
+    ]);
+
+  const allowed = new Set([
+    ...notifications.map((n) => n.id),
+    ...announcements.map((a) => a.id),
+    ...assignments.map((a) => assignmentKey(a.id)),
+    ...careerAlerts.map((a) => `career-${a.id}`),
+  ]);
+
+  if (allowed.has(key)) await markRead([key]);
 }
 
 /**
