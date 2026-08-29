@@ -15,7 +15,7 @@ export default async function SiteLayout({
 
   return (
     <div className="site-shell flex min-h-screen flex-col">
-      <Navbar homeHref={session ? "/pfcspace.com" : "/"} />
+      <Navbar homeHref={session ? "/" : "/"} />
       {/* The wrapper sits below the navbar on purpose: animating a transform
           on an ancestor would break the navbar's sticky positioning. */}
       <main className="min-w-0 flex-1">
