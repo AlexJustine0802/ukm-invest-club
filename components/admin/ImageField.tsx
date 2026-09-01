@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
 interface ImageFieldProps {
   label?: string;
@@ -30,6 +31,7 @@ export default function ImageField({
   const [previews, setPreviews] = useState<string[]>(
     defaultUrl ? [defaultUrl] : [],
   );
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,9 +72,21 @@ export default function ImageField({
         }`}
         onChange={(e) => {
           const files = Array.from(e.target.files ?? []);
+          if (files.some((file) => file.size > MAX_UPLOAD_BYTES)) {
+            setError(`Each image must be ${MAX_UPLOAD_MB} MB or smaller.`);
+            e.currentTarget.value = "";
+            updatePreviews([]);
+            return;
+          }
+          setError(null);
           updatePreviews(files.map((file) => URL.createObjectURL(file)));
         }}
       />
+
+      <p className="mb-2 text-xs text-slate-400">
+        Maximum image size: {MAX_UPLOAD_MB} MB per file.
+      </p>
+      {error && <p className="mb-2 text-xs text-red-600">{error}</p>}
 
       {uploadEnabled ? (
         <p className="mb-2 text-xs text-slate-400">

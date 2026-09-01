@@ -8,8 +8,9 @@ import {
   type PointerEvent,
 } from "react";
 import { Camera, Upload, X, ZoomIn } from "lucide-react";
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const MAX_PHOTO_BYTES = MAX_UPLOAD_BYTES;
 const OUTPUT_SIZE = 512;
 const CROP_SIZE = 320;
 
@@ -83,7 +84,7 @@ export default function ProfilePhotoCropper({
       return;
     }
     if (file.size > MAX_PHOTO_BYTES) {
-      setError("Image must be 5 MB or smaller.");
+      setError(`Image must be ${MAX_UPLOAD_MB} MB or smaller.`);
       return;
     }
 
@@ -294,7 +295,7 @@ export default function ProfilePhotoCropper({
                   Choose a photo
                 </span>
                 <span className="mt-1 text-xs text-slate-400">
-                  JPG or PNG, up to 5 MB
+                  JPG or PNG, up to {MAX_UPLOAD_MB} MB
                 </span>
               </label>
             ) : (

@@ -1,4 +1,7 @@
 import { put } from "@vercel/blob";
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
+
+export { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
 /**
  * Upload an image file to Vercel Blob and return its public URL.
@@ -14,6 +17,9 @@ export async function uploadImage(file: File): Promise<string> {
  * `folder` keeps form uploads out of the CMS image listing.
  */
 export async function uploadFile(file: File, folder = "uploads"): Promise<string> {
+  if (file.size > MAX_UPLOAD_BYTES) {
+    throw new Error(`File must be ${MAX_UPLOAD_MB} MB or smaller.`);
+  }
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
     throw new Error(
       "File upload is not configured (BLOB_READ_WRITE_TOKEN is missing).",

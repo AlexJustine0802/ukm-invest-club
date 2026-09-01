@@ -6,6 +6,7 @@ import { getUserSession } from "@/lib/userAuth";
 import { issueAuthToken, siteUrl } from "@/lib/authTokens";
 import { sendAuthEmail } from "@/lib/email";
 import { uploadImage } from "@/lib/upload";
+import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/upload";
 
 export interface ProfileState {
   error?: string;
@@ -62,7 +63,7 @@ export async function updateMySocials(
 }
 
 /** Same ceiling the browser cannot be trusted to enforce. */
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const MAX_PHOTO_BYTES = MAX_UPLOAD_BYTES;
 
 /**
  * The member's own profile picture.
@@ -96,7 +97,7 @@ export async function updateMyPhoto(
     return { error: "That file is not an image." };
   }
   if (file.size > MAX_PHOTO_BYTES) {
-    return { error: "Image must be 5 MB or smaller." };
+    return { error: `Image must be ${MAX_UPLOAD_MB} MB or smaller.` };
   }
 
   let url: string;
