@@ -17,7 +17,7 @@ import {
   allowsGuests,
   allowsMembers,
   CHOICE_TYPES,
-  DEFAULT_MAX_MB,
+  MAX_MB_LIMIT,
   type FormAnswers,
   type FormQuestion,
 } from "@/lib/forms";
@@ -145,7 +145,9 @@ export async function submitRegistration(
           if (q.required) return { error: `“${q.label}” needs a file.` };
           continue;
         }
-        const maxMb = q.maxMb ?? DEFAULT_MAX_MB;
+        // Registration uploads have one global ceiling. Do not trust an old
+        // maxMb value saved on a form (older forms used 1 or 3 MB defaults).
+        const maxMb = MAX_MB_LIMIT;
         if (file.size > maxMb * 1024 * 1024) {
           return { error: `“${q.label}”: file must be ${maxMb} MB or smaller.` };
         }

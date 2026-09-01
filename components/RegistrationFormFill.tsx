@@ -8,7 +8,7 @@ import {
   submitRegistration,
   type SubmitState,
 } from "@/app/(site)/register/[slug]/actions";
-import { DEFAULT_MAX_MB, sectionsOf, type FormQuestion } from "@/lib/forms";
+import { MAX_MB_LIMIT, sectionsOf, type FormQuestion } from "@/lib/forms";
 
 const fieldClass =
   "w-full rounded-xl border border-slate-200 p-3 text-sm text-navy outline-none placeholder:text-slate-400 focus:border-primary";
@@ -166,7 +166,7 @@ function Question({
               />
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
                 <Paperclip className="h-3 w-3" />
-                Max {q.maxMb ?? DEFAULT_MAX_MB} MB.
+                Max {MAX_MB_LIMIT} MB.
               </p>
             </>
           )}
