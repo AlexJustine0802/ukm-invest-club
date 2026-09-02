@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
-import { upload } from "@vercel/blob/client";
 import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import { AlertCircle, Paperclip } from "lucide-react";
@@ -10,7 +9,6 @@ import {
   type SubmitState,
 } from "@/app/(site)/register/[slug]/actions";
 import { MAX_MB_LIMIT, sectionsOf, type FormQuestion } from "@/lib/forms";
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
 const fieldClass =
   "w-full rounded-xl border border-slate-200 p-3 text-sm text-navy outline-none placeholder:text-slate-400 focus:border-primary";
@@ -222,7 +220,6 @@ export default function RegistrationFormFill({
   // and therefore where the section breaks fall.
   const [values, setValues] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
-  const [uploading, setUploading] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   // The questions actually being asked, in order: a branch's follow-ups are
@@ -250,56 +247,8 @@ export default function RegistrationFormFill({
 
   const back = () => goTo(stepIndex - 1);
 
-  const fileQuestions = (list: FormQuestion[]): FormQuestion[] =>
-    list.flatMap((question) => [
-      ...(question.type === "FILE" ? [question] : []),
-      ...Object.values(question.branches ?? {}).flatMap(fileQuestions),
-    ]);
-
-  const submit = async (formData: FormData) => {
-    setUploading(true);
-    try {
-      for (const question of fileQuestions(questions)) {
-        const key = `q_${question.id}`;
-        const file = formData.get(key);
-        if (!(file instanceof File) || file.size === 0) continue;
-        if (file.size > MAX_UPLOAD_BYTES) {
-          throw new Error(
-            `“${question.label}”: file must be ${MAX_UPLOAD_MB} MB or smaller.`,
-          );
-        }
-
-        const blob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/api/uploads",
-          clientPayload: JSON.stringify({ formId }),
-          multipart: file.size > 4 * 1024 * 1024,
-        });
-        formData.delete(key);
-        formData.set(`${key}_url`, blob.url);
-      }
-      action(formData);
-    } catch (error) {
-      // Reuse the existing form error surface for upload failures.
-      const message =
-        error instanceof Error
-          ? error.message
-          : "The file could not be uploaded. Please try again.";
-      setUploadError(message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
   return (
-    <form
-      ref={formRef}
-      action={submit}
-      className="space-y-4"
-      onChange={() => uploadError && setUploadError(null)}
-    >
+    <form ref={formRef} action={action} className="space-y-4">
       <input type="hidden" name="formId" value={formId} />
       <input type="hidden" name="basePath" value={basePath} />
 
@@ -348,12 +297,6 @@ export default function RegistrationFormFill({
           {state.error}
         </p>
       )}
-      {uploadError && (
-        <p className="flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700">
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-          {uploadError}
-        </p>
-      )}
 
       <div className="flex flex-wrap items-center gap-3">
         {stepIndex > 0 && (
@@ -367,13 +310,7 @@ export default function RegistrationFormFill({
         )}
 
         {last ? (
-            <button
-              type="submit"
-              disabled={uploading}
-              className="rounded-lg bg-primary px-8 py-3 text-sm font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
-            >
-              {uploading ? "Uploading…" : "Submit"}
-            </button>
+          <Submit />
         ) : (
           <button
             type="button"
