@@ -140,6 +140,22 @@ export async function submitRegistration(
       if (q.type === "PAGE_BREAK") continue;
 
       if (q.type === "FILE") {
+        const uploadedUrl = formData.get(`${key}_url`);
+        if (typeof uploadedUrl === "string" && uploadedUrl.trim()) {
+          try {
+            const parsed = new URL(uploadedUrl);
+            if (
+              parsed.protocol !== "https:" ||
+              !parsed.hostname.endsWith(".blob.vercel-storage.com")
+            ) {
+              return { error: `“${q.label}”: the uploaded file is invalid.` };
+            }
+          } catch {
+            return { error: `“${q.label}”: the uploaded file is invalid.` };
+          }
+          answers[q.id] = uploadedUrl;
+          continue;
+        }
         const file = formData.get(key);
         if (!(file instanceof File) || file.size === 0) {
           if (q.required) return { error: `“${q.label}” needs a file.` };
