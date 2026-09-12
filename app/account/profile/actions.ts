@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
 import { issueAuthToken, siteUrl } from "@/lib/authTokens";
 import { sendAuthEmail } from "@/lib/email";
-import { uploadImage } from "@/lib/upload";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/upload";
 
 export interface ProfileState {
@@ -88,6 +87,21 @@ export async function updateMyPhoto(
   }
 
   const file = formData.get("photoFile");
+  const uploadedPhotoUrl = ((formData.get("photoUrl") as string) ?? "").trim();
+  if (uploadedPhotoUrl) {
+    try {
+      const parsed = new URL(uploadedPhotoUrl);
+      if (parsed.protocol !== "https:") throw new Error("invalid url");
+    } catch {
+      return { error: "The uploaded photo URL is invalid." };
+    }
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { photo: uploadedPhotoUrl },
+    });
+    revalidateProfile();
+    return { saved: true };
+  }
   if (!(file instanceof File) || file.size === 0) {
     return { error: "Choose an image first." };
   }
@@ -100,20 +114,7 @@ export async function updateMyPhoto(
     return { error: `Image must be ${MAX_UPLOAD_MB} MB or smaller.` };
   }
 
-  let url: string;
-  try {
-    url = await uploadImage(file);
-  } catch {
-    return { error: "Upload failed. Please try again." };
-  }
-
-  await prisma.user.update({
-    where: { id: session.userId },
-    data: { photo: url },
-  });
-
-  revalidateProfile();
-  return { saved: true };
+  return { error: "Please upload the photo again before saving." };
 }
 
 /** Everywhere a member's photo is rendered. */

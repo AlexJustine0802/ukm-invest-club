@@ -60,6 +60,7 @@ export default function ProfilePhotoForm({
   );
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
+  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
 
   useEffect(() => {
@@ -84,10 +85,12 @@ export default function ProfilePhotoForm({
       </span>
 
       <div className="min-w-0 flex-1 space-y-3">
+        {uploadedPhotoUrl && <input type="hidden" name="photoUrl" value={uploadedPhotoUrl} />}
         <ProfilePhotoCropper
           onPreview={(value) => {
             setRemoving(false);
             setPreview(value);
+            setUploadedPhotoUrl(value);
           }}
         />
 

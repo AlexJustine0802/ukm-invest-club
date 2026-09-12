@@ -1,8 +1,9 @@
 // Shared between the submission form and the server action. Kept out of the
 // action file because a "use server" module may only export async functions.
+import { MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
 /** Uploads are capped so one member cannot fill the blob store. */
-export const MAX_SUBMISSION_MB = 5;
+export const MAX_SUBMISSION_MB = MAX_UPLOAD_MB;
 
 export const ALLOWED_SUBMISSION_EXTENSIONS = [
   "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",

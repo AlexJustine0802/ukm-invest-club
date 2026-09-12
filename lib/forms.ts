@@ -4,6 +4,7 @@
 // export and validation all read it from here.
 
 import { currentWallClockAsUtc } from "@/lib/wallClock";
+import { MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
 export const QUESTION_TYPES = [
   { id: "SHORT_TEXT", label: "Short answer" },
@@ -27,9 +28,9 @@ export function isQuestionType(value: string): value is QuestionType {
 /** Types whose answers come from a fixed option list. */
 export const CHOICE_TYPES: QuestionType[] = ["CHOICE", "CHECKBOX", "DROPDOWN"];
 
-export const DEFAULT_MAX_MB = 5;
+export const DEFAULT_MAX_MB = MAX_UPLOAD_MB;
 /** Hard ceiling regardless of what an admin types, to protect the blob store. */
-export const MAX_MB_LIMIT = 5;
+export const MAX_MB_LIMIT = MAX_UPLOAD_MB;
 
 export interface FormQuestion {
   id: string;

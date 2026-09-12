@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
 import { AlertCircle, Paperclip } from "lucide-react";
@@ -9,6 +10,7 @@ import {
   type SubmitState,
 } from "@/app/(site)/register/[slug]/actions";
 import { MAX_MB_LIMIT, sectionsOf, type FormQuestion } from "@/lib/forms";
+import { safeUploadName } from "@/lib/uploadPath";
 
 const fieldClass =
   "w-full rounded-xl border border-slate-200 p-3 text-sm text-navy outline-none placeholder:text-slate-400 focus:border-primary";
@@ -220,7 +222,42 @@ export default function RegistrationFormFill({
   // and therefore where the section breaks fall.
   const [values, setValues] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const submit = async (formData: FormData) => {
+    setUploadError(null);
+    try {
+      const fileQuestions: FormQuestion[] = [];
+      const collectFiles = (list: FormQuestion[]) => {
+        for (const question of list) {
+          if (question.type === "FILE") fileQuestions.push(question);
+          for (const branch of Object.values(question.branches ?? {})) collectFiles(branch);
+        }
+      };
+      collectFiles(questions);
+      for (const question of fileQuestions) {
+        const key = `q_${question.id}`;
+        const file = formData.get(key);
+        if (!(file instanceof File) || file.size === 0) continue;
+        const blob = await upload(`form-uploads/${safeUploadName(file.name)}`, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob/upload",
+          clientPayload: JSON.stringify({ formId }),
+          multipart: true,
+        });
+        formData.delete(key);
+        formData.set(`${key}_url`, blob.url);
+        formData.set(`${key}_name`, file.name);
+        const input = document.getElementById(key) as HTMLInputElement | null;
+        if (input) input.value = "";
+      }
+      action(formData);
+    } catch (error) {
+      console.error(error);
+      setUploadError("The file could not be uploaded. Please try again.");
+    }
+  };
 
   // The questions actually being asked, in order: a branch's follow-ups are
   // spliced in right after the dropdown that opened them. A section break
@@ -248,7 +285,7 @@ export default function RegistrationFormFill({
   const back = () => goTo(stepIndex - 1);
 
   return (
-    <form ref={formRef} action={action} className="space-y-4">
+    <form ref={formRef} action={submit} className="space-y-4">
       <input type="hidden" name="formId" value={formId} />
       <input type="hidden" name="basePath" value={basePath} />
 
@@ -295,6 +332,12 @@ export default function RegistrationFormFill({
         <p className="flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {state.error}
+        </p>
+      )}
+      {uploadError && (
+        <p className="flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700">
+          <AlertCircle className="mt-0.5 h-4 w-4" />
+          {uploadError}
         </p>
       )}
 

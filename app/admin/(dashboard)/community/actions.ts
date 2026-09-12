@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
-import { resolveImage, uploadImage } from "@/lib/upload";
+import { resolveImage } from "@/lib/upload";
 
 function revalidateCommunity() {
   revalidatePath("/community");
@@ -30,9 +30,12 @@ function imageFilesFrom(formData: FormData): File[] {
 
 async function uploadedImagesFrom(formData: FormData): Promise<string[]> {
   const files = imageFilesFrom(formData);
-  return files.length > 0
-    ? Promise.all(files.map((file) => uploadImage(file)))
-    : [];
+  if (files.length > 0) return [];
+  return formData
+    .getAll("imageUrl")
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter(Boolean);
 }
 
 export async function createMoment(formData: FormData) {

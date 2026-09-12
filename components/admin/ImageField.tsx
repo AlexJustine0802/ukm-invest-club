@@ -3,6 +3,7 @@
 import { upload } from "@vercel/blob/client";
 import { useRef, useState } from "react";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
+import { safeUploadName } from "@/lib/uploadPath";
 
 interface ImageFieldProps {
   label?: string;
@@ -49,9 +50,10 @@ export default function ImageField({
     try {
       const urls: string[] = [];
       for (const file of files) {
-        const blob = await upload(`uploads/${file.name}`, file, {
+        const blob = await upload(`uploads/${safeUploadName(file.name)}`, file, {
           access: "public",
           handleUploadUrl: "/api/blob/upload",
+          multipart: true,
         });
         urls.push(blob.url);
       }
@@ -134,4 +136,3 @@ export default function ImageField({
     </div>
   );
 }
-

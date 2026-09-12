@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { getAdminActor } from "@/lib/adminAccess";
 import { getUserSession } from "@/lib/userAuth";
 import { MAX_UPLOAD_BYTES } from "@/lib/uploadLimits";
+import { prisma } from "@/lib/prisma";
+import { allowsGuests, formStatus } from "@/lib/forms";
 
 /**
  * Issues short-lived Vercel Blob client-upload tokens. The image itself never
@@ -19,19 +21,74 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // Both admin CMS users and signed-in members can upload images.
+  const clientPayload =
+    typeof body.payload?.clientPayload === "string"
+      ? body.payload.clientPayload
+      : null;
+  let publicFormUpload = false;
+  if (clientPayload) {
+    try {
+      const parsed = JSON.parse(clientPayload) as { formId?: string };
+      if (parsed.formId) {
+        const form = await prisma.registrationForm.findUnique({
+          where: { id: parsed.formId },
+          select: {
+            audience: true,
+            published: true,
+            registrationEnabled: true,
+            opensAt: true,
+            closesAt: true,
+          },
+        });
+        publicFormUpload = Boolean(
+          form &&
+            allowsGuests(form.audience) &&
+            form.published &&
+            form.registrationEnabled &&
+            formStatus(form, new Date()) === "open",
+        );
+      }
+    } catch {
+      publicFormUpload = false;
+    }
+  }
+
+  // Admins and signed-in members can upload; public registration uploads are
+  // allowed only for a currently open public form.
   const [admin, member] = await Promise.all([getAdminActor(), getUserSession()]);
-  if (!admin && !member) {
+  if (!admin && !member && !publicFormUpload) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
+    if (!process.env.BLOB_NEW_READ_WRITE_TOKEN) {
+      return NextResponse.json(
+        { error: "Blob upload is not configured" },
+        { status: 503 },
+      );
+    }
     const jsonResponse = await handleUpload({
+      token: process.env.BLOB_NEW_READ_WRITE_TOKEN,
       request,
       body,
       onBeforeGenerateToken: async () => ({
         addRandomSuffix: true,
-        allowedContentTypes: ["image/*"],
+        allowedContentTypes: [
+          "image/jpeg",
+          "image/png",
+          "image/webp",
+          "image/gif",
+          "application/pdf",
+          "application/zip",
+          "application/x-zip-compressed",
+          "text/csv",
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/vnd.ms-excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "application/vnd.ms-powerpoint",
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        ],
         maximumSizeInBytes: MAX_UPLOAD_BYTES,
       }),
       onUploadCompleted: async () => undefined,

@@ -9,7 +9,6 @@ import {
   getUserSession,
   type UserSession,
 } from "@/lib/userAuth";
-import { uploadFile } from "@/lib/upload";
 import { sendRegistrationConfirmationEmail } from "@/lib/email";
 import {
   parseQuestions,
@@ -140,6 +139,17 @@ export async function submitRegistration(
       if (q.type === "PAGE_BREAK") continue;
 
       if (q.type === "FILE") {
+        const uploadedUrl = String(formData.get(`${key}_url`) ?? "").trim();
+        if (uploadedUrl) {
+          try {
+            const parsed = new URL(uploadedUrl);
+            if (parsed.protocol !== "https:") throw new Error("invalid url");
+          } catch {
+            return { error: `“${q.label}”: the uploaded file URL is invalid.` };
+          }
+          answers[q.id] = uploadedUrl;
+          continue;
+        }
         const file = formData.get(key);
         if (!(file instanceof File) || file.size === 0) {
           if (q.required) return { error: `“${q.label}” needs a file.` };
@@ -151,16 +161,7 @@ export async function submitRegistration(
         if (file.size > maxMb * 1024 * 1024) {
           return { error: `“${q.label}”: file must be ${maxMb} MB or smaller.` };
         }
-        try {
-          answers[q.id] = await uploadFile(file, "form-uploads");
-        } catch (error) {
-          registrationError("upload-file", formId, error);
-          return {
-            error:
-              "The file could not be uploaded. Please try again or contact the administrator.",
-          };
-        }
-        continue;
+        return { error: `“${q.label}”: please upload the file again before submitting.` };
       }
 
       if (q.type === "CHECKBOX") {

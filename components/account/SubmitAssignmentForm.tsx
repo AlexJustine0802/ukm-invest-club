@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState, useEffect } from "react";
+import { useState } from "react";
+import { upload } from "@vercel/blob/client";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import { useFormStatus } from "react-dom";
@@ -16,6 +18,7 @@ import {
   SUBMISSION_ACCEPT,
   type SubmitState,
 } from "@/lib/submissions";
+import { safeUploadName } from "@/lib/uploadPath";
 
 function Submit({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -49,6 +52,25 @@ export default function SubmitAssignmentForm({
     {},
   );
   const router = useRouter();
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<{ url: string; name: string } | null>(null);
+
+  const chooseFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploadError(null);
+    try {
+        const blob = await upload(`submissions/${safeUploadName(file.name)}`, file, {
+        access: "public",
+        handleUploadUrl: "/api/blob/upload",
+        clientPayload: JSON.stringify({ assignmentId }),
+        multipart: true,
+      });
+      setUploadedFile({ url: blob.url, name: file.name });
+    } catch (error) {
+      console.error(error);
+      setUploadError("The file could not be uploaded. Please try again.");
+    }
+  };
 
   /**
    * Pull the page's server components again after a successful hand-in, so the
@@ -67,6 +89,8 @@ export default function SubmitAssignmentForm({
   return (
     <form action={action} className="space-y-4">
       <input type="hidden" name="assignmentId" value={assignmentId} />
+      {uploadedFile && <input type="hidden" name="fileUrl" value={uploadedFile.url} />}
+      {uploadedFile && <input type="hidden" name="fileName" value={uploadedFile.name} />}
 
       <div>
         <label htmlFor="file" className="text-sm font-semibold text-navy">
@@ -77,6 +101,11 @@ export default function SubmitAssignmentForm({
           name="file"
           type="file"
           accept={SUBMISSION_ACCEPT}
+          onChange={(event) => {
+            void chooseFile(event.target.files?.[0]).finally(() => {
+              event.currentTarget.value = "";
+            });
+          }}
           className="mt-2 block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-navy hover:file:bg-slate-200"
         />
         <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
@@ -105,6 +134,12 @@ export default function SubmitAssignmentForm({
         <p className="flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {state.error}
+        </p>
+      )}
+      {uploadError && (
+        <p className="flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          {uploadError}
         </p>
       )}
       {state.ok && (

@@ -8,6 +8,7 @@ import {
   type PointerEvent,
 } from "react";
 import { Camera, Upload, X, ZoomIn } from "lucide-react";
+import { upload } from "@vercel/blob/client";
 import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
 const MAX_PHOTO_BYTES = MAX_UPLOAD_BYTES;
@@ -37,7 +38,6 @@ export default function ProfilePhotoCropper({
   const inputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const sourceUrlRef = useRef<string | null>(null);
-  const previewUrlRef = useRef<string | null>(null);
   const dragRef = useRef<{
     pointerId: number;
     startX: number;
@@ -63,7 +63,6 @@ export default function ProfilePhotoCropper({
   useEffect(() => {
     return () => {
       releaseSource();
-      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
     };
   }, [releaseSource]);
 
@@ -207,14 +206,13 @@ export default function ProfilePhotoCropper({
     const croppedFile = new File([blob], "profile-photo.jpg", {
       type: "image/jpeg",
     });
-    const dataTransfer = new DataTransfer();
-    dataTransfer.items.add(croppedFile);
-    if (inputRef.current) inputRef.current.files = dataTransfer.files;
+    const blobResult = await upload("profile-photos/profile-photo.jpg", croppedFile, {
+      access: "public",
+      handleUploadUrl: "/api/blob/upload",
+      multipart: true,
+    });
 
-    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
-    const previewUrl = URL.createObjectURL(croppedFile);
-    previewUrlRef.current = previewUrl;
-    onPreview(previewUrl);
+    onPreview(blobResult.url);
     close();
   };
 

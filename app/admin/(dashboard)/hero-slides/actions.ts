@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
-import { uploadImage } from "@/lib/upload";
 import { normalizeHeroStyle } from "@/lib/hero";
 import { publicPageHref } from "@/lib/publicPages";
 
@@ -56,7 +55,8 @@ function imageFilesFrom(formData: FormData): File[] {
 async function imagesFrom(formData: FormData): Promise<string[]> {
   const files = imageFilesFrom(formData);
   if (files.length > 0) {
-    return Promise.all(files.map((file) => uploadImage(file)));
+    // The browser must upload through @vercel/blob/client before submitting.
+    return [];
   }
 
   const pasted = formData

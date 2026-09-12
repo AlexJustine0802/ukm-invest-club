@@ -1,53 +1,24 @@
-import { put } from "@vercel/blob";
-import { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
-
 export { MAX_UPLOAD_BYTES, MAX_UPLOAD_MB } from "@/lib/uploadLimits";
 
-/**
- * Upload an image file to Vercel Blob and return its public URL.
- * Throws a friendly error if the Blob token isn't configured, so callers can
- * fall back to a pasted image URL instead.
- */
-export async function uploadImage(file: File): Promise<string> {
-  return uploadFile(file, "uploads");
-}
-
-/**
- * Upload any file (form attachments, not just images) and return its URL.
- * `folder` keeps form uploads out of the CMS image listing.
- */
-export async function uploadFile(file: File, folder = "uploads"): Promise<string> {
-  if (file.size > MAX_UPLOAD_BYTES) {
-    throw new Error(`File must be ${MAX_UPLOAD_MB} MB or smaller.`);
-  }
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    throw new Error(
-      "File upload is not configured (BLOB_READ_WRITE_TOKEN is missing).",
-    );
-  }
-  const ext = file.name.split(".").pop() || "bin";
-  const key = `${folder}/${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2)}.${ext}`;
-  const blob = await put(key, file, { access: "public" });
-  return blob.url;
-}
-
+/** Whether the new Vercel Blob store is configured on the server. */
 export function isBlobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(process.env.BLOB_NEW_READ_WRITE_TOKEN);
 }
 
 /**
- * Resolve the final image URL from a form: prefer an uploaded file, otherwise
- * use the pasted URL. Returns null when neither is provided.
+ * Server actions persist URLs produced by the client upload flow. They do not
+ * receive binary files and proxy them to a Function. Pasted URLs remain
+ * supported for the existing CMS behavior.
  */
 export async function resolveImage(
   file: File | null,
   pastedUrl: string | null,
 ): Promise<string | null> {
-  if (file && file.size > 0) {
-    return uploadImage(file);
-  }
   const trimmed = pastedUrl?.trim();
-  return trimmed ? trimmed : null;
+  if (trimmed) return trimmed;
+
+  // A binary file without a direct-upload URL is intentionally ignored. This
+  // prevents old/forged form posts from reintroducing the Server Action proxy.
+  if (file && file.size > 0) return null;
+  return null;
 }

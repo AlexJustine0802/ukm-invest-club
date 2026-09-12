@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
-import { isBlobConfigured, uploadFile } from "@/lib/upload";
 import { isOpen, isPastDue } from "@/lib/assignments";
 import { formatDateTime } from "@/lib/utils";
 import {
@@ -62,7 +61,22 @@ export async function submitAssignment(
   let fileUrl = existing?.fileUrl ?? null;
   let fileName = existing?.fileName ?? null;
 
-  if (file instanceof File && file.size > 0) {
+  const uploadedUrl = ((formData.get("fileUrl") as string) ?? "").trim();
+  const uploadedName = ((formData.get("fileName") as string) ?? "").trim();
+  if (uploadedUrl) {
+    try {
+      const parsed = new URL(uploadedUrl);
+      if (parsed.protocol !== "https:") throw new Error("invalid url");
+    } catch {
+      return { error: "The uploaded file URL is invalid." };
+    }
+    const ext = uploadedName.split(".").pop()?.toLowerCase() ?? "";
+    if (!ALLOWED_SUBMISSION_EXTENSIONS.includes(ext)) {
+      return { error: "That file type is not accepted." };
+    }
+    fileUrl = uploadedUrl;
+    fileName = uploadedName || fileName;
+  } else if (file instanceof File && file.size > 0) {
     if (file.size > MAX_SUBMISSION_MB * 1024 * 1024) {
       return { error: `File must be ${MAX_SUBMISSION_MB} MB or smaller.` };
     }
@@ -72,23 +86,7 @@ export async function submitAssignment(
         error: `That file type is not accepted. Allowed: ${ALLOWED_SUBMISSION_EXTENSIONS.join(", ")}.`,
       };
     }
-    // Two different problems used to share one message, which sent people
-    // chasing a config error when the upload had simply failed.
-    if (!isBlobConfigured()) {
-      return {
-        error:
-          "Error.",
-      };
-    }
-    try {
-      fileUrl = await uploadFile(file, "submissions");
-      fileName = file.name;
-    } catch (e) {
-      console.error("[submitAssignment] upload failed", e);
-      return {
-        error: "The upload did not go through. Check your connection and try again.",
-      };
-    }
+    return { error: "Please upload the file again before submitting." };
   }
 
   if (!fileUrl) return { error: "Please choose a file to upload." };

@@ -104,7 +104,7 @@ npm run dev
    npm run db:seed           # optional: seed starter content
    ```
 6. (Optional) Enable image uploads by adding a **Vercel Blob** store and its
-   `BLOB_READ_WRITE_TOKEN`. Without it, admins paste image URLs instead.
+   `BLOB_NEW_READ_WRITE_TOKEN`. Without it, admins paste image URLs instead.
 7. (Optional) Add a [Resend](https://resend.com) API key + verified sender so the
    contact form delivers email.
 
@@ -128,7 +128,8 @@ Log in at `/admin` and use the sidebar to manage:
 | `RESEND_API_KEY`        | ➖       | Enables contact-form email delivery            |
 | `CONTACT_EMAIL_TO`      | ➖       | Where contact messages are sent                |
 | `CONTACT_EMAIL_FROM`    | ➖       | Verified sender address                        |
-| `BLOB_READ_WRITE_TOKEN` | ➖       | Enables direct image uploads (Vercel Blob)     |
+| `BLOB_NEW_READ_WRITE_TOKEN` | ➖       | Enables direct uploads to the new Vercel Blob store |
+| `MAX_UPLOAD_SIZE_MB` | `5` | Maximum upload size, in binary MB (1024 × 1024 bytes) |
 | `NEXT_PUBLIC_SITE_URL`  | ➖       | Public base URL (metadata)                     |
 
 ## Useful scripts

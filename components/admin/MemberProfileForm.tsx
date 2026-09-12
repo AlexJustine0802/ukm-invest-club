@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { upload } from "@vercel/blob/client";
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import { DIVISIONS, GENERAL_ROLES, rolesFor } from "@/lib/roles";
+import { safeUploadName } from "@/lib/uploadPath";
 
 /**
  * The one place a person's record is edited. Division and role drive both the
@@ -28,12 +30,15 @@ export default function MemberProfileForm({
   };
 }) {
   const [picked, setPicked] = useState(member.division ?? "");
+  const [photoUrl, setPhotoUrl] = useState(member.photo ?? "");
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const options = picked ? rolesFor(picked) : GENERAL_ROLES;
   const selectedRole = options.includes(member.role) ? member.role : options[0];
 
   return (
     <form action={action} className="space-y-5">
       <input type="hidden" name="id" value={member.id} />
+      <input type="hidden" name="photoUrl" value={photoUrl} />
 
       <div>
         <label htmlFor="name" className="label">
@@ -110,11 +115,30 @@ export default function MemberProfileForm({
           name="photoFile"
           type="file"
           accept="image/*"
+          onChange={async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            setPhotoError(null);
+            try {
+              const blob = await upload(`member-photos/${safeUploadName(file.name)}`, file, {
+                access: "public",
+                handleUploadUrl: "/api/blob/upload",
+                multipart: true,
+              });
+              setPhotoUrl(blob.url);
+              event.currentTarget.value = "";
+            } catch (error) {
+              console.error(error);
+              setPhotoError("The photo could not be uploaded. Please try again.");
+            }
+          }}
           className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-navy hover:file:bg-slate-200"
         />
+        {photoError && <p className="mt-2 text-xs text-rose-600">{photoError}</p>}
         <input
           name="photo"
-          defaultValue={member.photo ?? ""}
+          value={photoUrl}
+          onChange={(event) => setPhotoUrl(event.target.value)}
           placeholder="…or paste an image URL"
           className="input mt-2"
         />

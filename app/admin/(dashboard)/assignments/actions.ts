@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
-import { uploadFile } from "@/lib/upload";
 
 function revalidateAssignments() {
   revalidatePath("/account/assignments");
@@ -30,9 +29,13 @@ async function dataFrom(formData: FormData) {
   // The question paper. No new file and no "remove" tick leaves whatever is
   // already stored alone, so saving an edit does not wipe the attachment.
   const file = formData.get("file");
+  const directFileUrl = (formData.get("fileUrl") as string)?.trim();
+  const directFileName = (formData.get("fileName") as string)?.trim();
   const upload =
-    file instanceof File && file.size > 0
-      ? { fileUrl: await uploadFile(file, "assignments"), fileName: file.name }
+    directFileUrl
+      ? { fileUrl: directFileUrl, fileName: directFileName || "Uploaded file" }
+      : file instanceof File && file.size > 0
+      ? {}
       : formData.get("removeFile") === "on"
         ? { fileUrl: null, fileName: null }
         : {};

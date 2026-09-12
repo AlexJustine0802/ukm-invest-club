@@ -1,5 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import { upload } from "@vercel/blob/client";
 import SubmitButton from "@/components/admin/SubmitButton";
+import { safeUploadName } from "@/lib/uploadPath";
 
 interface AssignmentFormProps {
   action: (formData: FormData) => void;
@@ -33,9 +38,30 @@ export default function AssignmentForm({
   assignment,
   uploadEnabled = false,
 }: AssignmentFormProps) {
+  const [uploadedFile, setUploadedFile] = useState<{ url: string; name: string } | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const chooseFile = async (file: File | undefined) => {
+    if (!file) return;
+    setUploadError(null);
+    try {
+      const blob = await upload(`assignments/${safeUploadName(file.name)}`, file, {
+        access: "public",
+        handleUploadUrl: "/api/blob/upload",
+        multipart: true,
+      });
+      setUploadedFile({ url: blob.url, name: file.name });
+    } catch (error) {
+      console.error(error);
+      setUploadError("The file could not be uploaded. Please try again.");
+    }
+  };
+
   return (
     <form action={action} className="space-y-5">
       {assignment && <input type="hidden" name="id" value={assignment.id} />}
+      {uploadedFile && <input type="hidden" name="fileUrl" value={uploadedFile.url} />}
+      {uploadedFile && <input type="hidden" name="fileName" value={uploadedFile.name} />}
 
       <div>
         <label htmlFor="title" className="label">
@@ -141,8 +167,10 @@ export default function AssignmentForm({
           name="file"
           type="file"
           disabled={!uploadEnabled}
+          onChange={(event) => void chooseFile(event.target.files?.[0])}
           className="input file:mr-3 file:rounded-md file:border-0 file:bg-slate-100 file:px-3 file:py-1.5 file:text-sm file:font-semibold"
         />
+        {uploadError && <p className="mt-2 text-xs text-rose-600">{uploadError}</p>}
         {assignment?.fileUrl && (
           <label className="mt-3 flex items-center gap-3">
             <input type="checkbox" name="removeFile" className="h-4 w-4" />
