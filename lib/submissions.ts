@@ -2,7 +2,7 @@
 // action file because a "use server" module may only export async functions.
 
 /** Uploads are capped so one member cannot fill the blob store. */
-export const MAX_SUBMISSION_MB = 10;
+export const MAX_SUBMISSION_MB = 5;
 
 export const ALLOWED_SUBMISSION_EXTENSIONS = [
   "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",

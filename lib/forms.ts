@@ -27,9 +27,9 @@ export function isQuestionType(value: string): value is QuestionType {
 /** Types whose answers come from a fixed option list. */
 export const CHOICE_TYPES: QuestionType[] = ["CHOICE", "CHECKBOX", "DROPDOWN"];
 
-export const DEFAULT_MAX_MB = 10;
+export const DEFAULT_MAX_MB = 5;
 /** Hard ceiling regardless of what an admin types, to protect the blob store. */
-export const MAX_MB_LIMIT = 10;
+export const MAX_MB_LIMIT = 5;
 
 export interface FormQuestion {
   id: string;

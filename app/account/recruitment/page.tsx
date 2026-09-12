@@ -157,6 +157,9 @@ export default async function RecruitmentPage() {
   // Members stay in the member area; the public /register page is for
   // guests following a shared link.
   const applyHref = `/account/register/${recruitment!.slug}?from=recruitment`;
+  // Temporarily hidden while the answer-review flow is being fixed.
+  // Set this to true to show the existing route/button again.
+  const SHOW_MY_ANSWERS = false;
 
   return (
     <>
@@ -213,12 +216,14 @@ export default async function RecruitmentPage() {
                   <CheckCircle2 className="h-4 w-4" />
                   Applied {formatDateTime(myResponse.createdAt)}
                 </span>
-                <Link
-                  href={applyHref}
-                  className="rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20"
-                >
-                  View my answers
-                </Link>
+                {SHOW_MY_ANSWERS && (
+                  <Link
+                    href={applyHref}
+                    className="rounded-lg bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/20"
+                  >
+                    View my answers
+                  </Link>
+                )}
               </>
             ) : full ? (
               <span className="rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-slate-300">
