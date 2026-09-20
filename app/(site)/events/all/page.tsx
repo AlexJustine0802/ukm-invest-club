@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays, Clock, MapPin } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import EmptyState from "@/components/EmptyState";
 import SearchBar from "@/components/SearchBar";
 import { eventDateLabel, timeRange } from "@/lib/eventStyles";
@@ -31,7 +32,7 @@ export default async function AllEventsPage({
   const tab = tabParam === "latest" ? "latest" : "upcoming";
   const page = Math.max(1, Number(pageParam) || 1);
   const query = q?.trim() ?? "";
-  const now = new Date();
+  const now = currentWallClockAsUtc();
 
   const categories = await prisma.eventCategory.findMany({
     orderBy: { order: "asc" },

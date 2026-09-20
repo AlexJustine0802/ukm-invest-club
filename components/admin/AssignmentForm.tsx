@@ -5,6 +5,7 @@ import { useState } from "react";
 import { upload } from "@vercel/blob/client";
 import SubmitButton from "@/components/admin/SubmitButton";
 import { safeUploadName } from "@/lib/uploadPath";
+import { toDateTimeLocalValue } from "@/lib/utils";
 
 interface AssignmentFormProps {
   action: (formData: FormData) => void;
@@ -25,12 +26,6 @@ interface AssignmentFormProps {
   };
   /** Whether file uploads are configured (Vercel Blob). */
   uploadEnabled?: boolean;
-}
-
-/** yyyy-MM-ddTHH:mm in local time, which is what datetime-local expects. */
-function toLocalInput(date: Date): string {
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 export default function AssignmentForm({
@@ -120,7 +115,7 @@ export default function AssignmentForm({
             name="opensAt"
             type="datetime-local"
             defaultValue={
-              assignment?.opensAt ? toLocalInput(assignment.opensAt) : undefined
+              assignment?.opensAt ? toDateTimeLocalValue(assignment.opensAt) : undefined
             }
             className="input"
           />
@@ -137,7 +132,7 @@ export default function AssignmentForm({
           type="datetime-local"
           required
           defaultValue={
-            assignment ? toLocalInput(assignment.dueDate) : undefined
+            assignment ? toDateTimeLocalValue(assignment.dueDate) : undefined
           }
           className="input"
         />

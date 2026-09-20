@@ -1,22 +1,33 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import {
+  useActionState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
 import { upload } from "@vercel/blob/client";
 import Spinner from "@/components/Spinner";
-import { useFormStatus } from "react-dom";
 import { AlertCircle, Paperclip } from "lucide-react";
 import {
   submitRegistration,
   type SubmitState,
 } from "@/app/(site)/register/[slug]/actions";
 import { MAX_MB_LIMIT, sectionsOf, type FormQuestion } from "@/lib/forms";
+import { MAX_UPLOAD_BYTES } from "@/lib/uploadLimits";
 import { safeUploadName } from "@/lib/uploadPath";
 
 const fieldClass =
   "w-full rounded-xl border border-slate-200 p-3 text-sm text-navy outline-none placeholder:text-slate-400 focus:border-primary";
+const DRAFT_PREFIX = "registration-draft:v1:";
+type DraftValue = string | string[];
+type Draft = Record<string, DraftValue>;
 
-function Submit() {
-  const { pending } = useFormStatus();
+function Submit({ pending }: { pending: boolean }) {
   return (
     <button
       type="submit"
@@ -44,11 +55,13 @@ function Question({
   live,
   value,
   onValue,
+  onFileChange,
 }: {
   question: FormQuestion;
   live: boolean;
   value: string;
   onValue: (next: string) => void;
+  onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const key = `q_${q.id}`;
   const required = q.required && live;
@@ -164,6 +177,7 @@ function Question({
                 name={key}
                 type="file"
                 required={required}
+                onChange={onFileChange}
                 className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-navy hover:file:bg-slate-200"
               />
               <p className="mt-1.5 flex items-center gap-1.5 text-xs text-slate-400">
@@ -223,10 +237,139 @@ export default function RegistrationFormFill({
   const [values, setValues] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [draftRestored, setDraftRestored] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, startSubmitting] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const draftRef = useRef<Draft | null>(null);
+  const submittingRef = useRef(false);
+  const draftKey = `${DRAFT_PREFIX}${formId}`;
+
+  const saveDraft = useCallback(() => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const draft: Draft = {};
+    for (const element of Array.from(form.elements)) {
+      const name = element.getAttribute("name");
+      if (!name?.startsWith("q_")) continue;
+
+      const control = element as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      if (
+        (control instanceof HTMLInputElement &&
+          (control.type === "file" ||
+            ((control.type === "radio" || control.type === "checkbox") &&
+              !control.checked)))
+      ) {
+        continue;
+      }
+
+      const value = control.value;
+      const previous = draft[name];
+      draft[name] = previous
+        ? [...(Array.isArray(previous) ? previous : [previous]), value]
+        : value;
+    }
+    draftRef.current = draft;
+    try {
+      const serialized = JSON.stringify(draft);
+      window.localStorage.setItem(draftKey, serialized);
+      window.sessionStorage.setItem(draftKey, serialized);
+    } catch {
+      try {
+        window.sessionStorage.setItem(draftKey, JSON.stringify(draft));
+      } catch {
+        // Private browsing or strict browser policies must not break the form.
+      }
+    }
+  }, [draftKey]);
+
+  const restoreDraftFields = useCallback(() => {
+    const form = formRef.current;
+    if (!form || !draftRef.current) return;
+    for (const [name, saved] of Object.entries(draftRef.current)) {
+      const wanted = Array.isArray(saved) ? saved : [saved];
+      const controls = Array.from(form.elements).filter(
+        (element) => element.getAttribute("name") === name,
+      ) as HTMLInputElement[];
+      for (const control of controls) {
+        if (control.type === "radio" || control.type === "checkbox") {
+          control.checked = wanted.includes(control.value);
+        } else {
+          control.value = wanted[0] ?? "";
+        }
+      }
+    }
+    setDraftRestored(true);
+  }, []);
+
+  // Restore dropdowns first so their conditional questions can be rendered.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try {
+        const raw =
+          window.localStorage.getItem(draftKey) ??
+          window.sessionStorage.getItem(draftKey);
+        if (!raw) return;
+        const saved = JSON.parse(raw) as Draft;
+        if (!saved || typeof saved !== "object") return;
+        draftRef.current = saved;
+        const dropdownValues: Record<string, string> = {};
+        for (const [name, value] of Object.entries(saved)) {
+          if (typeof value === "string") dropdownValues[name.slice(2)] = value;
+        }
+        setValues((current) => ({ ...current, ...dropdownValues }));
+      } catch {
+        try {
+          window.localStorage.removeItem(draftKey);
+          window.sessionStorage.removeItem(draftKey);
+        } catch {
+          // Ignore storage cleanup failures.
+        }
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [draftKey]);
+
+  // Fill native inputs after conditional branches have appeared in the DOM.
+  useEffect(() => {
+    if (!draftRef.current) return;
+    const timer = window.setTimeout(restoreDraftFields, 0);
+    return () => window.clearTimeout(timer);
+  }, [restoreDraftFields, values]);
+
+  // React resets uncontrolled fields after a form action finishes. Restore
+  // the latest draft when the server returns a validation/database error.
+  useEffect(() => {
+    if (!state.error) return;
+    submittingRef.current = false;
+    const timer = window.setTimeout(restoreDraftFields, 0);
+    return () => window.clearTimeout(timer);
+  }, [restoreDraftFields, state.error]);
+
+  useEffect(() => {
+    const saveBeforeLeaving = () => saveDraft();
+    window.addEventListener("beforeunload", saveBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", saveBeforeLeaving);
+  }, [saveDraft]);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    saveDraft();
+    const file = event.target.files?.[0];
+    if (file && file.size > MAX_UPLOAD_BYTES) {
+      event.target.value = "";
+      setUploadError(
+        `File is too large. Please choose a file up to ${MAX_MB_LIMIT} MB. Your answers were saved.`,
+      );
+      return;
+    }
+    setUploadError(null);
+  };
 
   const submit = async (formData: FormData) => {
+    saveDraft();
     setUploadError(null);
+    setIsUploading(true);
     try {
       const fileQuestions: FormQuestion[] = [];
       const collectFiles = (list: FormQuestion[]) => {
@@ -252,11 +395,26 @@ export default function RegistrationFormFill({
         const input = document.getElementById(key) as HTMLInputElement | null;
         if (input) input.value = "";
       }
-      action(formData);
+      startSubmitting(() => action(formData));
     } catch (error) {
-      console.error(error);
-      setUploadError("The file could not be uploaded. Please try again.");
+      submittingRef.current = false;
+      const message = error instanceof Error ? error.message : "";
+      setUploadError(
+        /token|configured|unauthorized|503/i.test(message)
+          ? "File upload is not configured yet. Your answers were saved, please contact admin."
+          : "The file could not be uploaded. Your answers were saved; please try again.",
+      );
+      window.setTimeout(restoreDraftFields, 0);
+    } finally {
+      setIsUploading(false);
     }
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+    void submit(new FormData(event.currentTarget));
   };
 
   // The questions actually being asked, in order: a branch's follow-ups are
@@ -285,9 +443,21 @@ export default function RegistrationFormFill({
   const back = () => goTo(stepIndex - 1);
 
   return (
-    <form ref={formRef} action={submit} className="space-y-4">
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      onInput={saveDraft}
+      onChange={saveDraft}
+      className="space-y-4"
+    >
       <input type="hidden" name="formId" value={formId} />
       <input type="hidden" name="basePath" value={basePath} />
+
+      {draftRestored && (
+        <p className="rounded-xl bg-blue-50 p-3 text-sm font-medium text-blue-700">
+          Your saved answers were restored.
+        </p>
+      )}
 
       {sections.length > 1 && (
         <p className="text-sm font-semibold text-slate-500">
@@ -312,6 +482,7 @@ export default function RegistrationFormFill({
                 question={question}
                 live={i === stepIndex}
                 value={values[question.id] ?? ""}
+                onFileChange={handleFileChange}
                 onValue={(answer) => {
                   setValues((current) => ({
                     ...current,
@@ -335,10 +506,31 @@ export default function RegistrationFormFill({
         </p>
       )}
       {uploadError && (
-        <p className="flex items-start gap-2 rounded-xl bg-rose-50 p-3 text-sm font-medium text-rose-700">
-          <AlertCircle className="mt-0.5 h-4 w-4" />
-          {uploadError}
-        </p>
+        <div
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="upload-error-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-rose-600" />
+              <div>
+                <h2 id="upload-error-title" className="font-semibold text-navy">
+                  Upload notice
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">{uploadError}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setUploadError(null)}
+              className="mt-5 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark"
+            >
+              OK
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
@@ -353,7 +545,7 @@ export default function RegistrationFormFill({
         )}
 
         {last ? (
-          <Submit />
+          <Submit pending={isUploading || isSubmitting} />
         ) : (
           <button
             type="button"

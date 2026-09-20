@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { createElement, useState } from "react";
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import { EVENT_ICON_KEYS, getEventIcon } from "@/lib/eventIcons";
@@ -23,8 +23,6 @@ export default function EventCategoryForm({
   category,
 }: EventCategoryFormProps) {
   const [iconKey, setIconKey] = useState(category?.icon ?? EVENT_ICON_KEYS[0]);
-  const Icon = getEventIcon(iconKey);
-
   return (
     <form action={action} className="space-y-5">
       {category && <input type="hidden" name="id" value={category.id} />}
@@ -74,7 +72,7 @@ export default function EventCategoryForm({
             ))}
           </select>
           <div className="mt-2 flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
-            <Icon className="h-5 w-5" />
+            {createElement(getEventIcon(iconKey), { className: "h-5 w-5" })}
           </div>
         </div>
         <div>

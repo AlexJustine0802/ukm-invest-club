@@ -9,6 +9,7 @@ import {
 } from "@/lib/forms";
 import { slugify } from "@/lib/utils";
 import { buildSheet, XLSX_CONTENT_TYPE } from "@/lib/xlsx";
+import { formatDateKey } from "@/lib/utils";
 
 /**
  * One Excel sheet per form: a header row of question labels, then a row per
@@ -64,7 +65,7 @@ export async function GET(
     ];
   });
 
-  const stamp = new Date().toISOString().slice(0, 10);
+  const stamp = formatDateKey(new Date());
   const file = await buildSheet(form.title || "Responses", columns, rows);
 
   return new NextResponse(new Uint8Array(file), {

@@ -27,7 +27,7 @@ import { prisma } from "@/lib/prisma";
 import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
 import { withDefaultStats } from "@/lib/impactStats";
-import { formatDate } from "@/lib/utils";
+import { formatWallClockDate } from "@/lib/utils";
 import PartnerStrip from "@/components/PartnerStrip";
 import DivisionsSection from "@/components/DivisionsSection";
 import HeroCursorArea from "@/components/HeroCursorArea";
@@ -192,7 +192,7 @@ export default async function AboutPage() {
     icon: getUiIcon("Users"),
     title: m.title,
     subtitle: m.category,
-    date: formatDate(m.date),
+    date: formatWallClockDate(m.date),
   }));
 
   return (

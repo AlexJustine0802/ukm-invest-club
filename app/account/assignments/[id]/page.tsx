@@ -24,7 +24,8 @@ import {
   isPastDue,
   memberState,
 } from "@/lib/assignments";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import { withdrawSubmission } from "./actions";
 
 export const metadata: Metadata = { title: "Assignment" };
@@ -49,7 +50,7 @@ export default async function AssignmentDetailPage({
     where: { assignmentId_userId: { assignmentId: id, userId: user.id } },
   });
 
-  const now = new Date();
+  const now = currentWallClockAsUtc();
   const open = isOpen(assignment.opensAt, now);
   const overdue = isPastDue(assignment.dueDate, now);
   const soon = isDueSoon(
@@ -190,7 +191,7 @@ export default async function AssignmentDetailPage({
             {!open ? (
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
                 <Clock className="h-4 w-4 text-amber-600" />
-                Opens {formatDateTime(assignment.opensAt!)}  you can read the
+                Opens {formatWallClockDateTime(assignment.opensAt!)}  you can read the
                 brief now and submit once it opens.
               </p>
             ) : graded ? (
@@ -203,7 +204,7 @@ export default async function AssignmentDetailPage({
               // member who already handed something in and wants to swap it.
               <p className="mt-4 flex items-center gap-2 text-sm text-slate-500">
                 <CalendarClock className="h-4 w-4 text-rose-600" />
-                The deadline passed on {formatDateTime(assignment.dueDate)}. This
+                The deadline passed on {formatWallClockDateTime(assignment.dueDate)}. This
                 assignment no longer accepts submissions.
               </p>
             ) : (
@@ -261,7 +262,7 @@ export default async function AssignmentDetailPage({
               <div className="flex items-center justify-between gap-3">
                 <span className="text-slate-500">Deadline</span>
                 <span className="text-right text-xs font-semibold text-navy">
-                  {formatDateTime(assignment.dueDate)}
+                  {formatWallClockDateTime(assignment.dueDate)}
                 </span>
               </div>
             </div>

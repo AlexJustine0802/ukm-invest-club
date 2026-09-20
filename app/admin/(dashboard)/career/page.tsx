@@ -7,6 +7,7 @@ import { isInBell, postedLabel, deadlineLabel } from "@/lib/career";
 import { deleteCareerAlert } from "./actions";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ export default async function AdminCareerPage() {
     orderBy: { createdAt: "desc" },
   });
   const now = new Date();
+  const wallClockNow = currentWallClockAsUtc(now);
 
   return (
     <div>
@@ -76,7 +78,7 @@ export default async function AdminCareerPage() {
                   </p>
                   <p className="mt-1 text-xs text-slate-400">
                     {postedLabel(a.createdAt, now)}
-                    {a.deadline ? ` · ${deadlineLabel(a.deadline, now)}` : ""}
+                    {a.deadline ? ` · ${deadlineLabel(a.deadline, wallClockNow)}` : ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

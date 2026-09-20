@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { ClipboardList } from "lucide-react";
 import { dueLabel, isDueSoon, isOpen } from "@/lib/assignments";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import { deleteAssignment } from "./actions";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
@@ -48,7 +49,7 @@ export default async function AdminAssignmentsPage({
       _count: { _all: true },
     }),
   ]);
-  const now = new Date();
+  const now = currentWallClockAsUtc();
 
   const gradedCount = new Map(
     gradedGroups.map((g) => [g.assignmentId, g._count._all]),
@@ -180,7 +181,7 @@ export default async function AdminAssignmentsPage({
                     </span>
                     {!isOpen(a.opensAt, now) && (
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">
-                        Opens {formatDateTime(a.opensAt!)}
+                        Opens {formatWallClockDateTime(a.opensAt!)}
                       </span>
                     )}
                     {soon && (
@@ -202,6 +203,7 @@ export default async function AdminAssignmentsPage({
                       year: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
+                      timeZone: "UTC",
                     })}
                   </p>
                 </div>

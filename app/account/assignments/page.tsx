@@ -18,6 +18,8 @@ import InlineSearch from "@/components/account/InlineSearch";
 import TabBar from "@/components/account/TabBar";
 import MarkSeen from "@/components/account/MarkSeen";
 import MarkUpdateLink from "@/components/account/MarkUpdateLink";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
+import { formatWallClockDateTime } from "@/lib/utils";
 import { getUiIcon } from "@/lib/uiIcons";
 import {
   ASSIGNMENT_TABS,
@@ -69,7 +71,7 @@ export default async function AssignmentsPage({
 
   const mySubmissions = new Map(submissions.map((s) => [s.assignmentId, s]));
 
-  const now = new Date();
+  const now = currentWallClockAsUtc();
 
   // Per member, not the shared column  see memberState in lib/assignments.
   const stateOf = (a: (typeof all)[number]) =>
@@ -276,16 +278,7 @@ export default async function AssignmentsPage({
                   </p>
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
                     <CalendarDays className="h-3.5 w-3.5" />
-                    {a.dueDate.toLocaleDateString("en-GB", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
-                    ,{" "}
-                    {a.dueDate.toLocaleTimeString("en-GB", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatWallClockDateTime(a.dueDate)}
                   </p>
                 </div>
 

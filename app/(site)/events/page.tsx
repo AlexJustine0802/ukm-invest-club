@@ -23,6 +23,7 @@ import EventCategoriesInteractive, {
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
 import { TextAnimate } from "@/components/ui/text-animate";
 import { EVENT_TIME_ZONE, timeRange } from "@/lib/eventStyles";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 
 export const dynamic = "force-dynamic";
 
@@ -315,7 +316,7 @@ function PastEventCard({ event }: { event: EventDisplay }) {
 }
 
 export default async function EventsPage() {
-  const now = new Date();
+  const now = currentWallClockAsUtc();
   let upcomingEvents: DbEvent[] = [];
   let pastEvents: DbEvent[] = [];
   let categoriesWithPreview: EventCategoryWithPreview[] = [];

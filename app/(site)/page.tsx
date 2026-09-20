@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Mail } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import { site } from "@/lib/site";
 import { getUiIcon } from "@/lib/uiIcons";
 import { InteractiveHoverButton } from "@/components/ui/interactive-hover-button";
@@ -19,7 +20,7 @@ import CountUp from "@/components/CountUp";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const now = new Date();
+  const now = currentWallClockAsUtc();
 
   const [
     upcomingEvents,

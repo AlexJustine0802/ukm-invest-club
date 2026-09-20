@@ -5,6 +5,8 @@
  * the dashboard on the same day reads the same line, and a refresh does not
  * reshuffle it.
  */
+import { currentWallClockAsUtc } from "@/lib/wallClock";
+
 export type Quote = { text: string; author: string };
 
 export const QUOTES: Quote[] = [
@@ -73,8 +75,13 @@ export const QUOTES: Quote[] = [
  * mid-afternoon in Jakarta rather than at midnight.
  */
 function dayNumber(date: Date): number {
+  const wallClock = currentWallClockAsUtc(date);
   return Math.floor(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86_400_000,
+    Date.UTC(
+      wallClock.getUTCFullYear(),
+      wallClock.getUTCMonth(),
+      wallClock.getUTCDate(),
+    ) / 86_400_000,
   );
 }
 

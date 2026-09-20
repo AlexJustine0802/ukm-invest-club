@@ -12,6 +12,12 @@ const PARTS = [
 ] as const;
 
 export function greetingFor(date: Date = new Date()): string {
-  const hour = date.getHours();
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Jakarta",
+      hour: "numeric",
+      hourCycle: "h23",
+    }).format(date),
+  );
   return PARTS.find((p) => hour >= p.from)!.label;
 }

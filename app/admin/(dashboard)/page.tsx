@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import AdminHome from "@/components/admin/AdminHome";
 import { getAdminActor, allowedModules } from "@/lib/adminAccess";
 
@@ -20,7 +21,7 @@ export default async function AdminDashboard() {
     );
   }
 
-  const now = new Date();
+  const now = currentWallClockAsUtc();
   const [events, upcoming, publications, members, partners] = await Promise.all([
     prisma.event.count(),
     prisma.event.count({ where: { eventDate: { gte: now } } }),

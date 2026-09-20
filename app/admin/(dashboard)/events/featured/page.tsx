@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+import { formatWallClockDate } from "@/lib/utils";
 import FeaturedSelectForm from "@/components/admin/FeaturedSelectForm";
 import { setFeaturedEvents } from "./actions";
 import { requirePage } from "@/lib/adminAccess";
@@ -19,7 +19,7 @@ export default async function EventsHeroPage() {
   const items = events.map((e) => ({
     id: e.id,
     label: e.title,
-    sub: formatDate(e.eventDate),
+    sub: formatWallClockDate(e.eventDate),
     checked: e.featured,
   }));
 

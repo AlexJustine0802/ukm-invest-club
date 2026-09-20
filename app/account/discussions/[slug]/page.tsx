@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { createElement } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, Users, MessagesSquare, Lock, LogOut } from "lucide-react";
@@ -25,6 +26,7 @@ function ago(date: Date, now: Date): string {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "Asia/Jakarta",
   });
 }
 
@@ -51,7 +53,6 @@ export default async function ChannelPage({
     select: { id: true },
   });
 
-  const Icon = getUiIcon(channel.icon);
   const palette = eventPalette(channel.color, channel.name);
   const now = new Date();
 
@@ -84,7 +85,7 @@ export default async function ChannelPage({
           <span
             className={`flex h-14 w-14 items-center justify-center rounded-2xl ${palette.badge}`}
           >
-            <Icon className="h-7 w-7" />
+            {createElement(getUiIcon(channel.icon), { className: "h-7 w-7" })}
           </span>
           <div>
             <h2 className="text-lg font-bold text-navy">{channel.name}</h2>
@@ -140,7 +141,7 @@ export default async function ChannelPage({
         <span
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${palette.badge}`}
         >
-          <Icon className="h-5 w-5" />
+          {createElement(getUiIcon(channel.icon), { className: "h-5 w-5" })}
         </span>
         <div className="min-w-0 flex-1 text-xs text-slate-500">
           <div className="flex flex-wrap items-center gap-4">
@@ -174,7 +175,7 @@ export default async function ChannelPage({
         subtitle={`${channel._count.members} member${
           channel._count.members === 1 ? "" : "s"
         } · ${posts.length} message${posts.length === 1 ? "" : "s"}`}
-        headerIcon={<Icon className="size-4" />}
+        headerIcon={createElement(getUiIcon(channel.icon), { className: "size-4" })}
         // A real conversation is already there when the page loads: no reveal
         // animation, no replay, and the demo input is replaced by the form.
         autoPlay={false}

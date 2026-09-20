@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { createElement, useState } from "react";
 import Link from "next/link";
 import SubmitButton from "@/components/admin/SubmitButton";
 import { RESEARCH_ICON_KEYS, getResearchIcon } from "@/lib/researchIcons";
@@ -21,8 +21,6 @@ export default function ResearchCategoryForm({
   category,
 }: ResearchCategoryFormProps) {
   const [iconKey, setIconKey] = useState(category?.icon ?? RESEARCH_ICON_KEYS[0]);
-  const Icon = getResearchIcon(iconKey);
-
   return (
     <form action={action} className="space-y-5">
       {category && <input type="hidden" name="id" value={category.id} />}
@@ -72,7 +70,7 @@ export default function ResearchCategoryForm({
             ))}
           </select>
           <div className="mt-2 flex h-11 w-11 items-center justify-center rounded-full bg-primary-light text-primary">
-            <Icon className="h-5 w-5" />
+            {createElement(getResearchIcon(iconKey), { className: "h-5 w-5" })}
           </div>
         </div>
         <div>

@@ -35,7 +35,7 @@ export function postedLabel(createdAt: Date, now: Date = new Date()): string {
 /** "Closes in 5 days" / "Closes today" / "Closed 2 days ago" */
 export function deadlineLabel(deadline: Date, now: Date = new Date()): string {
   const startOf = (d: Date) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
   const days = Math.round((startOf(deadline) - startOf(now)) / MS_PER_DAY);
   if (days < 0)
     return `Closed ${Math.abs(days)} day${Math.abs(days) === 1 ? "" : "s"} ago`;

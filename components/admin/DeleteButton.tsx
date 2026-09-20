@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useFormStatus } from "react-dom";
 import { AlertTriangle } from "lucide-react";
@@ -56,8 +56,13 @@ export default function DeleteButton({
 }: DeleteButtonProps) {
   const [open, setOpen] = useState(false);
   // Portals need the document, which does not exist during the server render.
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  // useSyncExternalStore gives SSR a stable false value and switches to true
+  // after hydration without a synchronous setState inside an effect.
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   useEffect(() => {
     if (!open) return;

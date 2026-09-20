@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
+import { parseWallClockDateTime } from "@/lib/wallClock";
 
 function revalidateAssignments() {
   revalidatePath("/account/assignments");
@@ -24,7 +25,9 @@ async function dataFrom(formData: FormData) {
   // admin who unticks the box reopens the assignment in one click.
   const opensAtRaw = str("opensAt");
   const opensAt =
-    formData.get("hasOpenDate") && opensAtRaw ? new Date(opensAtRaw) : null;
+    formData.get("hasOpenDate") && opensAtRaw
+      ? parseWallClockDateTime(opensAtRaw)
+      : null;
 
   // The question paper. No new file and no "remove" tick leaves whatever is
   // already stored alone, so saving an edit does not wipe the attachment.
@@ -45,7 +48,7 @@ async function dataFrom(formData: FormData) {
     title: (formData.get("title") as string).trim(),
     description: str("description"),
     opensAt,
-    dueDate: new Date(formData.get("dueDate") as string),
+    dueDate: parseWallClockDateTime(formData.get("dueDate") as string),
     published: formData.get("published") === "on",
   };
 }

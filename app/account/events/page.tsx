@@ -16,6 +16,7 @@ import {
 import { getUserSession } from "@/lib/userAuth";
 import { getCurrentMember } from "@/lib/currentUser";
 import { prisma } from "@/lib/prisma";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import InlineSearch from "@/components/account/InlineSearch";
 import { eventPalette, timeRange, eventDateLabel } from "@/lib/eventStyles";
@@ -71,6 +72,7 @@ export default async function EventsPage({
   const query = q.trim().toLowerCase();
 
   const now = new Date();
+  const wallClockNow = currentWallClockAsUtc(now);
 
   const [events, myRegistrations] = await Promise.all([
     prisma.event.findMany({
@@ -99,8 +101,8 @@ export default async function EventsPage({
   const registeredIds = new Set(myRegistrations.map((r) => r.eventId));
 
   const byFilter = (e: (typeof events)[number]) => {
-    if (filter === "upcoming") return e.eventDate >= now;
-    if (filter === "past") return e.eventDate < now;
+    if (filter === "upcoming") return e.eventDate >= wallClockNow;
+    if (filter === "past") return e.eventDate < wallClockNow;
     return true;
   };
 
@@ -240,7 +242,7 @@ export default async function EventsPage({
             const left =
               e.capacity === null ? null : Math.max(e.capacity - taken, 0);
             const isRegistered = registeredIds.has(e.id);
-            const isPast = e.eventDate < now;
+            const isPast = e.eventDate < wallClockNow;
             const isFull = left !== null && left === 0;
             // An event with no form, or one with registration switched off,
             // takes no sign-ups at all.

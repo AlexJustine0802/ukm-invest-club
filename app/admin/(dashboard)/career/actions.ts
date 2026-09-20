@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { parseWallClockDateTime } from "@/lib/wallClock";
 import { deleteIfExists } from "@/lib/deletes";
 import { requirePermission } from "@/lib/adminAccess";
 import { resolveImage } from "@/lib/upload";
@@ -97,7 +98,7 @@ async function dataFrom(formData: FormData) {
     // is cleared, so a stale link cannot outlive the switch to a form. The
     // form id is filled in by the caller, which owns creating it.
     applyUrl: viaForm ? null : str("applyUrl"),
-    deadline: deadline ? new Date(deadline) : null,
+    deadline: deadline ? parseWallClockDateTime(deadline) : null,
     // Uploaded file wins over a pasted URL; null clears the logo.
     logo: await resolveImage(
       formData.get("imageFile") as File | null,

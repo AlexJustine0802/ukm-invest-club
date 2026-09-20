@@ -101,7 +101,7 @@ export default async function RegistrationPanel({
         {form.closesAt && (
           <span className="flex items-center gap-1.5">
             <CalendarClock className="h-3.5 w-3.5 text-slate-400" />
-            Closes {formatDateTime(form.closesAt)}
+            Closes {formatWallClockDateTime(form.closesAt)} WIB
           </span>
         )}
         {form.capacity !== null && (

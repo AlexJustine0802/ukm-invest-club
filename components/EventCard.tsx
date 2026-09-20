@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { formatDate, isUpcoming } from "@/lib/utils";
+import { formatWallClockDate, isUpcoming } from "@/lib/utils";
 
 interface EventCardProps {
   event: {
@@ -43,7 +43,7 @@ export default function EventCard({ event }: EventCardProps) {
       </div>
       <div className="flex flex-1 flex-col p-5">
         <p className="text-sm font-medium text-primary">
-          {formatDate(event.eventDate)}
+          {formatWallClockDate(event.eventDate)}
         </p>
         <h3 className="mt-1 text-lg font-bold text-navy group-hover:text-primary">
           {event.title}

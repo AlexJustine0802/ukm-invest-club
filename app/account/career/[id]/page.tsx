@@ -20,7 +20,8 @@ import Markdown from "@/components/Markdown";
 import CompanyLogo from "@/components/account/CompanyLogo";
 import { eventPalette } from "@/lib/eventStyles";
 import { isNewAlert, deadlineLabel, postedLabel } from "@/lib/career";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 
 export const metadata: Metadata = { title: "Career Alert" };
 export const dynamic = "force-dynamic";
@@ -57,7 +58,8 @@ export default async function CareerAlertPage({
   if (!alert) notFound();
 
   const now = new Date();
-  const closed = alert.deadline !== null && alert.deadline < now;
+  const wallClockNow = currentWallClockAsUtc(now);
+  const closed = alert.deadline !== null && alert.deadline < wallClockNow;
   const applyFormSlug = alert.applyForm?.published
     ? alert.applyForm.slug
     : null;
@@ -121,8 +123,8 @@ export default async function CareerAlertPage({
                       closed ? "text-slate-400" : "font-semibold text-rose-600"
                     }
                   >
-                    {deadlineLabel(alert.deadline, now)} ·{" "}
-                    {formatDateTime(alert.deadline)}
+                    {deadlineLabel(alert.deadline, wallClockNow)} ·{" "}
+                    {formatWallClockDateTime(alert.deadline)} WIB
                   </span>,
                 )}
               {metaRow(

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import SubmitButton from "@/components/admin/SubmitButton";
 import { divisionName } from "@/lib/roles";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatWallClockDateTime } from "@/lib/utils";
 import { gradeSubmission, unmarkSubmission } from "./actions";
 import { requirePage } from "@/lib/adminAccess";
 
@@ -50,7 +50,7 @@ export default async function SubmissionsPage({
       <h1 className="mt-2 text-2xl font-bold text-navy">{assignment.title}</h1>
       <p className="mt-1 text-sm text-slate-500">
         due{" "}
-        {formatDateTime(assignment.dueDate)}
+        {formatWallClockDateTime(assignment.dueDate)}
       </p>
 
       <div className="mt-6 grid gap-3 sm:grid-cols-3">

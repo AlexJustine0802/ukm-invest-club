@@ -11,7 +11,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getSection } from "@/lib/dashboardContent";
-import { formatDate } from "@/lib/utils";
+import { formatWallClockDate } from "@/lib/utils";
 
 /** Same shape as a DashboardItem row, so both kinds render identically. */
 export interface Announcement {
@@ -63,9 +63,9 @@ export async function getAnnouncements(): Promise<Announcement[]> {
       title: f.event?.title ?? f.title,
       subtitle: trim(f.event?.description ?? f.description),
       meta: f.event
-        ? `${formatDate(f.event.eventDate)}${f.event.location ? ` · ${f.event.location}` : ""}`
+        ? `${formatWallClockDate(f.event.eventDate)}${f.event.location ? ` · ${f.event.location}` : ""}`
         : f.closesAt
-          ? `Closes ${formatDate(f.closesAt)}`
+          ? `Closes ${formatWallClockDate(f.closesAt)} WIB`
           : null,
       note: null,
       badge,
@@ -84,7 +84,11 @@ export async function getAnnouncements(): Promise<Announcement[]> {
       id: `career-${a.id}`,
       title: `${a.role} · ${a.company}`,
       subtitle: trim(a.description),
-      meta: [a.workType, a.location, a.deadline && `Apply by ${formatDate(a.deadline)}`]
+      meta: [
+        a.workType,
+        a.location,
+        a.deadline && `Apply by ${formatWallClockDate(a.deadline)} WIB`,
+      ]
         .filter(Boolean)
         .join(" · ") || null,
       note: null,

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { getUiIcon } from "@/lib/uiIcons";
 import { eventPalette } from "@/lib/eventStyles";
 import { formStatus, parseQuestions, flattenQuestions } from "@/lib/forms";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
 import { TextAnimate } from "@/components/ui/text-animate";
 
 export const metadata: Metadata = {
@@ -112,7 +112,7 @@ export default async function PublicRegisterPage() {
                       <h2 className="text-lg font-bold text-navy">{f.title}</h2>
                       {notYet && (
                         <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-                          Opens {f.opensAt ? formatDateTime(f.opensAt) : "soon"}
+                          Opens {f.opensAt ? `${formatWallClockDateTime(f.opensAt)} WIB` : "soon"}
                         </span>
                       )}
                     </div>
@@ -129,7 +129,7 @@ export default async function PublicRegisterPage() {
                       {f.closesAt && (
                         <span className="flex items-center gap-1.5">
                           <CalendarClock className="h-3.5 w-3.5 text-slate-400" />
-                          Closes {formatDateTime(f.closesAt)}
+                          Closes {formatWallClockDateTime(f.closesAt)} WIB
                         </span>
                       )}
                       {f.capacity !== null && (

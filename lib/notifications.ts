@@ -9,7 +9,8 @@ import {
   isDueSoon,
   memberState,
 } from "@/lib/assignments";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import type { TopBarNotification } from "@/components/account/TopBarMenus";
 
 /**
@@ -23,6 +24,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
   TopBarNotification[]
 > {
   const now = new Date();
+  const wallClockNow = currentWallClockAsUtc(now);
   const session = await getUserSession();
 
   // Each source can be switched off in /admin/notifications. Missing row = all
@@ -115,7 +117,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       : [],
     userOn("notifyEvents") && on("notifyEvents")
       ? prisma.event.findMany({
-          where: { published: true, eventDate: { gte: now } },
+          where: { published: true, eventDate: { gte: wallClockNow } },
           orderBy: { createdAt: "desc" },
           take: 5,
           select: {
@@ -159,8 +161,8 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
           where: {
             isRecruitment: true,
             published: true,
-            OR: [{ opensAt: null }, { opensAt: { lte: now } }],
-            AND: [{ OR: [{ closesAt: null }, { closesAt: { gte: now } }] }],
+            OR: [{ opensAt: null }, { opensAt: { lte: wallClockNow } }],
+            AND: [{ OR: [{ closesAt: null }, { closesAt: { gte: wallClockNow } }] }],
           },
           orderBy: { createdAt: "desc" },
           select: { id: true, title: true, closesAt: true, createdAt: true },
@@ -189,7 +191,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
       const state = memberState(
         a.opensAt,
         submissionFor.get(a.id),
-        now,
+        wallClockNow,
         a.dueDate,
       );
       return {
@@ -200,11 +202,11 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
             : `New assignment: ${a.title}`,
         body:
           state === "UPCOMING"
-            ? `Opens ${formatDateTime(a.opensAt!)}`
+            ? `Opens ${formatWallClockDateTime(a.opensAt!)} WIB`
             : state === "COMPLETED"
               ? "Waiting to be marked"
-              : dueLabel(a.dueDate, now),
-        ago: isDueSoon(a.dueDate, state, now) ? "Due soon" : "",
+              : dueLabel(a.dueDate, wallClockNow),
+        ago: isDueSoon(a.dueDate, state, wallClockNow) ? "Due soon" : "",
         icon: "ClipboardList",
         color:
           state === "UPCOMING"
@@ -230,7 +232,7 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
             id: `recruitment-${recruitment.id}`,
             title: `Recruitment open: ${recruitment.title}`,
             body: recruitment.closesAt
-              ? `Closes ${formatDateTime(recruitment.closesAt)}`
+              ? `Closes ${formatWallClockDateTime(recruitment.closesAt)} WIB`
               : "Applications are open",
             ago: "",
             icon: "ClipboardList",
@@ -243,8 +245,8 @@ export const getTopBarNotifications = cache(async function getTopBarNotification
     ...events.map((e) => ({
       id: `event-${e.id}`,
       title: `New event: ${e.title}`,
-      body: formatDateTime(e.eventDate),
-      ago: postedLabel(e.eventDate, now).replace("Posted", "Happens"),
+      body: `${formatWallClockDateTime(e.eventDate)} WIB`,
+      ago: postedLabel(e.eventDate, wallClockNow).replace("Posted", "Happens"),
       icon: "CalendarDays",
       color: "bg-sky-50 text-sky-700",
       href: `/account/events`,

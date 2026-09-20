@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { can } from "@/lib/adminAccess";
 import { DIVISIONS, divisionName } from "@/lib/roles";
 import { buildSheet, XLSX_CONTENT_TYPE } from "@/lib/xlsx";
+import { formatDateKey } from "@/lib/utils";
 
 /**
  * The member directory as an Excel workbook.
@@ -80,10 +81,10 @@ export async function GET(request: Request) {
     ...(manages ? [m.role, divisionName(m.division) || ""] : []),
     m.instagram ?? "",
     m.linkedin ?? "",
-    m.createdAt.toISOString().slice(0, 10),
+    formatDateKey(m.createdAt),
   ]);
 
-  const stamp = new Date().toISOString().slice(0, 10);
+  const stamp = formatDateKey(new Date());
   const file = await buildSheet("Members", columns, rows);
 
   return new NextResponse(new Uint8Array(file), {

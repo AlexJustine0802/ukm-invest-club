@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { CLUB_TIME_ZONE, currentWallClockAsUtc } from "@/lib/wallClock";
 
 /** Merge Tailwind classes; shadcn/magicui components import this. */
 export function cn(...inputs: ClassValue[]) {
@@ -9,6 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatDate(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return d.toLocaleDateString("en-US", {
+    timeZone: CLUB_TIME_ZONE,
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -18,11 +20,23 @@ export function formatDate(date: Date | string): string {
 export function formatDateTime(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
   return d.toLocaleString("en-US", {
+    timeZone: CLUB_TIME_ZONE,
     year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+  });
+}
+
+/** Format a user-entered schedule stored as UTC wall-clock components in WIB. */
+export function formatWallClockDate(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleDateString("en-US", {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -39,6 +53,33 @@ export function formatWallClockDateTime(date: Date | string): string {
   });
 }
 
+/** Format only the clock portion of a user-entered WIB schedule. */
+export function formatWallClockTime(date: Date | string): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleTimeString("en-US", {
+    timeZone: "UTC",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+/** Stable yyyy-MM-dd key for filenames and exports in the club timezone. */
+export function formatDateKey(
+  date: Date | string,
+  timeZone = CLUB_TIME_ZONE,
+): string {
+  const d = typeof date === "string" ? new Date(date) : date;
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "00";
+  return `${value("year")}-${value("month")}-${value("day")}`;
+}
+
 /** For a datetime-local input value (yyyy-MM-ddTHH:mm). */
 export function toDateTimeLocalValue(date: Date | string): string {
   const d = typeof date === "string" ? new Date(date) : date;
@@ -50,7 +91,7 @@ export function toDateTimeLocalValue(date: Date | string): string {
 
 export function isUpcoming(date: Date | string): boolean {
   const d = typeof date === "string" ? new Date(date) : date;
-  return d.getTime() >= Date.now();
+  return d.getTime() >= currentWallClockAsUtc().getTime();
 }
 
 /** Turn a title into a URL-friendly slug. */

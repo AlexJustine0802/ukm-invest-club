@@ -142,19 +142,19 @@ model User {
   // Public profile. A member with a division and role is shown in "Our
   // Divisions" on the public About page, so these are edited once in
   // /admin/members and appear in both places.
-  photo         String?
-  bio           String?     @db.Text
-  instagram     String?
-  linkedin      String?
-  notifyAnnouncements Boolean @default(true)
-  notifyEvents        Boolean @default(true)
-  notifyAssignments   Boolean @default(true)
-  notifyCareer        Boolean @default(true)
-  showPhoto           Boolean @default(true)
-  showSocials         Boolean @default(true)
-  emailVerified DateTime?
-  createdAt     DateTime    @default(now())
-  authTokens    AuthToken[]
+  photo               String?
+  bio                 String?     @db.Text
+  instagram           String?
+  linkedin            String?
+  notifyAnnouncements Boolean     @default(true)
+  notifyEvents        Boolean     @default(true)
+  notifyAssignments   Boolean     @default(true)
+  notifyCareer        Boolean     @default(true)
+  showPhoto           Boolean     @default(true)
+  showSocials         Boolean     @default(true)
+  emailVerified       DateTime?
+  createdAt           DateTime    @default(now())
+  authTokens          AuthToken[]
 
   eventRegistrations EventRegistration[]
   channelMembers     ChannelMember[]
@@ -246,15 +246,15 @@ model RegistrationForm {
   // Runs as the banner at the top of the member dashboard.
   highlighted Boolean @default(false)
 
-  opensAt   DateTime?
-  closesAt  DateTime?
-  capacity  Int? // null = unlimited
+  opensAt      DateTime?
+  closesAt     DateTime?
+  capacity     Int? // null = unlimited
   emailSubject String?
-  emailBody    String? @db.Text
-  published Boolean   @default(true)
-  order     Int       @default(0)
-  icon      String? // key from lib/uiIcons
-  color     String? // palette key from lib/eventStyles
+  emailBody    String?   @db.Text
+  published    Boolean   @default(true)
+  order        Int       @default(0)
+  icon         String? // key from lib/uiIcons
+  color        String? // palette key from lib/eventStyles
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -532,9 +532,9 @@ model RolePermission {
 }
 
 model SiteSettings {
-  id             Int     @id @default(1) // singleton row
-  homeAboutImage String? // home "About Us" strip picture
-  aboutHeroImage String? // about page hero image
+  id                    Int     @id @default(1) // singleton row
+  homeAboutImage        String? // home "About Us" strip picture
+  aboutHeroImage        String? // about page hero image
   whatsappGroupsEnabled Boolean @default(false)
 
   // Which automatic bell notifications members receive. Announcements are not
@@ -567,29 +567,29 @@ model WaGroupCard {
 }
 
 model HeroSlide {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   location String // "home" | "about"
   imageUrl String
   isActive Boolean @default(true)
 
   // home hero fields
-  heroStyle   String @default("split") // "split" | "full-background"
-  darkenVisual        Boolean @default(false)
-  softVisualOverlay   Boolean @default(true)
-  backgroundBlur      Boolean @default(false)
-  textShadow          Boolean @default(false)
-  darkenBackground    Boolean @default(false)
-  textBackground      Boolean @default(true)
+  heroStyle            String  @default("split") // "split" | "full-background"
+  darkenVisual         Boolean @default(false)
+  softVisualOverlay    Boolean @default(true)
+  backgroundBlur       Boolean @default(false)
+  textShadow           Boolean @default(false)
+  darkenBackground     Boolean @default(false)
+  textBackground       Boolean @default(true)
   strongTextBackground Boolean @default(false)
-  bottomGradient      Boolean @default(false)
-  topGradient         Boolean @default(false)
-  panelOpacity        Int     @default(40) // white panel opacity, 0-90
-  panelBlur           Int     @default(16) // backdrop blur in px, 0-24
-  eyebrow     String?
-  titleStart  String?
-  highlight   String?
-  titleEnd    String?
-  description String? @db.Text
+  bottomGradient       Boolean @default(false)
+  topGradient          Boolean @default(false)
+  panelOpacity         Int     @default(40) // white panel opacity, 0-90
+  panelBlur            Int     @default(16) // backdrop blur in px, 0-24
+  eyebrow              String?
+  titleStart           String?
+  highlight            String?
+  titleEnd             String?
+  description          String? @db.Text
   primaryButtonLabel   String?
   primaryButtonHref    String?
   secondaryButtonLabel String?

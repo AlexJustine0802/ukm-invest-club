@@ -10,7 +10,7 @@
 // an event and the banner moves with it.
 
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
+import { formatWallClockDate } from "@/lib/utils";
 
 export interface Banner {
   id: string;
@@ -77,9 +77,9 @@ export async function getBanners(): Promise<Banner[]> {
           : `/account/register/${f.slug}`,
       noteTitle: f.event ? "When" : f.closesAt ? "Closes" : null,
       noteBody: f.event
-        ? `${formatDate(f.event.eventDate)}${f.event.location ? ` · ${f.event.location}` : ""}`
+        ? `${formatWallClockDate(f.event.eventDate)}${f.event.location ? ` · ${f.event.location}` : ""}`
         : f.closesAt
-          ? formatDate(f.closesAt)
+          ? `${formatWallClockDate(f.closesAt)} WIB`
           : null,
       createdAt: f.createdAt,
     });
@@ -94,7 +94,7 @@ export async function getBanners(): Promise<Banner[]> {
       buttonLabel: "See the posting",
       buttonHref: "/account/career",
       noteTitle: a.deadline ? "Apply by" : null,
-      noteBody: a.deadline ? formatDate(a.deadline) : null,
+      noteBody: a.deadline ? `${formatWallClockDate(a.deadline)} WIB` : null,
       createdAt: a.createdAt,
     });
   }

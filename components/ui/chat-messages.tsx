@@ -181,6 +181,9 @@ export function ChatMessages({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isAutoPlaying = useRef(false);
+  const revealNextRef = useRef<(index: number) => Promise<void>>(
+    async () => {},
+  );
 
   const scrollToBottom = useCallback(() => {
     if (scrollRef.current) {
@@ -220,11 +223,15 @@ export function ChatMessages({
       );
 
       if (isAutoPlaying.current) {
-        revealNext(index + 1);
+        revealNextRef.current(index + 1);
       }
     },
     [chatMessages, autoPlayDelay, typingDuration, scrollToBottom],
   );
+
+  useEffect(() => {
+    revealNextRef.current = revealNext;
+  }, [revealNext]);
 
   const replay = useCallback(() => {
     setVisibleCount(0);
@@ -234,17 +241,20 @@ export function ChatMessages({
   }, [messages, revealNext]);
 
   useEffect(() => {
-    setChatMessages(messages);
+    const syncTimer = setTimeout(() => {
+      setChatMessages(messages);
+      setVisibleCount(autoPlay ? 0 : messages.length);
+    }, 0);
     if (autoPlay) {
-      setVisibleCount(0);
       isAutoPlaying.current = true;
       const timer = setTimeout(() => revealNext(0), 500);
       return () => {
+        clearTimeout(syncTimer);
         clearTimeout(timer);
         isAutoPlaying.current = false;
       };
     } else {
-      setVisibleCount(messages.length);
+      return () => clearTimeout(syncTimer);
     }
   }, [messages, autoPlay, revealNext]);
 

@@ -19,7 +19,8 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { getUiIcon } from "@/lib/uiIcons";
 import { formStatus, parseQuestions, flattenQuestions } from "@/lib/forms";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import { DIVISIONS } from "@/lib/roles";
 
 export const metadata: Metadata = { title: "Recruitment" };
@@ -68,13 +69,14 @@ export default async function RecruitmentPage() {
   });
 
   const now = new Date();
+  const wallClockNow = currentWallClockAsUtc(now);
   const status = recruitment ? formStatus(recruitment, now) : "hidden";
   const isOpen = status === "open";
 
   // The single admin-editable "when does recruitment open" date: the form's
   // opensAt, as long as it is still in the future.
   const opensAt =
-    recruitment?.opensAt && recruitment.opensAt > now
+    recruitment?.opensAt && recruitment.opensAt > wallClockNow
       ? recruitment.opensAt
       : null;
 
@@ -110,7 +112,7 @@ export default async function RecruitmentPage() {
     const detail = opensAt
       ? "Applications are not open yet. Mark the date below so you are ready."
       : status === "closed" && recruitment?.closesAt
-        ? `Applications closed on ${formatDateTime(recruitment.closesAt)}.`
+        ? `Applications closed on ${formatWallClockDateTime(recruitment.closesAt)} WIB.`
         : "There is no open recruitment right now. When the committee opens one, it will appear here.";
 
     return (
@@ -127,7 +129,7 @@ export default async function RecruitmentPage() {
             {opensAt && (
               <p className="flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm font-semibold text-primary">
                 <CalendarClock className="h-4 w-4" />
-                Opens {formatDateTime(opensAt)}
+                Opens {formatWallClockDateTime(opensAt)} WIB
               </p>
             )}
             {myResponse && (
@@ -180,10 +182,6 @@ export default async function RecruitmentPage() {
           </>
         )}
         <div className="relative px-6 py-12 sm:px-10">
-          <span className="inline-flex items-center gap-2 rounded-full bg-primary/25 px-3 py-1 text-xs font-bold uppercase tracking-widest text-primary-light">
-            <Sparkles className="h-3.5 w-3.5" />
-            Open recruitment
-          </span>
           <h2 className="mt-4 max-w-2xl text-3xl font-bold leading-tight sm:text-4xl">
             {recruitment!.title}
           </h2>
@@ -197,7 +195,7 @@ export default async function RecruitmentPage() {
             {recruitment!.closesAt && (
               <span className="flex items-center gap-2">
                 <CalendarClock className="h-4 w-4 text-primary-light" />
-                Closes {formatDateTime(recruitment!.closesAt)}
+                Closes {formatWallClockDateTime(recruitment!.closesAt)} WIB
               </span>
             )}
             {recruitment!.capacity !== null && (
@@ -298,7 +296,7 @@ export default async function RecruitmentPage() {
           <p className="max-w-md text-sm text-slate-600">
             Fill in the form and we will get back to you after it closes
             {recruitment!.closesAt
-              ? ` on ${formatDateTime(recruitment!.closesAt)}`
+              ? ` on ${formatWallClockDateTime(recruitment!.closesAt)} WIB`
               : ""}
             .
           </p>

@@ -64,7 +64,6 @@ export function readEventDetails(formData: FormData): EventDetails | null {
 async function uniqueEventSlug(db: Db, base: string, ignoreId?: string) {
   let slug = base;
   let n = 1;
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const clash = await db.event.findUnique({
       where: { slug },

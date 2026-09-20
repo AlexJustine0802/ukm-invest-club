@@ -9,7 +9,7 @@ import {
   flattenQuestions,
   AUDIENCES,
 } from "@/lib/forms";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
 import { deleteRegistrationForm } from "./actions";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
@@ -210,7 +210,7 @@ export default async function AdminRegistrationsPage({
                     {f._count.responses} response
                     {f._count.responses === 1 ? "" : "s"}
                     {f.capacity !== null ? ` / ${f.capacity}` : ""}
-                    {f.closesAt ? ` · closes ${formatDateTime(f.closesAt)}` : ""}
+                    {f.closesAt ? ` · closes ${formatWallClockDateTime(f.closesAt)} WIB` : ""}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">

@@ -20,6 +20,8 @@ import { dueLabel, isDueSoon } from "@/lib/assignments";
 import { isNewAlert } from "@/lib/career";
 import { quoteOfTheDay } from "@/lib/quotes";
 import { assignmentKey } from "@/lib/assignments";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
+import { formatWallClockTime } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
@@ -27,15 +29,17 @@ export const dynamic = "force-dynamic";
 /** Monday-to-Sunday strip for the week containing `today`. */
 function weekOf(today: Date) {
   const monday = new Date(today);
-  monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  monday.setUTCDate(today.getUTCDate() - ((today.getUTCDay() + 6) % 7));
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+    d.setUTCDate(monday.getUTCDate() + i);
     return {
-      day: d.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase(),
-      date: String(d.getDate()),
-      active: d.toDateString() === today.toDateString(),
-      iso: d.toDateString(),
+      day: d
+        .toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" })
+        .toUpperCase(),
+      date: String(d.getUTCDate()),
+      active: d.toISOString().slice(0, 10) === today.toISOString().slice(0, 10),
+      iso: d.toISOString().slice(0, 10),
     };
   });
 }
@@ -88,6 +92,7 @@ export default async function AccountPage() {
   if (!user) redirect("/login");
 
   const now = new Date();
+  const wallClockNow = currentWallClockAsUtc(now);
 
   const [
     highlight,
@@ -114,7 +119,7 @@ export default async function AccountPage() {
     }),
     // Upcoming events reuse the existing public Event model.
     prisma.event.findMany({
-      where: { published: true, eventDate: { gte: now } },
+      where: { published: true, eventDate: { gte: wallClockNow } },
       orderBy: { eventDate: "asc" },
       take: 4,
       select: {
@@ -127,13 +132,13 @@ export default async function AccountPage() {
     }),
     // Live counts for any Overview card wired to a metric. "Pending
     // assignments" is this member's own outstanding work.
-    getMetricValues(now, user.id),
+    getMetricValues(wallClockNow, user.id),
     // The dashboard rails below read the real tables, not a second hand-typed
     // copy in Dashboard Content.
     prisma.careerAlert.findMany({
       where: {
         published: true,
-        OR: [{ deadline: null }, { deadline: { gte: now } }],
+        OR: [{ deadline: null }, { deadline: { gte: wallClockNow } }],
       },
       orderBy: { createdAt: "desc" },
       take: 3,
@@ -145,7 +150,7 @@ export default async function AccountPage() {
       where: {
         published: true,
         status: "ACTIVE",
-        dueDate: { gte: now },
+        dueDate: { gte: wallClockNow },
         submissions: { none: { userId: session.userId } },
       },
       orderBy: { dueDate: "asc" },
@@ -181,10 +186,10 @@ export default async function AccountPage() {
 
   const quote = quoteOfTheDay(now);
 
-  const week = weekOf(now);
+  const week = weekOf(wallClockNow);
   const weekDays = new Set(week.map((w) => w.iso));
   const thisWeekEvents = events.filter((e) =>
-    weekDays.has(e.eventDate.toDateString()),
+    weekDays.has(e.eventDate.toISOString().slice(0, 10)),
   );
 
   const railAnnouncements = announcements.slice(0, 3);
@@ -468,11 +473,12 @@ export default async function AccountPage() {
                       <div key={e.id} className="flex items-center gap-3">
                         <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-slate-50">
                           <span className="text-lg font-extrabold leading-none text-navy">
-                            {e.eventDate.getDate()}
+                            {e.eventDate.getUTCDate()}
                           </span>
                           <span className="text-[10px] font-bold uppercase text-slate-400">
                             {e.eventDate.toLocaleDateString("en-US", {
                               month: "short",
+                              timeZone: "UTC",
                             })}
                           </span>
                         </div>
@@ -482,10 +488,7 @@ export default async function AccountPage() {
                           </p>
                           <p className="flex items-center gap-1 text-xs text-slate-400">
                             <Clock className="h-3 w-3 shrink-0" />
-                            {e.eventDate.toLocaleTimeString("en-US", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {formatWallClockTime(e.eventDate)}
                           </p>
                           {e.location && (
                             <p className="flex items-center gap-1 text-xs text-slate-400">
@@ -541,16 +544,14 @@ export default async function AccountPage() {
                         className="flex items-center gap-2 text-xs"
                       >
                         <span className="shrink-0 text-slate-400">
-                          {e.eventDate.toLocaleTimeString("en-US", {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {formatWallClockTime(e.eventDate)}
                         </span>
                         <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
                         <span className="min-w-0 flex-1 truncate font-medium text-navy">
                           {e.title}
                         </span>
-                        {e.eventDate.toDateString() === now.toDateString() && (
+                        {e.eventDate.toISOString().slice(0, 10) ===
+                          wallClockNow.toISOString().slice(0, 10) && (
                           <span className="shrink-0 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-primary">
                             Today
                           </span>
@@ -564,7 +565,7 @@ export default async function AccountPage() {
           </Reveal>
 
           <p className="pt-2 text-center text-xs text-slate-400">
-            © {now.getFullYear()} Parahyangan Finance Club. All rights reserved.
+          © {wallClockNow.getUTCFullYear()} Parahyangan Finance Club. All rights reserved.
           </p>
         </div>
 
@@ -633,7 +634,7 @@ export default async function AccountPage() {
               ) : (
                 deadlines.map((d) => {
                   const Icon = getUiIcon(d.icon);
-                  const soon = isDueSoon(d.dueDate, d.status, now);
+                  const soon = isDueSoon(d.dueDate, d.status, wallClockNow);
                   return (
                     <Link
                       key={d.id}
@@ -657,7 +658,7 @@ export default async function AccountPage() {
                             soon ? "text-rose-600" : "text-slate-400"
                           }`}
                         >
-                          {dueLabel(d.dueDate, now)}
+                          {dueLabel(d.dueDate, wallClockNow)}
                         </p>
                       </div>
                     </Link>

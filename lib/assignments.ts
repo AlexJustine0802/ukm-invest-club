@@ -11,16 +11,16 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
  * later today reads "Due today" rather than flipping on the hour.
  */
 export function daysUntil(due: Date, now: Date = new Date()): number {
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-  ).getTime();
-  const startOfDue = new Date(
-    due.getFullYear(),
-    due.getMonth(),
-    due.getDate(),
-  ).getTime();
+  const startOfToday = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+  );
+  const startOfDue = Date.UTC(
+    due.getUTCFullYear(),
+    due.getUTCMonth(),
+    due.getUTCDate(),
+  );
   return Math.round((startOfDue - startOfToday) / MS_PER_DAY);
 }
 

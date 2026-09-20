@@ -9,7 +9,8 @@ import { prisma } from "@/lib/prisma";
 import AccountTopBar from "@/components/account/AccountTopBar";
 import { eventPalette, timeRange, eventDateLabel } from "@/lib/eventStyles";
 import { formStatus } from "@/lib/forms";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import { registerForEvent } from "../actions";
 
 export const metadata: Metadata = { title: "Event" };
@@ -57,7 +58,7 @@ export default async function MemberEventPage({
     select: { id: true },
   });
 
-  const now = new Date();
+  const now = currentWallClockAsUtc();
   const isPast = event.eventDate < now;
   const left =
     event.capacity === null
@@ -173,7 +174,7 @@ export default async function MemberEventPage({
             <p className="font-bold text-navy">Registration opens soon</p>
             <p className="mt-1 text-sm text-slate-500">
               {event.registrationForm?.opensAt
-                ? `Opens ${formatDateTime(event.registrationForm.opensAt)}.`
+                ? `Opens ${formatWallClockDateTime(event.registrationForm.opensAt)} WIB.`
                 : "Check back shortly."}
             </p>
             <button
@@ -188,7 +189,7 @@ export default async function MemberEventPage({
           <p className="font-semibold text-slate-500">
             Registration has closed
             {event.registrationForm?.closesAt
-              ? ` (${formatDateTime(event.registrationForm.closesAt)})`
+              ? ` (${formatWallClockDateTime(event.registrationForm.closesAt)} WIB)`
               : ""}
             .
           </p>

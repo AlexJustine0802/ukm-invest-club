@@ -7,7 +7,7 @@ import {
   parseAnswers,
   answerText,
 } from "@/lib/forms";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, formatWallClockDateTime } from "@/lib/utils";
 import Can from "@/components/admin/Can";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { deleteRegistrationForm } from "../registrations/actions";
@@ -106,11 +106,11 @@ export default async function AdminRecruitmentPage() {
                 <p className="mt-2 text-xs text-slate-400">
                   {questions.length === 1 ? "" : "s"} ·{" "}
                   {current.opensAt
-                    ? `opens ${formatDateTime(current.opensAt)}`
+                    ? `opens ${formatWallClockDateTime(current.opensAt)} WIB`
                     : "opens immediately"}{" "}
                   ·{" "}
                   {current.closesAt
-                    ? `closes ${formatDateTime(current.closesAt)}`
+                    ? `closes ${formatWallClockDateTime(current.closesAt)} WIB`
                     : "no close date"}
                 </p>
               </div>

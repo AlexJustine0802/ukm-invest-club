@@ -22,6 +22,7 @@ import {
   monthLabel,
 } from "@/lib/eventStyles";
 import { dueLabel, isDueSoon } from "@/lib/assignments";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 
 export const metadata: Metadata = { title: "Calendar" };
 export const dynamic = "force-dynamic";
@@ -80,7 +81,7 @@ export default async function CalendarPage({
 
   const itemsByDay = new Map<number, DayItem[]>();
   const addItem = (date: Date, item: DayItem) => {
-    const day = date.getDate();
+    const day = date.getUTCDate();
     const list = itemsByDay.get(day) ?? [];
     list.push(item);
     itemsByDay.set(day, list);
@@ -103,18 +104,18 @@ export default async function CalendarPage({
       kind: "deadline",
       title: a.title,
       className: "bg-amber-50 text-amber-700",
-      detail: `${a.category} · ${dueLabel(a.dueDate, new Date())}`,
+      detail: `${a.category} · ${dueLabel(a.dueDate, currentWallClockAsUtc())}`,
       location: null,
       registered: false,
       href: "/account/assignments",
     });
   }
 
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const leadingBlanks = start.getDay();
-  const now = new Date();
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  const leadingBlanks = start.getUTCDay();
+  const now = currentWallClockAsUtc();
   const isThisMonth =
-    now.getFullYear() === year && now.getMonth() === month;
+    now.getUTCFullYear() === year && now.getUTCMonth() === month;
 
   // ?d=<day> expands that day below the grid; clicking it again collapses it.
   const parsedDay = Number(d);
@@ -205,7 +206,7 @@ export default async function CalendarPage({
             {Array.from({ length: daysInMonth }).map((_, i) => {
               const day = i + 1;
               const chips = itemsByDay.get(day) ?? [];
-              const isToday = isThisMonth && now.getDate() === day;
+              const isToday = isThisMonth && now.getUTCDate() === day;
               const isSelected = day === selectedDay;
               return (
                 <Link
@@ -270,11 +271,12 @@ export default async function CalendarPage({
             >
               <div className="flex items-center justify-between">
                 <p className="font-bold text-navy">
-                  {new Date(year, month, selectedDay).toLocaleDateString("en-GB", {
+                  {new Date(Date.UTC(year, month, selectedDay)).toLocaleDateString("en-GB", {
                     weekday: "long",
                     day: "numeric",
                     month: "long",
                     year: "numeric",
+                    timeZone: "UTC",
                   })}
                 </p>
                 <Link
@@ -362,10 +364,11 @@ export default async function CalendarPage({
                       <span
                         className={`flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg text-[11px] font-bold leading-none ${palette.badge}`}
                       >
-                        <span className="text-sm">{e.eventDate.getDate()}</span>
+                        <span className="text-sm">{e.eventDate.getUTCDate()}</span>
                         <span className="mt-0.5 font-semibold uppercase">
                           {e.eventDate.toLocaleDateString("en-GB", {
                             month: "short",
+                            timeZone: "UTC",
                           })}
                         </span>
                       </span>
@@ -462,6 +465,7 @@ export default async function CalendarPage({
                         {r.event.eventDate.toLocaleDateString("en-GB", {
                           day: "numeric",
                           month: "long",
+                          timeZone: "UTC",
                         })}{" "}
                         · {timeRange(r.event.eventDate, r.event.endDate)}
                       </p>

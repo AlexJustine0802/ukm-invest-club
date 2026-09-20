@@ -11,6 +11,7 @@ import CompanyLogo from "@/components/account/CompanyLogo";
 import { eventPalette } from "@/lib/eventStyles";
 import { isNewAlert, deadlineLabel, postedLabel } from "@/lib/career";
 import MarkUpdateLink from "@/components/account/MarkUpdateLink";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 
 export const metadata: Metadata = { title: "Career Alert" };
 export const dynamic = "force-dynamic";
@@ -37,6 +38,7 @@ export default async function CareerPage({
   const types = [...new Set(alerts.map((a) => a.workType))].sort();
   const type = typeParam && types.includes(typeParam) ? typeParam : "all";
   const now = new Date();
+  const wallClockNow = currentWallClockAsUtc(now);
 
   const visible = alerts.filter(
     (a) =>
@@ -105,7 +107,7 @@ export default async function CareerPage({
         <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {visible.map((a) => {
             const palette = eventPalette(a.color, a.company);
-            const closed = a.deadline !== null && a.deadline < now;
+            const closed = a.deadline !== null && a.deadline < wallClockNow;
 
             return (
               <MarkUpdateLink
@@ -180,7 +182,7 @@ export default async function CareerPage({
                       }`}
                     >
                       <Clock className="h-3.5 w-3.5" />
-                      {deadlineLabel(a.deadline, now)}
+                      {deadlineLabel(a.deadline, wallClockNow)}
                     </span>
                   )}
                 </div>

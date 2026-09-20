@@ -4,7 +4,7 @@ import Can from "@/components/admin/Can";
 import DeleteButton from "@/components/admin/DeleteButton";
 import { requireView } from "@/lib/adminAccess";
 import { getUiIcon } from "@/lib/uiIcons";
-import { formatDate } from "@/lib/utils";
+import { formatWallClockDate } from "@/lib/utils";
 import { deleteAnnouncement, setAnnounced } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -171,7 +171,7 @@ export default async function AdminAnnouncementsPage() {
               <Row
                 key={f.id}
                 title={f.event!.title}
-                detail={`${formatDate(f.event!.eventDate)}${
+                detail={`${formatWallClockDate(f.event!.eventDate)}${
                   f.event!.location ? ` · ${f.event!.location}` : ""
                 }${f.published ? "" : " · form unpublished"}`}
               >
@@ -196,7 +196,7 @@ export default async function AdminAnnouncementsPage() {
                 title={f.title}
                 detail={
                   f.closesAt
-                    ? `Closes ${formatDate(f.closesAt)}`
+                    ? `Closes ${formatWallClockDate(f.closesAt)} WIB`
                     : "No closing date"
                 }
               >

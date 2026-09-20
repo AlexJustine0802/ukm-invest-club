@@ -32,8 +32,11 @@ export const EVENT_PALETTES: Record<string, EventPalette> = {
 
 export const EVENT_COLOR_KEYS = Object.keys(EVENT_PALETTES);
 
+import { currentWallClockAsUtc } from "@/lib/wallClock";
+
 // Event datetime fields are stored as the wall-clock values entered in the
-// admin form. Every event surface uses this same timezone when reading them.
+// admin form. They use UTC components in the database so every server reads
+// the same WIB clock value.
 export const EVENT_TIME_ZONE = "UTC";
 
 /** Stable fallback so a category without a colour still looks deliberate. */
@@ -74,9 +77,9 @@ export function monthRange(param: string | undefined): {
   start: Date;
   end: Date; // exclusive: the first instant of the next month
 } {
-  const now = new Date();
-  let year = now.getFullYear();
-  let month = now.getMonth();
+  const now = currentWallClockAsUtc();
+  let year = now.getUTCFullYear();
+  let month = now.getUTCMonth();
 
   const match = /^(\d{4})-(\d{2})$/.exec(param ?? "");
   if (match) {
@@ -91,22 +94,23 @@ export function monthRange(param: string | undefined): {
   return {
     year,
     month,
-    start: new Date(year, month, 1),
-    end: new Date(year, month + 1, 1),
+    start: new Date(Date.UTC(year, month, 1)),
+    end: new Date(Date.UTC(year, month + 1, 1)),
   };
 }
 
 /** "?m=" value for a month offset from the given one, e.g. -1 for previous. */
 export function monthParam(year: number, month: number, offset = 0): string {
-  const d = new Date(year, month + offset, 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const d = new Date(Date.UTC(year, month + offset, 1));
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
 /** "July 2025" */
 export function monthLabel(year: number, month: number): string {
-  return new Date(year, month, 1).toLocaleDateString("en-GB", {
+  return new Date(Date.UTC(year, month, 1)).toLocaleDateString("en-GB", {
     month: "long",
     year: "numeric",
+    timeZone: EVENT_TIME_ZONE,
   });
 }
 
@@ -127,5 +131,8 @@ export function eventDateLabel(date: Date): string {
 
 /** Value for an event's datetime-local admin input in the event timezone. */
 export function eventDateTimeLocalValue(date: Date): string {
-  return date.toISOString().slice(0, 16);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(
+    date.getUTCDate(),
+  )}T${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}`;
 }

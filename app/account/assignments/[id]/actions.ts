@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/userAuth";
 import { isOpen, isPastDue } from "@/lib/assignments";
-import { formatDateTime } from "@/lib/utils";
+import { formatWallClockDateTime } from "@/lib/utils";
+import { currentWallClockAsUtc } from "@/lib/wallClock";
 import {
   MAX_SUBMISSION_MB,
   ALLOWED_SUBMISSION_EXTENSIONS,
@@ -34,16 +35,17 @@ export async function submitAssignment(
   }
   // Checked here and not only in the page: hiding the upload box does not stop
   // a form post arriving early.
-  if (!isOpen(assignment.opensAt)) {
+  const now = currentWallClockAsUtc();
+  if (!isOpen(assignment.opensAt, now)) {
     return {
-      error: `This assignment opens on ${formatDateTime(assignment.opensAt!)}.`,
+      error: `This assignment opens on ${formatWallClockDateTime(assignment.opensAt!)}.`,
     };
   }
   // Same reason as the check above: the page hides the upload once the
   // deadline passes, but hiding a form does not stop a post from reaching here.
-  if (isPastDue(assignment.dueDate)) {
+  if (isPastDue(assignment.dueDate, now)) {
     return {
-      error: `The deadline passed on ${formatDateTime(assignment.dueDate)}. This assignment no longer accepts submissions.`,
+      error: `The deadline passed on ${formatWallClockDateTime(assignment.dueDate)}. This assignment no longer accepts submissions.`,
     };
   }
 
@@ -117,7 +119,7 @@ export async function withdrawSubmission(formData: FormData) {
     where: { id: assignmentId },
     select: { dueDate: true },
   });
-  if (!assignment || isPastDue(assignment.dueDate)) return;
+  if (!assignment || isPastDue(assignment.dueDate, currentWallClockAsUtc())) return;
 
   await prisma.assignmentSubmission.deleteMany({
     where: { assignmentId, userId: session.userId, gradedAt: null },

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import DeleteButton from "@/components/admin/DeleteButton";
 import Can from "@/components/admin/Can";
 import { requireView } from "@/lib/adminAccess";
-import { formatDate } from "@/lib/utils";
+import { formatWallClockDate } from "@/lib/utils";
 import { getBanner } from "@/lib/highlights";
 import { deleteHighlight, setHighlighted } from "./actions";
 
@@ -179,7 +179,7 @@ export default async function AdminHighlightsPage() {
               <Row
                 key={f.id}
                 title={f.event!.title}
-                detail={`${formatDate(f.event!.eventDate)}${
+                detail={`${formatWallClockDate(f.event!.eventDate)}${
                   f.event!.location ? ` · ${f.event!.location}` : ""
                 }${f.published ? "" : " · form unpublished"}`}
               >
@@ -206,7 +206,7 @@ export default async function AdminHighlightsPage() {
                 title={f.title}
                 detail={
                   f.closesAt
-                    ? `Closes ${formatDate(f.closesAt)}`
+                    ? `Closes ${formatWallClockDate(f.closesAt)} WIB`
                     : "No closing date"
                 }
               >

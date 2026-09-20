@@ -2,6 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
+import { formatDateKey } from "@/lib/utils";
 
 export default function Footer() {
   return (
@@ -80,7 +81,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col items-center justify-between gap-2 py-6 text-xs text-slate-500 sm:flex-row">
           <p>
-            © {new Date().getFullYear()} {site.fullName}. All rights reserved.
+            © {formatDateKey(new Date()).slice(0, 4)} {site.fullName}. All rights reserved.
           </p>
         </div>
       </div>
